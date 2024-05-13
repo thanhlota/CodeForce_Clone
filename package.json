@@ -1,0 +1,42 @@
+{
+  "name": "codeforce_clone",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "NODE_ENV=development nodemon server.js",
+    "start": "NODE_ENV=production node server.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "format": "prettier --write .",
+    "lint": "eslint -c .eslintrc.js --ignore-path .eslintignore \"./**/*.js\"",
+    "prepare": "husky install"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/thanhlota/CodeForce_Clone.git"
+  },
+  "author": "thanhtht",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/thanhlota/CodeForce_Clone/issues"
+  },
+  "homepage": "https://github.com/thanhlota/CodeForce_Clone#readme",
+  "dependencies": {
+    "express": "^4.19.2"
+  },
+  "devDependencies": {
+    "eslint": "^8.20.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.1.3",
+    "husky": "^9.0.11",
+    "lint-staged": "^15.2.2",
+    "prettier": "^3.2.5"
+  },
+  "lint-staged": {
+    "*.js": [
+      "npm run lint",
+      "npm run format",
+      "git add ."
+    ]
+  }
+}
