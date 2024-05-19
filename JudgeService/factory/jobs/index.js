@@ -1,8 +1,14 @@
 class Job {
+    language = null;
+    mem = null;
+    time = null;
+    code = null;
     constructor(language, mem, time, code) {
-
+        this.language = language;
+        this.mem = mem;
+        this.time = time;
+        this.code = code;
     }
-
 }
 
-modules.export = Job;
+module.exports = Job;

@@ -6,10 +6,7 @@
   "scripts": {
     "dev": "NODE_ENV=development nodemon server.js",
     "start": "NODE_ENV=production node server.js",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "format": "prettier --write .",
-    "lint": "eslint -c .eslintrc.js --ignore-path .eslintignore \"./**/*.js\"",
-    "prepare": "husky install"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
@@ -22,8 +19,8 @@
   },
   "homepage": "https://github.com/thanhlota/CodeForce_Clone#readme",
   "dependencies": {
+    "dockernode": "^0.1.0",
+    "dotenv": "^16.4.5",
     "express": "^4.19.2"
-  },
-  "devDependencies": {
   }
 }

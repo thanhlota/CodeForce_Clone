@@ -1,8 +1,6 @@
-const { Worker } = require('worker_threads')
-
 class Worker {
+   
     contructor() {
-
     }
 
     processJob() {
@@ -10,4 +8,4 @@ class Worker {
     }
 }
 
-modules.export = Worker;
+module.exports = Worker;
