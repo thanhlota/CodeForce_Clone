@@ -1,15 +1,17 @@
 const Worker = require('./index.js');
 const Container = require('../containers/C++.js');
+const WorkerState = require('../../enum/WorkerState');
 class Cplusplus extends Worker {
-    constructor() {
 
+    constructor() {
+        this.state = WorkerState.AVAILABLE;
+        this.container = null;
     }
 
     processJob(job) {
         const { mem, time, code } = job;
-        const container = new Container(mem, time, code);
+        this.container = new Container(mem, time, code);
         container.start();
-        
     }
 }
 

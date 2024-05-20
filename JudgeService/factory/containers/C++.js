@@ -1,21 +1,40 @@
-const Lang = require('index.js');
-const Docker = require('dockernode');
+const Lang = require('./index.js');
+const Docker = require('dockerode');
+
 class CPlusPlus extends Lang {
   constructor(mem, time, code) {
     this.mem = mem;
     this.time = time;
     this.code = code;
+    this.image = ''
   }
 
-  build() {
-      
+  createContainer() {
+    try {
+      const docker = new Docker();
+      const newContainer =  docker.createContainer({
+
+      });
+    }
+    catch (e) {
+
+    }
   }
 
-  start() {
+  startContainer() {
+
 
   }
 
-  stop() {
+  buildCode() {
+
+  }
+
+  runCode() {
+
+  }
+
+  stopContainer() {
 
   }
 

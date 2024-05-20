@@ -19,7 +19,7 @@
   },
   "homepage": "https://github.com/thanhlota/CodeForce_Clone#readme",
   "dependencies": {
-    "dockernode": "^0.1.0",
+    "dockerode": "^4.0.2",
     "dotenv": "^16.4.5",
     "express": "^4.19.2"
   }

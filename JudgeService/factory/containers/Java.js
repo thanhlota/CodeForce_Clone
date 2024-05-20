@@ -1,18 +1,20 @@
-const Lang = require('Lang.js');
+const Lang = require('./index.js');
 class Java extends Lang {
-   constructor(mem, time, lang) {
+   constructor(mem, time, code) {
+      this.mem = mem;
+      this.time = time;
+      this.code = code;
+   }
+
+   buildCode() {
 
    }
 
-   build() {
+   runCode() {
 
    }
 
-   start(code) {
-
-   }
-
-   stop() {
+   stopContainer() {
 
    }
 
