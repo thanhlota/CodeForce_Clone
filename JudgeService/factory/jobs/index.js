@@ -1,10 +1,10 @@
 class Job {
-    language = null;
+    lang = null;
     mem = null;
     time = null;
     code = null;
-    constructor(language, mem, time, code) {
-        this.language = language;
+    constructor(lang, mem, time, code) {
+        this.lang = lang;
         this.mem = mem;
         this.time = time;
         this.code = code;

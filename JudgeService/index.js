@@ -1,5 +1,6 @@
 // const express = require("express");
 const Factory = require("./factory");
+const readFile = require("./utils/readFile")
 // const app = express();
 
 // app.get("/", (req, res) => {
@@ -15,7 +16,8 @@ const mem = 256 * 1024 * 1024;
 const time = 1000;
 const lang = "C++";
 const Job = require('./factory/jobs');
-
-// const newJob = new Job(lang, mem, time, fileContent);
-// const FactoryInstance = Factory.getInstance();
-// FactoryInstance.distributeWorker(newJob);
+const filePath = '../test.c++';
+const fileContent = readFile(filePath);
+const newJob = new Job(lang, mem, time, fileContent);
+const FactoryInstance = Factory.getInstance();
+FactoryInstance.distributeWorker(newJob);

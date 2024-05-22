@@ -33,7 +33,7 @@ class Factory {
           console.log('Language is not supported');
       }
       if (worker) {
-        workers.push(worker);
+        Factory.workers.push(worker);
         worker.processJob(job);
       }
     }
@@ -41,9 +41,9 @@ class Factory {
 
   checkAvailableWorker(job) {
     const { lang } = job;
-    for (let i = 0; i < workers.length; i++) {
-      const currentWorker = workers[i];
-      if (currentWorker.state == WorkerState.AVAILABLE) {
+    for (let i = 0; i < Factory.workers.length; i++) {
+      const currentWorker = Factory.workers[i];
+      if (currentWorker.state === WorkerState.AVAILABLE) {
         if (
           (lang === Language.C && currentWorker.instanceof(CWorker))
           || (Language.CPlusPlus && currentWorker.instanceOf(CPlusPlusWorker))
@@ -58,8 +58,8 @@ class Factory {
   checkCanHireMoreWoker(job) {
     const { lang } = job;
     let countC = 0, countCpp = 0, countJava = 0;
-    for (let i = 0; i < workers.length; i++) {
-      const currentWorker = workers[i];
+    for (let i = 0; i < Factory.workers.length; i++) {
+      const currentWorker = Factory.workers[i];
       if (currentWorker instanceof CWorker) {
         countC++;
       } else if (item instanceof JavaWorker) {

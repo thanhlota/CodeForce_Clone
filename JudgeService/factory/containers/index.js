@@ -3,7 +3,21 @@ class Lang {
     mem = null;
     time = null;
     code = null;
-    constructor() {
+    id = null;
+    vm = null;
+    filePath = null;
+
+    constructor(mem, time, code) {
+        this.mem = mem;
+        this.time = time;
+        this.code = code;
+    }
+
+    createContainer() {
+
+    }
+
+    startContainer() {
 
     }
 

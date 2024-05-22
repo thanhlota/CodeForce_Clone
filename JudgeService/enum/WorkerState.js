@@ -1,6 +1,6 @@
 const STATE = {
     AVAILABLE: 'available',
-    RUNNING: 'running'
+    BUSY: 'busy'
 }
 
 module.exports = STATE;
