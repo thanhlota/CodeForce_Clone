@@ -5,8 +5,9 @@ class Lang {
     code = null;
     id = null;
     vm = null;
-    filePath = null;
-
+    inPath = null;
+    outPath = null;
+    
     constructor(mem, time, code) {
         this.mem = mem;
         this.time = time;

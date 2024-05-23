@@ -13,7 +13,7 @@ function containerConfig(name) {
 
 function startConfig(code, inPath) {
     return {
-        Cmd: ['sh', '-c', `echo "${code.replace(/"/g, '\\"')}" > ${inPath}`],
+        Cmd: ['sh', '-c', `echo "${code}" > ${inPath}`],
         AttachStdin: true,
         AttachStdout: true,
         AttachStderr: true,
@@ -21,7 +21,7 @@ function startConfig(code, inPath) {
 }
 function buildConfig(inPath, outPath) {
     return {
-        Cmd: ['g++', inPath, '-o', outPath],
+        Cmd: ['sh', '-c', `g++ ${inPath} -o ${outPath}`],
         AttachStdin: true,
         AttachStdout: true,
         AttachStderr: true
@@ -32,7 +32,7 @@ function buildConfig(inPath, outPath) {
 function runConfig(outPath) {
     const src = "./" + outPath;
     return {
-        Cmd: [src],
+        Cmd: ['sh', '-c', src],
         AttachStdin: true,
         AttachStdout: true,
         AttachStderr: true,

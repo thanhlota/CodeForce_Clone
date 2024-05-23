@@ -1,6 +1,8 @@
 const Lang = require('./index.js');
 const Docker = require('dockerode');
-const { containerConfig, compileConfig, startConfig, runConfig, buildConfig } = require('../../configs/container/cpp.config.js');
+const Stream = require('stream')
+const { containerConfig, startConfig, runConfig, buildConfig } = require('../../configs/container/cpp.config.js');
+const CodeError = require('../../enum/CodeError.js');
 
 class CPlusPlus extends Lang {
   constructor(mem, time, code) {
@@ -9,6 +11,7 @@ class CPlusPlus extends Lang {
     this.vm = null;
     this.inPath = 'main.cpp';
     this.outPath = 'main.exe'
+
   }
 
   setContainerId(id) {
@@ -48,16 +51,17 @@ class CPlusPlus extends Lang {
   async createFile() {
     try {
       const createFileExec = await this.vm.exec(startConfig(this.code, this.inPath));
-      const createFileStream = await createFileExec.start({
+      await createFileExec.start({
         stdin: true
+      }, (err, stream) => {
+        if (err) {
+          console.log('Error when create file!');
+          throw (err);
+        }
+        stream.on('end', () => {
+          console.log('Create file finished!');
+        });
       });
-      createFileStream.pipe(process.stdout);
-      await new Promise((resolve, reject) => {
-        createFileStream.on('end', resolve());
-        createFileStream.on('error', reject(error));
-      })
-        .then(() => console.log("Create file finished!"))
-        .catch((error) => console.log("Error when create file:", error));
     }
     catch (e) {
       console.log('Error when create new file');
@@ -66,46 +70,85 @@ class CPlusPlus extends Lang {
   }
 
   async buildCode() {
-    try {
-      const buildExec = await this.vm.exec(buildConfig(this.inPath, this.outPath));
-      const buildStream = await buildExec.start({
-        hijack: true, stdin: true
-      });
-      this.vm.modem.demuxStream(buildStream, process.stdout, process.stderr);
-      await new Promise((resolve, reject) => {
-        buildStream.on('end', resolve());
-        buildStream.on('error', reject(error));
-      })
-        .then(() => console.log("Build finished!"))
-        .catch((error) => {
-          throw error;
-        })
-    }
-    catch (e) {
-      console.log('Error when build cpp code');
-      throw e;
-    }
+    return new Promise(async (resolve, reject) => {
+      try {
+        const buildExec = await this.vm.exec(buildConfig(this.inPath, this.outPath));
+        await buildExec.start({
+          stdin: true
+        }, (err, stream) => {
+          if (err) {
+            console.log('Error when build code!');
+            throw (err);
+          }
+
+          const _outStream = new Stream.PassThrough();
+          const _errStream = new Stream.PassThrough();
+          let error = "";
+          this.vm.modem.demuxStream(stream, _outStream, _errStream);
+          _errStream.on('data', (chunk) => {
+            error += chunk.toString();
+          });
+          stream.on('end', () => {
+            if (error) {
+              reject({ name: CodeError.COMPILE_ERROR, message: error });
+            }
+            else {
+              console.log('Compile successfully!');
+              resolve(true);
+            }
+          });
+        });
+      }
+      catch (e) {
+        console.log('Error when build cpp code');
+        throw e;
+      }
+    })
+
   }
 
   async runCode() {
-    try {
-      await this.vm.restart();
-      const runExec = await this.vm.exec(runConfig(this.outPath));
-      const runStream = await runExec.start({
-        hijack: true, stdin: true
-      });
-      this.vm.modem.demuxStream(runStream, process.stdout, process.stderr);
-      await new Promise((resolve, reject) => {
-        runStream.on('end', resolve());
-        runStream.on('error', reject(error));
-      })
-        .then(() => console.log("Run finished!"))
-        .catch((error) => console.log("Run failed!", error));
-    }
-    catch (e) {
-      console.log('Error when run cpp code');
-      throw e;
-    }
+    return new Promise(async (resolve, reject) => {
+      try {
+        // await this.vm.restart();
+        const runExec = await this.vm.exec(runConfig(this.outPath));
+        await runExec.start({
+          stdin: true
+        }, (err, stream) => {
+          if (err) {
+            console.log('Error when run code!');
+            throw (err);
+          }
+
+          const _outStream = new Stream.PassThrough();
+          const _errStream = new Stream.PassThrough();
+          let error = "";
+          let output = "";
+          this.vm.modem.demuxStream(stream, _outStream, _errStream);
+          _errStream.on('data', (chunk) => {
+            error += chunk.toString();
+          });
+          _outStream.on('data', (chunk) => {
+            output += chunk.toString();
+          })
+          stream.on('end', () => {
+            if (error) {
+              reject({ name: CodeError.RUN_TIME_ERROR, message: error });
+            }
+            else {
+              console.log("Result:", output);
+              resolve(true);
+            }
+          });
+        });
+
+      }
+      catch (e) {
+        console.log('Error when run cpp code');
+        throw e;
+      }
+    })
+
   }
 
   async stopContainer() {
@@ -122,6 +165,7 @@ class CPlusPlus extends Lang {
   async updateSourceCode(code) {
     this.code = code;
   }
+
 }
 
 module.exports = CPlusPlus;
