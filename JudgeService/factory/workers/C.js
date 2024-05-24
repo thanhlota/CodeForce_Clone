@@ -10,7 +10,7 @@ class C extends Worker {
     processJob(job) {
         const { mem, time, code } = job;
         this.container = new Container(mem, time, code);
-        container.start();
+        this.container.start();
     }
 
 }

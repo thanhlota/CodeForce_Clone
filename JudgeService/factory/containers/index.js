@@ -7,7 +7,11 @@ class Lang {
     vm = null;
     inPath = null;
     outPath = null;
-    
+    cpuUsage = null;
+    memUsage = null;
+    exitCode = null;
+    output = "";
+
     constructor(mem, time, code) {
         this.mem = mem;
         this.time = time;

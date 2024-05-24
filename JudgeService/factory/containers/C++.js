@@ -1,3 +1,5 @@
+/* eslint no-async-promise-executor: 0 */
+
 const Lang = require('./index.js');
 const Docker = require('dockerode');
 const Stream = require('stream')
@@ -10,8 +12,11 @@ class CPlusPlus extends Lang {
     this.id = Date.now().toString(36);
     this.vm = null;
     this.inPath = 'main.cpp';
-    this.outPath = 'main.exe'
-
+    this.outPath = 'main.exe';
+    this.exitCode = null;
+    this.cpuUsage = 0;//nanosecond
+    this.memUsage = 0;
+    this.outPut = 0;
   }
 
   setContainerId(id) {
@@ -22,6 +27,21 @@ class CPlusPlus extends Lang {
     this.vm = vm;
   }
 
+  setCpuUsage(usage) {
+    this.cpuUsage = usage;
+  }
+
+  setMemUsage(usage) {
+    this.memUsage = usage;
+  }
+
+  setExitCode(exitCode) {
+    this.exitCode = exitCode;
+  }
+
+  setOutput(output) {
+    this.outPut = output;
+  }
 
   async createContainer() {
     const docker = new Docker();
@@ -32,7 +52,7 @@ class CPlusPlus extends Lang {
       console.log(`Container id:${containerName} is created successfully!`);
     }
     catch (e) {
-      console.log('Error when create new cpp container');
+      this.setExitCode(CodeError.SERVER_ERROR);
       throw e;
     }
   }
@@ -43,30 +63,34 @@ class CPlusPlus extends Lang {
       console.log('Create cpp container successfully!')
     }
     catch (e) {
-      console.log('Error when start cpp container');
+      this.setExitCode(CodeError.SERVER_ERROR);
       throw e;
     }
   }
 
   async createFile() {
-    try {
-      const createFileExec = await this.vm.exec(startConfig(this.code, this.inPath));
-      await createFileExec.start({
-        stdin: true
-      }, (err, stream) => {
-        if (err) {
-          console.log('Error when create file!');
-          throw (err);
-        }
-        stream.on('end', () => {
-          console.log('Create file finished!');
+    return new Promise(async (resolve, reject) => {
+      try {
+        const createFileExec = await this.vm.exec(startConfig(this.code, this.inPath));
+        await createFileExec.start({
+          stdin: true
+        }, (err, stream) => {
+          if (err) {
+            this.setExitCode(CodeError.SERVER_ERROR);
+            reject(err);
+          }
+          stream.on('end', () => {
+            console.log('Create file finished!');
+            resolve(true);
+          });
         });
-      });
-    }
-    catch (e) {
-      console.log('Error when create new file');
-      throw (e);
-    }
+      }
+      catch (e) {
+        this.setExitCode(CodeError.SERVER_ERROR);
+        reject(e);
+      }
+    });
+
   }
 
   async buildCode() {
@@ -77,7 +101,7 @@ class CPlusPlus extends Lang {
           stdin: true
         }, (err, stream) => {
           if (err) {
-            console.log('Error when build code!');
+            this.setExitCode(CodeError.SERVER_ERROR);
             throw (err);
           }
 
@@ -88,11 +112,15 @@ class CPlusPlus extends Lang {
           _errStream.on('data', (chunk) => {
             error += chunk.toString();
           });
-          stream.on('end', () => {
+          stream.on('end', async () => {
             if (error) {
-              reject({ name: CodeError.COMPILE_ERROR, message: error });
+              this.setExitCode(CodeError.COMPILE_ERROR);
+              reject({ message: error });
             }
             else {
+              const stats = await this.vm.stats({ stream: false });
+              this.setCpuUsage(stats.cpu_stats.cpu_usage.total_usage);
+              this.setMemUsage(stats.memory_stats.usage);
               console.log('Compile successfully!');
               resolve(true);
             }
@@ -100,8 +128,8 @@ class CPlusPlus extends Lang {
         });
       }
       catch (e) {
-        console.log('Error when build cpp code');
-        throw e;
+        this.setExitCode(CodeError.SERVER_ERROR);
+        reject(e);
       }
     })
 
@@ -110,14 +138,13 @@ class CPlusPlus extends Lang {
   async runCode() {
     return new Promise(async (resolve, reject) => {
       try {
-        // await this.vm.restart();
         const runExec = await this.vm.exec(runConfig(this.outPath));
         await runExec.start({
           stdin: true
         }, (err, stream) => {
           if (err) {
-            console.log('Error when run code!');
-            throw (err);
+            this.setExitCode(CodeError.SERVER_ERROR);
+            reject(err);
           }
 
           const _outStream = new Stream.PassThrough();
@@ -131,12 +158,16 @@ class CPlusPlus extends Lang {
           _outStream.on('data', (chunk) => {
             output += chunk.toString();
           })
-          stream.on('end', () => {
+          stream.on('end', async () => {
             if (error) {
+              this.setExitCode();
               reject({ name: CodeError.RUN_TIME_ERROR, message: error });
             }
             else {
-              console.log("Result:", output);
+              const stats = await this.vm.stats({ stream: false });
+              this.setCpuUsage(stats.cpu_stats.cpu_usage.total_usage - this.cpuUsage);
+              this.setMemUsage(stats.memory_stats.usage - this.memUsage);
+              this.setOutput(output);
               resolve(true);
             }
           });
@@ -144,8 +175,8 @@ class CPlusPlus extends Lang {
 
       }
       catch (e) {
-        console.log('Error when run cpp code');
-        throw e;
+        this.setExitCode(CodeError.SERVER_ERROR);
+        reject(e);
       }
     })
 
@@ -157,7 +188,7 @@ class CPlusPlus extends Lang {
       console.log(`Container ${this.vm.id} stopped successfully!`);
     }
     catch (e) {
-      console.log('Error when stop cpp code');
+      this.setExitCode(CodeError.SERVER_ERROR);
       throw e;
     }
   }

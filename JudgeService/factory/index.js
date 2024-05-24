@@ -15,6 +15,7 @@ class Factory {
   distributeWorker(job) {
     let worker = this.checkAvailableWorker(job);
     if (worker) {
+      worker.setWorkerBusy();
       worker.processJob(job);
       return;
     }
@@ -34,6 +35,7 @@ class Factory {
       }
       if (worker) {
         Factory.workers.push(worker);
+        worker.setWorkerBusy();
         worker.processJob(job);
       }
     }
@@ -62,9 +64,9 @@ class Factory {
       const currentWorker = Factory.workers[i];
       if (currentWorker instanceof CWorker) {
         countC++;
-      } else if (item instanceof JavaWorker) {
+      } else if (currentWorker instanceof JavaWorker) {
         countJava++;
-      } else if (item instanceof CPlusPlusWorker) {
+      } else if (currentWorker instanceof CPlusPlusWorker) {
         countCpp++;
       }
     }
@@ -81,8 +83,8 @@ class Factory {
   }
 
   async removeAllWorkers() {
-    for (let i = 0; i < workers.length; i++) {
-      const currentWorker = workers[i];
+    for (let i = 0; i < Factory.workers.length; i++) {
+      const currentWorker = Factory.workers[i];
       if (currentWorker.container) {
         try {
           await currentWorker.container.stop();
@@ -91,7 +93,7 @@ class Factory {
           console.log(`${currentWorker.container} removed successfully!`);
         }
         catch (e) {
-          console.log(`Error when remove worker id: ${id}`, e);
+          console.log(`Error when remove worker id: ${currentWorker.container.id}`, e);
         }
       }
     }
