@@ -12,6 +12,8 @@ class Worker {
     processJob() {
 
     }
+
+   
 }
 
 module.exports = Worker;

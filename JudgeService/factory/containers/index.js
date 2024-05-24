@@ -38,6 +38,14 @@ class Lang {
     stopContainer() {
 
     }
+    
+    removeContainer(){
+
+    }
+    
+    updateConfig(mem, time, code) {
+
+    }
 }
 
 module.exports = Lang;

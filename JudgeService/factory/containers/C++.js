@@ -60,7 +60,7 @@ class CPlusPlus extends Lang {
   async startContainer() {
     try {
       await this.vm.start();
-      console.log('Create cpp container successfully!')
+      console.log('Start cpp container successfully!');
     }
     catch (e) {
       this.setExitCode(CodeError.SERVER_ERROR);
@@ -79,13 +79,27 @@ class CPlusPlus extends Lang {
             this.setExitCode(CodeError.SERVER_ERROR);
             reject(err);
           }
+          const _outStream = new Stream.PassThrough();
+          const _errStream = new Stream.PassThrough();
+          let error = "";
+          this.vm.modem.demuxStream(stream, _outStream, _errStream);
+          _errStream.on('data', (chunk) => {
+            error += chunk.toString();
+          });
           stream.on('end', () => {
-            console.log('Create file finished!');
-            resolve(true);
+            if (error) {
+              this.setExitCode(CodeError.SERVER_ERROR);
+              reject({ message: error });
+            }
+            else {
+              console.log('Create file finished!');
+              resolve();
+            }
           });
         });
       }
       catch (e) {
+        console.log('Error when create new file', e);
         this.setExitCode(CodeError.SERVER_ERROR);
         reject(e);
       }
@@ -104,7 +118,6 @@ class CPlusPlus extends Lang {
             this.setExitCode(CodeError.SERVER_ERROR);
             throw (err);
           }
-
           const _outStream = new Stream.PassThrough();
           const _errStream = new Stream.PassThrough();
           let error = "";
@@ -139,9 +152,9 @@ class CPlusPlus extends Lang {
     return new Promise(async (resolve, reject) => {
       try {
         const runExec = await this.vm.exec(runConfig(this.outPath));
-        await runExec.start({
+        runExec.start({
           stdin: true
-        }, (err, stream) => {
+        }, async (err, stream) => {
           if (err) {
             this.setExitCode(CodeError.SERVER_ERROR);
             reject(err);
@@ -166,7 +179,7 @@ class CPlusPlus extends Lang {
             else {
               const stats = await this.vm.stats({ stream: false });
               this.setCpuUsage(stats.cpu_stats.cpu_usage.total_usage - this.cpuUsage);
-              this.setMemUsage(stats.memory_stats.usage - this.memUsage);
+              this.setMemUsage(stats.memory_stats.max_usage - this.memUsage);
               this.setOutput(output);
               resolve(true);
             }
@@ -193,8 +206,22 @@ class CPlusPlus extends Lang {
     }
   }
 
-  async updateSourceCode(code) {
+  async removeContainer() {
+    try {
+      await this.vm.remove({ force: true });
+      this.setVm(null);
+      console.log(`Container ${this.vm.id} removed successfully!`);
+    }
+    catch (e) {
+      this.setExitCode(CodeError.SERVER_ERROR);
+      throw e;
+    }
+  }
+
+  async updateConfig(mem, time, code) {
     this.code = code;
+    this.mem = mem;
+    this.time = time;
   }
 
 }

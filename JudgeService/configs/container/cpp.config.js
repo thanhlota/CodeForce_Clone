@@ -7,7 +7,7 @@ function containerConfig(name) {
         Tty: true,
         OpenStdin: true,
         AttachStdin: true,
-        WorkingDir: "/usr/src/myapp"
+        WorkingDir: "/usr/src/myapp",
     }
 }
 
