@@ -8,6 +8,10 @@ function containerConfig(name) {
         OpenStdin: true,
         AttachStdin: true,
         WorkingDir: "/usr/src/myapp",
+        HostConfig: {
+            Memory: 500 * 1024 * 1024,
+            NanoCpus: 2000000000
+        }
     }
 }
 

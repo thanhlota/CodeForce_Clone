@@ -7,8 +7,8 @@ const { containerConfig, startConfig, runConfig, buildConfig } = require('../../
 const CodeError = require('../../enum/CodeError.js');
 
 class CPlusPlus extends Lang {
-  constructor(mem, time, code) {
-    super(mem, time, code);
+  constructor(mem, time, code, input) {
+    super(mem, time, code, input);
     this.id = Date.now().toString(36);
     this.vm = null;
     this.inPath = 'main.cpp';
@@ -16,7 +16,9 @@ class CPlusPlus extends Lang {
     this.exitCode = null;
     this.cpuUsage = 0;//nanosecond
     this.memUsage = 0;
-    this.outPut = 0;
+    this.output = {};
+    this.infoStream = null;
+    this.runStream = null;
   }
 
   setContainerId(id) {
@@ -40,7 +42,22 @@ class CPlusPlus extends Lang {
   }
 
   setOutput(output) {
-    this.outPut = output;
+    this.output = output;
+  }
+
+  setInfoStream(infoStream) {
+    this.infoStream = infoStream;
+  }
+
+  setRunStream(runStream) {
+    this.runStream = runStream;
+  }
+
+  getOutput() {
+    return this.output;
+  }
+  getExitCode() {
+    return this.exitCode;
   }
 
   async createContainer() {
@@ -150,18 +167,46 @@ class CPlusPlus extends Lang {
 
   async runCode() {
     return new Promise(async (resolve, reject) => {
+      /*
+      STATS EXEC
+      */
+      try {
+        const statsStream = await this.vm.stats({ stream: true });
+        this.setInfoStream(statsStream);
+        statsStream.on('data', (data) => {
+          const stats = JSON.parse(data.toString());
+          const cpuUsage = (stats.cpu_stats.cpu_usage.total_usage - this.cpuUsage);
+          const memUsage = stats.memory_stats.max_usage - this.memUsage;
+          if (cpuUsage > this.time) {
+            this.setExitCode(CodeError.TIME_LIMIT_EXCEED);
+            reject({ message: CodeError.TIME_LIMIT_EXCEED });
+          }
+          if (memUsage > this.mem) {
+            this.setExitCode(CodeError.MEMORY_LIMIT_EXCEED);
+            reject({ message: CodeError.MEMORY_LIMIT_EXCEED });
+          }
+        });
+      } catch (e) {
+        this.setExitCode(CodeError.SERVER_ERROR);
+        reject(e);
+      }
+      /*
+      RUN EXEC
+      */
       try {
         const runExec = await this.vm.exec(runConfig(this.outPath));
         runExec.start({
           stdin: true
         }, async (err, stream) => {
+          this.setRunStream(stream);
           if (err) {
             this.setExitCode(CodeError.SERVER_ERROR);
             reject(err);
           }
-
+          stream.write(this.input);
           const _outStream = new Stream.PassThrough();
           const _errStream = new Stream.PassThrough();
+
           let error = "";
           let output = "";
           this.vm.modem.demuxStream(stream, _outStream, _errStream);
@@ -173,14 +218,27 @@ class CPlusPlus extends Lang {
           })
           stream.on('end', async () => {
             if (error) {
-              this.setExitCode();
-              reject({ name: CodeError.RUN_TIME_ERROR, message: error });
+              this.setExitCode(CodeError.RUN_TIME_ERROR);
+              reject({ message });
             }
             else {
               const stats = await this.vm.stats({ stream: false });
-              this.setCpuUsage(stats.cpu_stats.cpu_usage.total_usage - this.cpuUsage);
-              this.setMemUsage(stats.memory_stats.max_usage - this.memUsage);
-              this.setOutput(output);
+              const cpuUsage = (stats.cpu_stats.cpu_usage.total_usage - this.cpuUsage);
+              const memUsage = stats.memory_stats.max_usage - this.memUsage;
+              if (cpuUsage > this.time) {
+                this.setExitCode(CodeError.TIME_LIMIT_EXCEED);
+                reject({ message: CodeError.TIME_LIMIT_EXCEED });
+              }
+              if (memUsage > this.mem) {
+                this.setExitCode(CodeError.MEMORY_LIMIT_EXCEED);
+                reject({ message: CodeError.MEMORY_LIMIT_EXCEED });
+              }
+              const data = {
+                result: output,
+                cpuUsage,
+                memUsage
+              }
+              this.setOutput(data);
               resolve(true);
             }
           });
@@ -198,7 +256,8 @@ class CPlusPlus extends Lang {
   async stopContainer() {
     try {
       await this.vm.stop();
-      console.log(`Container ${this.vm.id} stopped successfully!`);
+      const containerName = `cpp_container_${this.id}`;
+      console.log(`Container ${containerName} stopped successfully!`);
     }
     catch (e) {
       this.setExitCode(CodeError.SERVER_ERROR);
@@ -210,7 +269,8 @@ class CPlusPlus extends Lang {
     try {
       await this.vm.remove({ force: true });
       this.setVm(null);
-      console.log(`Container ${this.vm.id} removed successfully!`);
+      const containerName = `cpp_container_${this.id}`;
+      console.log(`Container ${containerName} removed successfully!`);
     }
     catch (e) {
       this.setExitCode(CodeError.SERVER_ERROR);
@@ -218,10 +278,24 @@ class CPlusPlus extends Lang {
     }
   }
 
-  async updateConfig(mem, time, code) {
+  async updateConfig(mem, time, code, input) {
     this.code = code;
     this.mem = mem;
     this.time = time;
+    this.input = input;
+  }
+
+  clearData() {
+    this.exitCode = null;
+    this.cpuUsage = 0;
+    this.memUsage = 0;
+    this.output = {};
+    if (this.infoStream) this.infoStream.destroy();
+    this.infoStream = null;
+    if (this.runStream) this.runStream.destroy();
+    this.runStream = null;
+    this.input = null;
+
   }
 
 }

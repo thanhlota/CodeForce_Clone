@@ -3,6 +3,7 @@ class Lang {
     mem = null;
     time = null;
     code = null;
+    input = null;
     id = null;
     vm = null;
     inPath = null;
@@ -10,12 +11,13 @@ class Lang {
     cpuUsage = null;
     memUsage = null;
     exitCode = null;
-    output = "";
+    output = {};
 
-    constructor(mem, time, code) {
+    constructor(mem, time, code, input) {
         this.mem = mem;
         this.time = time;
         this.code = code;
+        this.input = input;
     }
 
     createContainer() {
@@ -38,11 +40,11 @@ class Lang {
     stopContainer() {
 
     }
-    
-    removeContainer(){
+
+    removeContainer() {
 
     }
-    
+
     updateConfig(mem, time, code) {
 
     }
