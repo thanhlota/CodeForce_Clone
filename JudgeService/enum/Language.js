@@ -1,7 +1,7 @@
 const LANGUAGE = {
-    C: 'C',
-    CPlusPlus: 'C++',
-    JAVA: 'JAVA'
-}
+  C: "C",
+  CPlusPlus: "C++",
+  JAVA: "JAVA",
+};
 
-module.exports = LANGUAGE
+module.exports = LANGUAGE;

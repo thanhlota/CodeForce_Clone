@@ -1,16 +1,15 @@
-const CWorker = require('./workers/C.js');
-const CPlusPlusWorker = require('./workers/C++.js');
-const JavaWorker = require('./workers/Java.js');
-const WorkerState = require('../enum/WorkerState.js');
-const Language = require('../enum/Language.js');
-const WorkerConfig = require('../configs/worker.config.js');
+const CWorker = require("./workers/C.js");
+const CPlusPlusWorker = require("./workers/C++.js");
+const JavaWorker = require("./workers/Java.js");
+const WorkerState = require("../enum/WorkerState.js");
+const Language = require("../enum/Language.js");
+const WorkerConfig = require("../configs/worker.config.js");
 
 class Factory {
   static instance = null;
   static workers = [];
 
-  constructor() {
-  }
+  constructor() {}
 
   distributeWorker(job) {
     let worker = this.checkAvailableWorker(job);
@@ -31,7 +30,7 @@ class Factory {
           worker = new JavaWorker(job);
           break;
         default:
-          console.log('Language is not supported');
+          console.log("Language is not supported");
       }
       if (worker) {
         Factory.workers.push(worker);
@@ -47,9 +46,10 @@ class Factory {
       const currentWorker = Factory.workers[i];
       if (currentWorker.state === WorkerState.AVAILABLE) {
         if (
-          (lang === Language.C && currentWorker.instanceof(CWorker))
-          || (Language.CPlusPlus && currentWorker.instanceOf(CPlusPlusWorker))
-          || (lang === Language.JAVA && currentWorker.instanceOf(JavaWorker))) {
+          (lang === Language.C && currentWorker.instanceof(CWorker)) ||
+          (Language.CPlusPlus && currentWorker.instanceOf(CPlusPlusWorker)) ||
+          (lang === Language.JAVA && currentWorker.instanceOf(JavaWorker))
+        ) {
           return currentWorker;
         }
       }
@@ -59,7 +59,9 @@ class Factory {
 
   checkCanHireMoreWoker(job) {
     const { lang } = job;
-    let countC = 0, countCpp = 0, countJava = 0;
+    let countC = 0,
+      countCpp = 0,
+      countJava = 0;
     for (let i = 0; i < Factory.workers.length; i++) {
       const currentWorker = Factory.workers[i];
       if (currentWorker instanceof CWorker) {
@@ -72,11 +74,9 @@ class Factory {
     }
     if (lang === Language.C) {
       return countC < WorkerConfig.MAX_C_WORKER;
-    }
-    else if (lang === Language.CPlusPlus) {
+    } else if (lang === Language.CPlusPlus) {
       return countCpp < WorkerConfig.MAX_CPLUSPLUS_WORKER;
-    }
-    else if (lang === Language.JAVA) {
+    } else if (lang === Language.JAVA) {
       return countJava < WorkerConfig.MAX_JAVA_WORKER;
     }
     return true;
@@ -91,8 +91,7 @@ class Factory {
           console.log(`${currentWorker.container.id} stopped successfully!`);
           await currentWorker.container.remove();
           console.log(`${currentWorker.container} removed successfully!`);
-        }
-        catch (e) {
+        } catch (e) {
           console.log(`Error when remove worker id: ${currentWorker.container.id}`, e);
         }
       }

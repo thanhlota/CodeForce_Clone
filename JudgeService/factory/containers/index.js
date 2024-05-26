@@ -1,53 +1,38 @@
 class Lang {
-    image = null;
-    mem = null;
-    time = null;
-    code = null;
-    input = null;
-    id = null;
-    vm = null;
-    inPath = null;
-    outPath = null;
-    cpuUsage = null;
-    memUsage = null;
-    exitCode = null;
-    output = {};
+  image = null;
+  mem = null;
+  time = null;
+  code = null;
+  input = null;
+  id = null;
+  vm = null;
+  inPath = null;
+  outPath = null;
+  cpuUsage = null;
+  memUsage = null;
+  exitCode = null;
+  output = {};
 
-    constructor(mem, time, code, input) {
-        this.mem = mem;
-        this.time = time;
-        this.code = code;
-        this.input = input;
-    }
+  constructor(mem, time, code, input) {
+    this.mem = mem;
+    this.time = time;
+    this.code = code;
+    this.input = input;
+  }
 
-    createContainer() {
+  createContainer() {}
 
-    }
+  startContainer() {}
 
-    startContainer() {
+  buildCode() {}
 
-    }
+  runCode() {}
 
-    buildCode() {
+  stopContainer() {}
 
-    }
+  removeContainer() {}
 
-
-    runCode() {
-
-    }
-
-    stopContainer() {
-
-    }
-
-    removeContainer() {
-
-    }
-
-    updateConfig(mem, time, code) {
-
-    }
+  updateConfig() {}
 }
 
 module.exports = Lang;
