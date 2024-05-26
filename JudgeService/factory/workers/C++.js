@@ -33,7 +33,7 @@ class Cplusplus extends Worker {
             await this.container.createFile();
             await this.container.buildCode();
             await this.container.runCode();
-            // await this.container.stopContainer();
+            await this.container.stopContainer();
         }
         catch (e) {
             const { exitCode } = this.container;

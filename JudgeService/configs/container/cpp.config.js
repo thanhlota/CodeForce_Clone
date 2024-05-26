@@ -25,7 +25,7 @@ function startConfig(code, inPath) {
 }
 function buildConfig(inPath, outPath) {
     return {
-        Cmd: ['sh', '-c', `g++ ${inPath} -o ${outPath}`],
+        Cmd: ['sh', '-c', `g++  ${inPath} -o ${outPath}`],
         AttachStdin: true,
         AttachStdout: true,
         AttachStderr: true
