@@ -1,5 +1,5 @@
 {
-  "name": "codeforce_clone",
+  "name": "judgeservice",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -17,7 +17,7 @@
   "bugs": {
     "url": "https://github.com/thanhlota/CodeForce_Clone/issues"
   },
-  "homepage": "https://github.com/thanhlota/CodeForce_Clone#readme",
+  "homepage": "https://github.com/thanhlota/CodeForce_Clone/JudgeService",
   "dependencies": {
     "dockerode": "^4.0.2",
     "dotenv": "^16.4.5",

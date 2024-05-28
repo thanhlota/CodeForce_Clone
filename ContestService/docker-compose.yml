@@ -1,0 +1,23 @@
+version: "3"
+services:
+  node-app:
+    build: .
+    ports:
+      - ${HOST_PORT}:${CONTAINER_PORT}
+    volumes:
+      - ./:/app
+    depends_on:
+      - mysqldb
+  mysqldb:
+    image: mysql:8.4.0
+    restart: always
+    volumes:
+      - mysql-db:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_TCP_PORT: ${MYSQL_PORT}
+    ports:
+      - ${DB_HOST_PORT}:${DB_CONTAINER_PORT}
+volumes:
+  mysql-db:
