@@ -1,15 +1,17 @@
 const jwt = require("jsonwebtoken");
-const ErrorHandler = require("../utils/error");
+const { ErrorHandler, DefaultError } = require("../utils/error");
 const ERROR = require("../enum/error");
 const ROLE = require("../enum/role");
 const UserService = require("../services/user.service")
-let DefaultError = new ErrorHandler(ERROR.DEFAULT_SERVER_ERROR.status, ERROR.DEFAULT_SERVER_ERROR.message);
 
 async function verifyAdmin(req, res, next) {
     const authorization = req.headers["authorization"];
 
     if (!authorization) {
-        throw new ErrorHandler(404, "Missing access token");
+        return new ErrorHandler(
+            ERROR.INVALID_ACCESS_TOKEN.status,
+            ERROR.INVALID_ACCESS_TOKEN.message
+        ).httpResponse(res);
     }
     const token = authorization.replace("Bearer ", "");
 
@@ -18,6 +20,12 @@ async function verifyAdmin(req, res, next) {
             clockTolerance: 5,
         });
 
+        if (!decoded) {
+            return new ErrorHandler(
+                ERROR.INVALID_ACCESS_TOKEN.status,
+                ERROR.INVALID_ACCESS_TOKEN.message
+            ).httpResponse(res);
+        }
         const user = await UserService.getById(decoded.id);
 
         if (!user) {

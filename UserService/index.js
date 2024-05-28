@@ -2,7 +2,7 @@ require('dotenv').config();
 const express = require("express");
 const app = express();
 const cors = require("cors");
-const route = require("./routes/index.js");
+const route = require("./routes");
 
 app.use(cors({
     origin: '*',
@@ -24,6 +24,10 @@ app.use(express.urlencoded({ extended: true }));
 
 const port = process.env.HOST_PORT || 6000;
 
+app.get("/", (req, res) => {
+    res.json({ message: "Hello World12!" });
+});
+
 app.listen(port, () => console.log(`listening on port ${port}`));
 
-app.use('api', route);
+app.use('/api', route);

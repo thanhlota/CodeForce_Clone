@@ -1,6 +1,5 @@
 const users = require("../models").users;
 const bcrypt = require("bcrypt");
-const ErrorHandler = require("../utils/error")
 
 async function createOne(email, username, role, password) {
     const user = users.build({
@@ -18,17 +17,19 @@ async function getById(id) {
     return await users.findByPk(id);
 }
 
-async function getByFilter(filter) {
+async function getUsersByFilter(filter) {
+    return await users.findAll({
+        where: filter,
+    });
+}
+
+async function getUserByFilter(filter) {
     return await users.findOne({
         where: filter,
     });
 }
 
-async function remove(id) {
-    const user = await users.findByPk(id);
-    if (!user) {
-        throw new ErrorHandler(404, "User is non-existent");
-    }
+async function remove(user) {
     return await user.destroy();
 }
 
@@ -36,6 +37,7 @@ async function remove(id) {
 module.exports = {
     createOne,
     getById,
-    getByFilter,
+    getUserByFilter,
+    getUsersByFilter,
     remove
 }

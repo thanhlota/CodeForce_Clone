@@ -7,26 +7,27 @@ UserRouter.post(
     "/signup", UserController.signUp
 );
 UserRouter.post(
-    "/logIn",
+    "/login",
     UserController.logIn
 );
 UserRouter.post(
-    "/admin/addUser",
+    "/admin/add-user",
     verifyAdmin,
     UserController.addUser
 );
 UserRouter.delete(
-    "/admin/removeUser",
+    "/admin/remove-user/:id",
     verifyAdmin,
     UserController.removeUser
-);
-UserRouter.get(
-    "/:id",
-    UserController.getUserById
 );
 UserRouter.get(
     "/all",
     UserController.getUsers
 )
+
+UserRouter.get(
+    "/:id",
+    UserController.getUserById
+);
 
 module.exports = UserRouter;

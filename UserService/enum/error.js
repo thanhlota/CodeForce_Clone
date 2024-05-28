@@ -26,6 +26,14 @@ const ERROR = {
     AUTHORIZE_FAILED: {
         status: 403,
         message: "Forbidden"
+    },
+    NON_EXISTED_USER: {
+        status: 404,
+        message: "User is not existed"
+    },
+    INCORRECT_EMAIL_OR_PASSWORD: {
+        status: 401,
+        message: "Incorrect email or password"
     }
 
 }

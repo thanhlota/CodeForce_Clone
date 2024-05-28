@@ -1,7 +1,7 @@
 "use strict";
 const ROLE  =require("../enum/role");
 module.exports = (sequelize, DataTypes) => {
-  const User = sequelize.define('User', {
+  const User = sequelize.define('users', {
     id: {
       type: DataTypes.INTEGER,
       autoIncrement: true,
@@ -38,7 +38,6 @@ module.exports = (sequelize, DataTypes) => {
       }
     ],
     timestamps: false,
-    tableName: 'users',
   });
   return User;
 }

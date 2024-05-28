@@ -1,8 +1,0 @@
-const express = require('express');
-const combineRouter = express.Router();
-
-
-const userRoute = require('./user.route');
-combineRouter.use('/user', userRoute);
-
-module.exports = combineRouter;
