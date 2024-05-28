@@ -229,13 +229,13 @@ module.exports = {
           queryInterface.dropTable("testcases", {
               transaction: t,
           }),
-          queryInterface.createTable("categories", {
+          queryInterface.dropTable("categories", {
               transaction: t,
           }),
-          queryInterface.createTable("problem_category", {
+          queryInterface.dropTable("problem_category", {
               transaction: t,
           }),
-          queryInterface.createTable("user_contest", {
+          queryInterface.dropTable("user_contest", {
               transaction: t,
           }),
       ]);

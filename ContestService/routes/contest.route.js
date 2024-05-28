@@ -3,19 +3,19 @@ const express = require('express');
 const ContestRouter = express.Router();
 
 ContestRouter.post(
-    "/create", ContestController.create
+    "/admin/create", ContestController.create
 );
 
 ContestRouter.delete(
-    "/remove", ContestController.remove
+    "/admin/remove", ContestController.remove
 )
 
 ContestRouter.patch(
-    "/update", ContestController.update
+    "/admin/update", ContestController.update
 )
 
 ContestRouter.get(
-    "/all", ContestRouter.getContestsWithFilter
+    "/all", ContestRouter.getContests
 )
 
 ContestRouter.get(
