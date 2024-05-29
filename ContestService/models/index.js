@@ -47,20 +47,32 @@ db["problems"].hasMany(db["testcases"], { foreignKey: 'problemId', onDelete: 'CA
 db["testcases"].belongsTo(db["problems"], { foreignKey: 'problemId', onDelete: 'CASCADE' });
 
 db["categories"].belongsToMany(db["problems"], {
-    through: 'problem_category',
-    foreignKey: 'categoryId',
-    otherKey: 'problemId'
-  });
+  through: 'problem_category',
+  foreignKey: 'categoryId',
+  otherKey: 'problemId'
+});
 
 db["problems"].belongsToMany(db["categories"], {
-    through: 'problem_category',
-    foreignKey: 'problemId',
-    otherKey: 'categoryId'
-  });
+  through: 'problem_category',
+  foreignKey: 'problemId',
+  otherKey: 'categoryId'
+});
 
 db["contests"].hasMany(db["user_contest"], { foreignKey: 'contestId', onDelete: 'CASCADE' });
 db["user_contest"].belongsTo(db["contests"], { foreignKey: 'contestId', onDelete: 'CASCADE' });
 db["user_contest"].hasMany(db["contests"], { foreignKey: 'contestId', onDelete: 'CASCADE' });
 db["contests"].belongsTo(db["user_contest"], { foreignKey: 'contestId', onDelete: 'CASCADE' });
+
+db["languages"].belongsToMany(db["problems"], {
+  through: 'problem_language',
+  foreignKey: 'languageId',
+  otherKey: 'problemId'
+});
+
+db["problems"].belongsToMany(db["categories"], {
+  through: 'problem_category',
+  foreignKey: 'problemId',
+  otherKey: 'categoryId'
+});
 
 module.exports = db;

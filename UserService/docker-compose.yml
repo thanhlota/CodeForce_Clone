@@ -1,6 +1,6 @@
 version: "3"
 services:
-  node-app:
+  user-service:
     build: .
     ports:
       - ${HOST_PORT}:${CONTAINER_PORT}

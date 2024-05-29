@@ -1,7 +1,7 @@
 "use strict";
 
 module.exports = (sequelize, DataTypes) => {
-    const Category = sequelize.define('categories', {
+    const Language = sequelize.define('languages', {
         id: {
             type: DataTypes.INTEGER,
             autoIncrement: true,
@@ -11,17 +11,14 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.STRING,
             allowNull: false
         },
-        description: {
-            type: DataTypes.TEXT,
-            allowNull: true
+        timeLimited: {
+            type: DataTypes.INTEGER,
+        },
+        memoryLimited: {
+            type: DataTypes.INTEGER,
         }
     }, {
-        indexes: [
-            {
-                fields: ['name']
-            }
-        ],
         timestamps: false,
     });
-    return Category;
+    return Language;
 }

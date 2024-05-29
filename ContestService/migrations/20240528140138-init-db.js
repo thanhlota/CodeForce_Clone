@@ -130,18 +130,10 @@ module.exports = {
           transaction: t
         }),
         queryInterface.createTable("categories", {
-          id: {
-            type: Sequelize.INTEGER,
-            autoIncrement: true,
-            primaryKey: true
-          },
-          name: {
+          type: {
             type: Sequelize.STRING,
-            allowNull: false
-          },
-          description: {
-            type: Sequelize.TEXT,
-            allowNull: true
+            allowNull: false,
+            primaryKey: true
           },
           createdAt: {
             type: Sequelize.DATE,
@@ -165,11 +157,11 @@ module.exports = {
             allowNull: false,
             primaryKey: true
           },
-          category_id: {
-            type: Sequelize.INTEGER,
+          category_type: {
+            type: Sequelize.STRING,
             references: {
               model: 'categories',
-              key: 'id'
+              key: 'type'
             },
             onDelete: 'CASCADE',
             allowNull: false,
@@ -186,14 +178,14 @@ module.exports = {
             defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
           }
         }),
-        queryInterface.createTable("user_contest",{
+        queryInterface.createTable("user_contest", {
           user_id: {
             type: Sequelize.INTEGER,
             onDelete: 'CASCADE',
             allowNull: false,
             primaryKey: true
           },
-          username:{
+          username: {
             type: Sequelize.STRING,
             allowNull: false
           },
@@ -218,27 +210,25 @@ module.exports = {
   },
 
   async down(queryInterface, Sequelize) {
-    return queryInterface.sequelize.transaction((t) => {
-      return Promise.all([
-          queryInterface.dropTable("contests", {
-              transaction: t,
-          }),
-          queryInterface.dropTable("problems", {
-              transaction: t,
-          }),
-          queryInterface.dropTable("testcases", {
-              transaction: t,
-          }),
-          queryInterface.dropTable("categories", {
-              transaction: t,
-          }),
-          queryInterface.dropTable("problem_category", {
-              transaction: t,
-          }),
-          queryInterface.dropTable("user_contest", {
-              transaction: t,
-          }),
-      ]);
-  });
+    return queryInterface.sequelize.transaction(async (t) => {
+      await queryInterface.dropTable("problem_category", {
+        transaction: t,
+      });
+      await queryInterface.dropTable("categories", {
+        transaction: t,
+      });
+      await queryInterface.dropTable("testcases", {
+        transaction: t,
+      });
+      await queryInterface.dropTable("problems", {
+        transaction: t,
+      });
+      await queryInterface.dropTable("user_contest", {
+        transaction: t,
+      });
+      await queryInterface.dropTable("contests", {
+        transaction: t,
+      });
+    });
   }
 };

@@ -53,11 +53,12 @@ module.exports = {
         })
       ])
     })
-
-
   },
 
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable("languages");
+    return queryInterface.sequelize.transaction(async (t) => {
+      await queryInterface.dropTable("problem_language", { transaction: t });
+      await queryInterface.dropTable("languages", { transaction: t })
+    });
   }
 };
