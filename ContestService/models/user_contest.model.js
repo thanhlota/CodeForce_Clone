@@ -25,7 +25,7 @@ module.exports = (sequelize, DataTypes) => {
         createdAt: {
             type: DataTypes.DATE,
             allowNull: false,
-            defaultValue: DataTypes.literal('CURRENT_TIMESTAMP')
+            defaultValue: DataTypes.NOW
         },
     }, {
         indexes: [

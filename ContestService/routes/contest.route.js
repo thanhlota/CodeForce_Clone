@@ -15,11 +15,11 @@ ContestRouter.patch(
 )
 
 ContestRouter.get(
-    "/all", ContestRouter.getContests
+    "/all", ContestController.getContests
 )
 
 ContestRouter.get(
-    "/:id", ContestRouter.getContestById
+    "/:id", ContestController.getContestById
 )
 
-module.exports = UserRouter;
+module.exports = ContestRouter;

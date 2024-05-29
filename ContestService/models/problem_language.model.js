@@ -1,7 +1,7 @@
 "use strict";
 
 module.exports = (sequelize, DataTypes) => {
-    const ProblemLanguages = sequelize.define('problem_language', {
+    const ProblemLanguage = sequelize.define('problem_language', {
         problem_id: {
             type: DataTypes.INTEGER,
             references: {
@@ -25,10 +25,10 @@ module.exports = (sequelize, DataTypes) => {
         createdAt: {
             type: DataTypes.DATE,
             allowNull: false,
-            defaultValue: DataTypes.literal('CURRENT_TIMESTAMP')
+            defaultValue: DataTypes.NOW
         },
     }, {
         timestamps: false,
     });
-    return ProblemCategory;
+    return ProblemLanguage;
 }
