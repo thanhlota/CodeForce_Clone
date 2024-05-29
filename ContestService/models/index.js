@@ -60,8 +60,6 @@ db["problems"].belongsToMany(db["categories"], {
 
 db["contests"].hasMany(db["user_contest"], { foreignKey: 'contestId', onDelete: 'CASCADE' });
 db["user_contest"].belongsTo(db["contests"], { foreignKey: 'contestId', onDelete: 'CASCADE' });
-db["user_contest"].hasMany(db["contests"], { foreignKey: 'contestId', onDelete: 'CASCADE' });
-db["contests"].belongsTo(db["user_contest"], { foreignKey: 'contestId', onDelete: 'CASCADE' });
 
 db["languages"].belongsToMany(db["problems"], {
   through: 'problem_language',

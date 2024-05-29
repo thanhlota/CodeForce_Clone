@@ -7,11 +7,11 @@ ContestRouter.post(
 );
 
 ContestRouter.delete(
-    "/admin/remove", ContestController.remove
+    "/admin/remove/:id", ContestController.remove
 )
 
-ContestRouter.patch(
-    "/admin/update", ContestController.update
+ContestRouter.put(
+    "/admin/update/:id", ContestController.update
 )
 
 ContestRouter.get(

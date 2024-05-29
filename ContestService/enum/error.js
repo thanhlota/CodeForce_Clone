@@ -7,9 +7,13 @@ const ERROR = {
         status: 400,
         message: "Invalid date"
     },
+    MISSING_UPDATE_FIELD: {
+        status: 400,
+        message: "Missing update field"
+    },
     MISSING_CONTEST_INFO: {
         status: 400,
-        message: "Missing user info"
+        message: "Missing contest info"
     },
     EMAIL_EXISTED: {
         status: 409,
@@ -23,9 +27,9 @@ const ERROR = {
         status: 403,
         message: "Forbidden"
     },
-    NON_EXISTED_USER: {
+    NON_EXISTED_CONTEST: {
         status: 404,
-        message: "User is not existed"
+        message: "Contest is not existed"
     },
     INCORRECT: {
         status: 401,

@@ -6,7 +6,7 @@ const contestRoute = require('./contest.route');
 // const problemRoute = require('./problem.route');
 // const testcaseRoute = require('./testcase.route');
 
-CombineRouter.use('/constest', contestRoute);
+CombineRouter.use('/contest', contestRoute);
 // CombineRouter.use('/problem', problemRoute);
 // CombineRouter.use('/testcase', testcaseRoute);x
 
