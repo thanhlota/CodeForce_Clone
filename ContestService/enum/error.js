@@ -35,6 +35,10 @@ const ERROR = {
         status: 404,
         message: "Contest is not existed"
     },
+    NON_EXISTED_CATEGORIES: {
+        status: 404,
+        message: "Category is not existed"
+    },
     INCORRECT: {
         status: 401,
         message: "Incorrect email or password"

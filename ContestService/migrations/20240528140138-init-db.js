@@ -104,6 +104,11 @@ module.exports = {
             allowNull: false,
             onDelete: 'CASCADE'
           },
+          isSample: {
+            type: Sequelize.BOOLEAN,
+            allowNull: false,
+            defaultValue: true
+          },
           input: {
             type: Sequelize.TEXT,
             allowNull: false
@@ -142,7 +147,7 @@ module.exports = {
             defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
           }
         }),
-        queryInterface.createTable("problem_category", {
+        queryInterface.createTable("problem_categories", {
           problem_id: {
             type: Sequelize.INTEGER,
             references: {
@@ -207,7 +212,7 @@ module.exports = {
 
   async down(queryInterface, Sequelize) {
     return queryInterface.sequelize.transaction(async (t) => {
-      await queryInterface.dropTable("problem_category", {
+      await queryInterface.dropTable("problem_categories", {
         transaction: t,
       });
       await queryInterface.dropTable("categories", {

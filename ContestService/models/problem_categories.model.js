@@ -1,7 +1,7 @@
 "use strict";
 
 module.exports = (sequelize, DataTypes) => {
-    const ProblemLanguage = sequelize.define('problem_language', {
+    const ProblemCategories = sequelize.define('problem_categories', {
         problem_id: {
             type: DataTypes.INTEGER,
             references: {
@@ -12,11 +12,11 @@ module.exports = (sequelize, DataTypes) => {
             allowNull: false,
             primaryKey: true
         },
-        language_id: {
-            type: DataTypes.INTEGER,
+        category_type: {
+            type: DataTypes.STRING,
             references: {
-                model: 'languages',
-                key: 'id'
+                model: 'categories',
+                key: 'type'
             },
             onDelete: 'CASCADE',
             allowNull: false,
@@ -30,5 +30,5 @@ module.exports = (sequelize, DataTypes) => {
     }, {
         timestamps: false,
     });
-    return ProblemLanguage;
+    return ProblemCategories;
 }

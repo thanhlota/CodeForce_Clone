@@ -16,6 +16,11 @@ module.exports = (sequelize, DataTypes) => {
             allowNull: false,
             onDelete: 'CASCADE'
         },
+        isSample: {
+            type: DataTypes.BOOLEAN,
+            allowNull: false,
+            defaultValue: true
+        },
         input: {
             type: DataTypes.TEXT,
             allowNull: false

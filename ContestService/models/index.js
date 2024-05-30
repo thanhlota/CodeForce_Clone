@@ -40,37 +40,27 @@ Object.keys(db).forEach(modelName => {
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
 
-db["contests"].hasMany(db["problems"], { foreignKey: 'contestId', onDelete: 'CASCADE' });
-db["problems"].belongsTo(db["contests"], { foreignKey: 'contestId', onDelete: 'CASCADE' });
+db["contests"].hasMany(db["problems"], { foreignKey: 'contest_id', onDelete: 'CASCADE' });
+db["problems"].belongsTo(db["contests"], { foreignKey: 'contest_Id', onDelete: 'CASCADE' });
 
-db["problems"].hasMany(db["testcases"], { foreignKey: 'problemId', onDelete: 'CASCADE' });
-db["testcases"].belongsTo(db["problems"], { foreignKey: 'problemId', onDelete: 'CASCADE' });
+db["problems"].hasMany(db["testcases"], { foreignKey: 'problem_id', onDelete: 'CASCADE' });
+db["testcases"].belongsTo(db["problems"], { foreignKey: 'problem_id', onDelete: 'CASCADE' });
+
+db["problems"].belongsToMany(db["categories"], {
+  through: 'problem_categories',
+  foreignKey: 'problem_id',
+  otherKey: 'category_type'
+});
 
 db["categories"].belongsToMany(db["problems"], {
-  through: 'problem_category',
-  foreignKey: 'categoryId',
-  otherKey: 'problemId'
+  through: 'problem_categories',
+  foreignKey: 'category_type',
+  otherKey: 'problem_id'
 });
 
-db["problems"].belongsToMany(db["categories"], {
-  through: 'problem_category',
-  foreignKey: 'problemId',
-  otherKey: 'categoryId'
-});
+db["contests"].hasMany(db["user_contest"], { foreignKey: 'contest_id', onDelete: 'CASCADE' });
+db["user_contest"].belongsTo(db["contests"], { foreignKey: 'contest_id', onDelete: 'CASCADE' });
 
-db["contests"].hasMany(db["user_contest"], { foreignKey: 'contestId', onDelete: 'CASCADE' });
-db["user_contest"].belongsTo(db["contests"], { foreignKey: 'contestId', onDelete: 'CASCADE' });
 
-db["languages"].belongsToMany(db["problems"], {
-  through: 'problem_language',
-  foreignKey: 'languageId',
-  otherKey: 'problemId'
-});
-
-db["problems"].belongsToMany(db["categories"], {
-  through: 'problem_category',
-  foreignKey: 'problemId',
-  otherKey: 'categoryId'
-});
 
 module.exports = db;

@@ -1,10 +1,9 @@
 const problems = require("../models").problems;
 
-async function create(title, description, guide_input, guide_ouput, time_limit, memory_limit) {
-    const problem = problems.build({
-        title, description, guide_input, guide_ouput, time_limit, memory_limit
-    })
-    return await problem.save();
+async function create(contest_id, title, description, guide_input, guide_output, time_limit, memory_limit, option = {}) {
+    return await problems.create({
+        contest_id, title, description, guide_input, guide_output, time_limit, memory_limit
+    }, option);
 }
 
 async function getById(id) {
