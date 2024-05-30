@@ -15,6 +15,10 @@ const ERROR = {
         status: 400,
         message: "Missing contest info"
     },
+    MISSING_PROBLEM_INFO: {
+        status: 400,
+        message: "Missing problem info"
+    },
     EMAIL_EXISTED: {
         status: 409,
         message: "Email already existed"

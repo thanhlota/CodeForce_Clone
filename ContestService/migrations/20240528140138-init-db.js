@@ -68,18 +68,6 @@ module.exports = {
             type: Sequelize.TEXT,
             allowNull: false
           },
-          difficulty: {
-            type: Sequelize.ENUM('easy', 'medium', 'hard'),
-            allowNull: false
-          },
-          time_limit: {
-            type: Sequelize.INTEGER,
-            allowNull: false
-          },
-          memory_limit: {
-            type: Sequelize.INTEGER,
-            allowNull: false
-          },
           createdAt: {
             type: Sequelize.DATE,
             allowNull: false,
@@ -89,7 +77,15 @@ module.exports = {
             type: Sequelize.DATE,
             allowNull: false,
             defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
-          }
+          },
+          time_limit: {
+            type: Sequelize.INTEGER,
+            allowNull: false
+          },
+          memory_limit: {
+            type: Sequelize.INTEGER,
+            allowNull: false
+          },
         }, {
           transaction: t
         }),

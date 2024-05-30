@@ -32,10 +32,6 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.TEXT,
             allowNull: false
         },
-        difficulty: {
-            type: DataTypes.ENUM('easy', 'medium', 'hard'),
-            allowNull: false
-        },
         time_limit: {
             type: DataTypes.INTEGER,
             allowNull: false
@@ -51,7 +47,7 @@ module.exports = (sequelize, DataTypes) => {
         },
         updatedAt: {
             type: DataTypes.DATE,
-            allowNull: false,
+            allowNull: false,   
             defaultValue: DataTypes.NOW
         }
     }, {

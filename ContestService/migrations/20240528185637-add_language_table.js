@@ -14,12 +14,6 @@ module.exports = {
           name: {
             type: Sequelize.STRING,
             allowNull: false
-          },
-          timeLimited: {
-            type: Sequelize.INTEGER,
-          },
-          memoryLimited: {
-            type: Sequelize.INTEGER,
           }
         }, {
           transaction: t

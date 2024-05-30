@@ -25,8 +25,8 @@ async function getContest(filter = {}) {
     });
 }
 
-async function remove(user) {
-    return await user.destroy();
+async function remove(contest) {
+    return await contest.destroy();
 }
 
 async function update(contest, updateFields = {}) {

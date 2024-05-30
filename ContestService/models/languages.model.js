@@ -10,12 +10,6 @@ module.exports = (sequelize, DataTypes) => {
         name: {
             type: DataTypes.STRING,
             allowNull: false
-        },
-        timeLimited: {
-            type: DataTypes.INTEGER,
-        },
-        memoryLimited: {
-            type: DataTypes.INTEGER,
         }
     }, {
         timestamps: false,
