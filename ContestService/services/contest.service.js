@@ -33,7 +33,7 @@ async function update(contest, updateFields = {}) {
     for (let [key, value] of Object.entries(updateFields)) {
         contest[key] = value;
     }
-    return await language.save();
+    return await contest.save();
 }
 
 module.exports = {
