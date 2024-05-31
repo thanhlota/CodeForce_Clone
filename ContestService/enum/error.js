@@ -19,6 +19,10 @@ const ERROR = {
         status: 400,
         message: "Missing problem info"
     },
+    MISSING_TESTCASE_INFO: {
+        status: 400,
+        message: "Missing testcase info"
+    },
     EMAIL_EXISTED: {
         status: 409,
         message: "Email already existed"
