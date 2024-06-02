@@ -40,4 +40,7 @@ Object.keys(db).forEach(modelName => {
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
 
+db["submissions"].hasMany(db["results"], { foreignKey: 'submission_id', onDelete: 'CASCADE' });
+db["results"].belongsTo(db["submissions"], { foreignKey: 'submission_id', onDelete: 'CASCADE' });
+
 module.exports = db;

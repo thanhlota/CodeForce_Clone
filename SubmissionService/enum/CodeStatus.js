@@ -5,5 +5,6 @@ module.exports = {
     MLE: 'memory limit exceeded',
     RE: 'runtime error',
     CE: 'compilation error',
+    SE: 'server error',
     TT: 'testing'
 }

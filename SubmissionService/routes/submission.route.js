@@ -5,4 +5,4 @@ const SubmissionRouter = express.Router();
 SubmissionRouter.post("/submit", SubmissionController.create);
 
 SubmissionRouter.get("/:id", SubmissionController.getById);
-SubmissionRouter.get("/details/:id", SubmissionController.getDetails);
+SubmissionRouter.get("/all", SubmissionController.getSubmissions);
