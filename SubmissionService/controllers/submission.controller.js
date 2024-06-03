@@ -1,7 +1,9 @@
 const { ErrorHandler, DefaultError } = require("../utils/error");
 const ERROR = require("../enum/error");
 const SubmissionService = require("../services/submission.service");
+const TestcaseService = require("../services/testcase.service");
 const { Op } = require("sequelize");
+const callWorker = require("../utils/callWorker");
 
 async function create(req, res) {
     try {
@@ -10,12 +12,17 @@ async function create(req, res) {
             return new ErrorHandler(
                 ERROR.MISSING_SUBMISSION_INFO.status,
                 ERROR.MISSING_SUBMISSION_INFO.message
-            ).ErrorHandler(res);
+            ).httpResponse(res);
         }
         const submission = await SubmissionService.create(user_id, problem_id, code, language);
-        return res.status(200).send({
-            submission: submission
-        })
+        if (submission && submission.id) {
+            const testcases = await TestcaseService.getTestcase(problem_id);
+            const result = await callWorker(problem_id, submission.id, code, language, testcases);
+            const resultJson = await result.json();
+            return res.status(200).send({
+                result: resultJson
+            })
+        }
     }
     catch (e) {
         console.log("Create submission failed with error:", e.message);
@@ -54,7 +61,7 @@ async function getSubmissions(req, res) {
     try {
         const { uq } = req.query;
         const searchConditions = [];
-        if (ns) searchConditions.push({ user_id: uq });
+        if (uq) searchConditions.push({ user_id: uq });
         const filter = {
             [Op.and]: searchConditions
         }

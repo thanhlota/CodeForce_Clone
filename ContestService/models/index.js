@@ -41,7 +41,7 @@ db.sequelize = sequelize;
 db.Sequelize = Sequelize;
 
 db["contests"].hasMany(db["problems"], { foreignKey: 'contest_id', onDelete: 'CASCADE' });
-db["problems"].belongsTo(db["contests"], { foreignKey: 'contest_Id', onDelete: 'CASCADE' });
+db["problems"].belongsTo(db["contests"], { foreignKey: 'contest_id', onDelete: 'CASCADE' });
 
 db["problems"].hasMany(db["testcases"], { foreignKey: 'problem_id', onDelete: 'CASCADE' });
 db["testcases"].belongsTo(db["problems"], { foreignKey: 'problem_id', onDelete: 'CASCADE' });
@@ -60,7 +60,6 @@ db["categories"].belongsToMany(db["problems"], {
 
 db["contests"].hasMany(db["user_contest"], { foreignKey: 'contest_id', onDelete: 'CASCADE' });
 db["user_contest"].belongsTo(db["contests"], { foreignKey: 'contest_id', onDelete: 'CASCADE' });
-
 
 
 module.exports = db;

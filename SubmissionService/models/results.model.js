@@ -1,4 +1,5 @@
 "use strict"
+const CodeStatus = require("../enum/CodeStatus");
 
 module.exports = (sequelize, DataTypes) => {
     const Result = sequelize.define('results', {

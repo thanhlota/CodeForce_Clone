@@ -242,6 +242,7 @@ class CPlusPlus extends Lang {
                   cpuUsage,
                   memUsage,
                 };
+                console.log('Run successfully');
                 this.setOutput(data);
                 resolve(true);
               }

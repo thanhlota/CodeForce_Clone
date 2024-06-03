@@ -3,6 +3,7 @@ const express = require('express');
 const SubmissionRouter = express.Router();
 
 SubmissionRouter.post("/submit", SubmissionController.create);
-
 SubmissionRouter.get("/:id", SubmissionController.getById);
 SubmissionRouter.get("/all", SubmissionController.getSubmissions);
+
+module.exports = SubmissionRouter;

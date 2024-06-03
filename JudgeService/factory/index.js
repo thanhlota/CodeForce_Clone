@@ -9,11 +9,12 @@ class Factory {
   static instance = null;
   static workers = [];
 
-  constructor() {}
+  constructor() { }
 
   distributeWorker(job) {
     let worker = this.checkAvailableWorker(job);
     if (worker) {
+      console.log('available worker');
       worker.setWorkerBusy();
       worker.processJob(job);
       return;
@@ -46,9 +47,9 @@ class Factory {
       const currentWorker = Factory.workers[i];
       if (currentWorker.state === WorkerState.AVAILABLE) {
         if (
-          (lang === Language.C && currentWorker.instanceof(CWorker)) ||
-          (Language.CPlusPlus && currentWorker.instanceOf(CPlusPlusWorker)) ||
-          (lang === Language.JAVA && currentWorker.instanceOf(JavaWorker))
+          (lang === Language.C && currentWorker instanceof CWorker) ||
+          (lang === Language.CPlusPlus && currentWorker instanceof CPlusPlusWorker) ||
+          (lang === Language.JAVA && currentWorker instanceof JavaWorker)
         ) {
           return currentWorker;
         }
