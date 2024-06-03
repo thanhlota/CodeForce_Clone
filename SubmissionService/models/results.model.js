@@ -52,6 +52,8 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.DATE,
             default: DataTypes.NOW
         }
+    }, {
+        timestamps: false,
     });
     return Result;
 }

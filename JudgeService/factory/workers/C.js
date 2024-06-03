@@ -21,12 +21,12 @@ class C extends Worker {
   }
 
   async processJob(job) {
-    const { mem, time, code, testcases, httpResponse } = job;
+    const { mem, time, code, testcases, httpResponse, submission_id } = job;
     const response = [];
-    let data = { exitCode: null, output: "", verdict: "" };
+    let data = { exitCode: null, output: "", verdict: "", submission_id, time: "", memory: "" };
     try {
       for (let i = 0; i < testcases.length; i++) {
-        data = { name: `Test_case_${i + 1}` };
+        data = { ...data, testcase_id: testcases[i].id, name: `Test_case_${i + 1}` };
         const endCharacter = "\x04";
         const input = testcases[i].input + endCharacter;
         if (this.container) {
@@ -40,7 +40,7 @@ class C extends Worker {
         await this.container.buildCode();
         await this.container.runCode();
         const output = this.container.getOutput();
-        data.output = output;
+        data = { ...data, output: output?.result, memory: output.memUsage, time: output.cpuUsage };
         if (output?.result === testcases[i].expected_output) {
           data.verdict = Verdict.AC;
         }
@@ -53,6 +53,7 @@ class C extends Worker {
       // await this.container.stopContainer();
     } catch (e) {
       const { exitCode } = this.container;
+      data.output = e.message;
       data.exitCode = exitCode;
       switch (exitCode) {
         case CodeError.COMPILE_ERROR:
@@ -73,21 +74,22 @@ class C extends Worker {
           break;
         default:
           console.log("INTERNAL SERVER ERROR:", e.message);
+          data.output = "INTERNAL SERVER ERROR"
           data.verdict = Verdict.SE;
       }
       response.push(data);
     }
-    httpResponse(response);
     this.container.clearData();
-    if (response.code === CodeError.SERVER_ERROR) {
+    if (data.exitCode === CodeError.SERVER_ERROR) {
       await this.handleServerError();
     } else if (
-      response.code === CodeError.MEMORY_LIMIT_EXCEED ||
-      response.code === CodeError.TIME_LIMIT_EXCEED
+      data.exitCode === CodeError.MEMORY_LIMIT_EXCEED ||
+      data.exitCode === CodeError.TIME_LIMIT_EXCEED
     ) {
       await this.handleResourceExceed();
     }
     this.setWorkerAvailable();
+    httpResponse(response);
   }
 
   async handleServerError() {

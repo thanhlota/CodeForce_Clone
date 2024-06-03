@@ -6,6 +6,11 @@ async function getResults(filter = {}) {
     });
 }
 
+async function createResults(new_results) {
+    return await results.bulkCreate(new_results);
+}
+
 module.exports = {
-    getResults
+    getResults,
+    createResults
 }

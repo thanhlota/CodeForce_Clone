@@ -21,18 +21,16 @@ app.listen(port, () => console.log(`listening on port ${port}`));
 
 app.post('/api/process-job', (req, res) => {
     const {
-        problem_id,
         submission_id,
         code,
         lang,
         testcases
     } = req.body;
     const httpResponse = (data) => {
-        console.log('data', data);
         return res.status(200).send({
-            data
+            data,
         })
     }
-    const newJob = new Job(lang, mem, time, code, testcases, httpResponse);
+    const newJob = new Job(lang, mem, time, code, testcases, httpResponse, submission_id);
     FactoryInstance.distributeWorker(newJob);
 });

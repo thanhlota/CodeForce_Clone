@@ -2,6 +2,7 @@ const { ErrorHandler, DefaultError } = require("../utils/error");
 const ERROR = require("../enum/error");
 const SubmissionService = require("../services/submission.service");
 const TestcaseService = require("../services/testcase.service");
+const ResultService = require("../services/result.service");
 const { Op } = require("sequelize");
 const callWorker = require("../utils/callWorker");
 
@@ -17,10 +18,11 @@ async function create(req, res) {
         const submission = await SubmissionService.create(user_id, problem_id, code, language);
         if (submission && submission.id) {
             const testcases = await TestcaseService.getTestcase(problem_id);
-            const result = await callWorker(problem_id, submission.id, code, language, testcases);
-            const resultJson = await result.json();
+            const results = await callWorker(submission.id, code, language, testcases);
+            const resultsJson = await results.json();
+            await ResultService.createResults(resultsJson.data);
             return res.status(200).send({
-                result: resultJson
+                submission: submission
             })
         }
     }
