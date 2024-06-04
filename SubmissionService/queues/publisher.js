@@ -5,8 +5,9 @@ const EXCHANGE = "direct_jobs";
 const QUEUE = 'jobs';
 const ROUTING_KEY = 'task_queue';
 const RESPONSE_QUEUE = 'responses';
-
+const ResultService = require("../services/result.service");
 class Publisher {
+    static instance = null;
     channel = null;
     queue = null;
     callback_queue = null;
@@ -62,20 +63,28 @@ class Publisher {
 
     }
 
-    async pushJob(job) {
+    pushJob(job) {
         try {
-            this.channel.publish(EXCHANGE, ROUTING_KEY, Buffer.from(job.toString()), {
+            this.channel.publish(EXCHANGE, ROUTING_KEY, Buffer.from(JSON.stringify(job)), {
                 replyTo: RESPONSE_QUEUE
             });
-            console.log(' [x] Requesting fib(%d)', job);
             this.channel.consume(RESPONSE_QUEUE, (msg) => {
-                console.log(' [.] Got %s', msg.content.toString());
+                const responseString = msg.content.toString();
+                const responseObject = JSON.parse(responseString);
                 this.channel.ack(msg);
+                ResultService.createResults(responseObject);
             }, { noAck: false })
         }
         catch (e) {
             console.log("Error when push job", e.message);
         }
+    }
+
+    static getInstance() {
+        if (!Publisher.instance) {
+            Publisher.instance = new Publisher();
+        }
+        return Publisher.instance;
     }
 }
 

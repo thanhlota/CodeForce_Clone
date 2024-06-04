@@ -24,12 +24,12 @@ app.post('/api/process-job', (req, res) => {
         lang,
         testcases
     } = req.body;
-    const httpResponse = (data) => {
+    const worker_response = (data) => {
         return res.status(200).send({
             data,
         })
     }
-    const newJob = new Job(lang, mem, time, code, testcases, httpResponse, submission_id);
+    const newJob = new Job(lang, mem, time, code, testcases, worker_response, submission_id);
     FactoryInstance.distributeWorker(newJob);
 });
 

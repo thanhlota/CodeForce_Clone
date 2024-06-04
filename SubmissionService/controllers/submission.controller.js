@@ -5,6 +5,7 @@ const TestcaseService = require("../services/testcase.service");
 const ResultService = require("../services/result.service");
 const { Op } = require("sequelize");
 const callWorker = require("../utils/callWorker");
+const Publisher = require("../queues/publisher");
 
 async function create(req, res) {
     try {
@@ -18,9 +19,14 @@ async function create(req, res) {
         const submission = await SubmissionService.create(user_id, problem_id, code, language);
         if (submission && submission.id) {
             const testcases = await TestcaseService.getTestcase(problem_id);
-            const results = await callWorker(submission.id, code, language, testcases);
-            const resultsJson = await results.json();
-            await ResultService.createResults(resultsJson.data);
+            const publisher = Publisher.getInstance();
+            const job = {
+                submission_id: submission.id,
+                code,
+                lang: language,
+                testcases
+            }
+            publisher.pushJob(job);
             return res.status(200).send({
                 submission: submission
             })

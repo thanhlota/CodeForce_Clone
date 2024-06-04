@@ -17,7 +17,7 @@ class Factory {
       console.log('available worker');
       worker.setWorkerBusy();
       worker.processJob(job);
-      return;
+      return worker;
     }
     if (this.checkCanHireMoreWoker(job)) {
       switch (job.lang) {
@@ -32,13 +32,16 @@ class Factory {
           break;
         default:
           console.log("Language is not supported");
+          return { languageError: true }
       }
       if (worker) {
         Factory.workers.push(worker);
         worker.setWorkerBusy();
         worker.processJob(job);
+        return worker;
       }
     }
+    return null;
   }
 
   checkAvailableWorker(job) {

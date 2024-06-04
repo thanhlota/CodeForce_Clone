@@ -21,7 +21,7 @@ class Cplusplus extends Worker {
     this.container = container;
   }
   async processJob(job) {
-    const { mem, time, code, testcases, httpResponse, submission_id } = job;
+    const { mem, time, code, testcases, worker_response, submission_id } = job;
     const response = [];
     let data = { exitCode: null, output: "", verdict: "", submission_id, time: "", memory: "" };
     try {
@@ -87,8 +87,9 @@ class Cplusplus extends Worker {
     ) {
       await this.handleResourceExceed();
     }
+    worker_response(response);
     this.setWorkerAvailable();
-    httpResponse(response);
+
   }
 
 
