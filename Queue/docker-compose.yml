@@ -1,0 +1,12 @@
+version: "3"
+services:
+ cf_rabbitmq:
+    image: "rabbitmq:3.13-management"
+    ports:
+      - ${HOST_PORT}:${CONTAINER_PORT}
+      - ${MANAGEMENT_PORT}:${CONTAINER_MANAGEMENT_PORT}
+    volumes:
+      - 'cf_rabbitmq_data:/data'
+
+volumes:
+  cf_rabbitmq_data:

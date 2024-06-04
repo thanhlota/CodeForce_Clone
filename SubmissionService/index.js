@@ -3,6 +3,7 @@ const express = require("express");
 const app = express();
 const cors = require("cors");
 const route = require("./routes");
+const Publisher = require("./queues/publisher");
 
 app.use(cors({
     origin: '*',
@@ -30,3 +31,10 @@ app.get("/", (req, res) => {
 app.listen(port, () => console.log(`listening on port ${port}`));
 
 app.use('/api', route);
+
+const publisher = new Publisher(); 
+await publisher.init();
+const jobs = [1, 2];
+for (let i = 0; i < jobs.length; i++) {
+    publisher.pushJob(jobs[i]);
+}

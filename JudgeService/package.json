@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/thanhlota/CodeForce_Clone/JudgeService",
   "dependencies": {
+    "amqplib": "^0.10.4",
     "dockerode": "^4.0.2",
     "dotenv": "^16.4.5",
     "express": "^4.19.2"

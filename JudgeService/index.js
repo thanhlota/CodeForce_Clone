@@ -1,14 +1,12 @@
+require('dotenv').config();
 const Factory = require("./factory");
 const Job = require("./factory/jobs");
-// const readFile = require("./utils/readFile");
-
+const express = require("express");
 const mem = 256 * 1024 * 1024;
 const time = 1000 * 1000000;
 const FactoryInstance = Factory.getInstance();
-require('dotenv').config();
-const express = require("express");
-const app = express();
 
+const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 const port = process.env.HOST_PORT || 6000;
@@ -34,3 +32,12 @@ app.post('/api/process-job', (req, res) => {
     const newJob = new Job(lang, mem, time, code, testcases, httpResponse, submission_id);
     FactoryInstance.distributeWorker(newJob);
 });
+
+const Consumer = require("./queues/consumer");
+
+(async (
+) => {
+    const consumer = new Consumer();
+    await consumer.init();
+    consumer.receiveJob();
+})();
