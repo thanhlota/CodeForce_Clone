@@ -1,0 +1,74 @@
+.header {
+    background-color: #fff;
+    box-shadow: 0 1px 5px 0 rgba(0, 0, 0, .1);
+    display: flex;
+    flex-direction: row;
+    min-height: 64px;
+}
+
+.left_navigation {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    flex: 1;
+}
+
+.right_navigation {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.navigation_item {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    cursor: pointer;
+    min-width: 120px;
+}
+
+.app_title {
+    margin: 0 16px;
+    font-size: 24px;
+    line-height: 60px;
+    text-wrap: nowrap;
+    color: #515a6e;
+}
+
+.custom_icon {
+    margin-top: 3px;
+    margin-right: 3px;
+}
+
+.login_btn {
+    height: 32px;
+    padding: 0 15px;
+    font-size: 14px;
+    color: #fff;
+    background-color: #1976d2;
+    border: 1px solid #dcdee2;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 32px;
+    cursor: pointer;
+    margin-right: 15px;
+}
+
+.app_name {
+    font-family: 'Roboto', sans-serif;
+    font-weight: bold;
+    color: #1976d2;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 0.1rem;
+    margin: 1rem 0;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+    font-size: 20px;
+}
+
+.avatar {
+    margin-right: 8px;
+}

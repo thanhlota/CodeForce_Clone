@@ -1,0 +1,53 @@
+.table_header {
+    font-weight: bold;
+}
+
+.category {
+    color: #000;
+}
+
+.problem,
+.contest {
+    color: #1976d2;
+    text-decoration: underline;
+    cursor: pointer;
+    position: relative;
+}
+
+.contest:hover,
+.problem:hover {
+    color: darkblue;
+    text-decoration: none;
+}
+
+
+
+.limit_container {
+    display: flex;
+    flex-direction: column;
+    font-size: 12px;
+    color: #888;
+}
+
+.limit {}
+
+.custom_cell {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    flex: 1;
+}
+
+.custom_table {
+    width: 100%;
+}
+
+.custom_table th,
+.custom_table td {
+    border-bottom: 1px solid #ddd;
+    border-right: 1px solid #ddd;
+}
+
+.search_bar {
+    background-color: #fff;
+}
