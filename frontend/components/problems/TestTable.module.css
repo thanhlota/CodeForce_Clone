@@ -1,0 +1,38 @@
+.container {
+    border: 1px solid #888;
+}
+
+.title {
+    font-size: 16px;
+    padding: .25em;
+    border-bottom: 1px solid #888;
+    text-transform: lowercase;
+    font-weight: 700;
+}
+
+.detail {
+    padding: 4px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    font-size: 13px;
+}
+
+.cpy_btn {
+    font-size: 12px;
+    float: right;
+    color: #888 !important;
+    cursor: pointer;
+    border: 1px solid rgb(185, 185, 185);
+    padding: 0 1px;
+    top: -2px;
+    line-height: 1.1rem;
+    text-transform: none;
+}
+
+.cpy_btn:hover {
+    background-color: #def;
+}
+
+.custom_grid {
+    padding-top: 0px !important;
+}

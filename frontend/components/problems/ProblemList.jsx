@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -8,13 +8,19 @@ import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import TextField from '@mui/material/TextField';
 import styles from './ProblemList.module.css';
+import { useRouter } from 'next/router';
 
 export default function CustomTable({ data }) {
+    const router = useRouter();
     const [searchTerm, setSearchTerm] = useState('');
 
     const filteredData = data.filter((row) =>
         row.title.toLowerCase().includes(searchTerm.toLowerCase())
     );
+
+    const handleProblemClick = useCallback((contestId, problemId) => {
+        router.push(`/contests/${contestId}/problem/${problemId}`);
+    }, []);
 
     return (
         <div className={styles.custom_table}>
@@ -45,7 +51,7 @@ export default function CustomTable({ data }) {
                                 className={styles.table_row}
                             >
                                 <TableCell component="th" scope="row" className={styles.custom_cell}>
-                                    <span className={styles.problem}>
+                                    <span className={styles.problem} onClick={() => handleProblemClick(row.contest.id, row.id)}>
                                         {row.title}
                                     </span>
                                     <div className={styles.limit_container}>
