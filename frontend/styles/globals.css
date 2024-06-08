@@ -80,3 +80,10 @@ a {
   color: inherit;
   text-decoration: none;
 }
+
+.ͼ1.cm-focused{
+  outline: none!important;
+}
+.cm-gutter.cm-lineNumbers{
+  min-height: 300px;
+}

@@ -1,4 +1,5 @@
 const contests = require("../models").contests;
+const problems = require("../models").problems;
 
 async function create(name, start_time, end_time) {
     const contest = contests.build({
@@ -10,7 +11,15 @@ async function create(name, start_time, end_time) {
 }
 
 async function getById(id) {
-    return await contests.findByPk(id);
+    return await contests.findByPk(id, {
+        include: [
+            {
+                model: problems,
+                attributes: ['id', 'title', 'time_limit', 'memory_limit'],
+                required: false
+            }
+        ]
+    });
 }
 
 async function getContests(filter = {}) {

@@ -18,7 +18,8 @@ async function getById(id) {
     return await submissions.findByPk(id, {
         include: {
             model: results,
-            through: { attributes: [] }
+            through: { attributes: [] },
+            required: false
         }
     });
 }

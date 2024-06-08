@@ -193,8 +193,7 @@ async function getProblems(req, res) {
         const filter = {
             [Op.and]: searchConditions
         }
-        const problems = await ProblemService.getProblems(filter);
-
+        let problems = await ProblemService.getProblems(filter);
         return res.status(200).send({
             problems
         })

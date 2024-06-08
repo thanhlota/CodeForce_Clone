@@ -1,5 +1,8 @@
 const problems = require("../models").problems;
 const categories = require("../models").categories;
+const contests = require("../models").contests;
+const testcases = require("../models").testcases;
+
 async function create(contest_id, title, description, guide_input, guide_output, time_limit, memory_limit, option = {}) {
     return await problems.create({
         contest_id, title, description, guide_input, guide_output, time_limit, memory_limit
@@ -8,20 +11,39 @@ async function create(contest_id, title, description, guide_input, guide_output,
 
 async function getById(id) {
     return await problems.findByPk(id, {
-        include: {
+        include: [{
             model: categories,
-            through: { attributes: [] }
+            through: { attributes: [] },
+            required: false
+        },
+        {
+            model: testcases,
+            where: {
+                isSample: true
+            },
+            attributes: ['input', 'expected_output'],
+            required: false
         }
+        ]
     });
 }
 
 async function getProblems(filter = {}) {
     return await problems.findAll({
         where: filter,
-        include: {
-            model: categories,
-            through: { attributes: [] }
-        }
+        include: [
+            {
+                model: categories,
+                attributes: ['type'],
+                through: { attributes: [] },
+                required: false
+            },
+            {
+                model: contests,
+                attributes: ['id', 'name'],
+                required: false
+            }
+        ]
     });
 }
 
@@ -30,7 +52,8 @@ async function getProblem(filter = {}) {
         where: filter,
         include: {
             model: categories,
-            through: { attributes: [] }
+            through: { attributes: [] },
+            
         }
     });
 }

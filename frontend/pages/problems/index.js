@@ -1,4 +1,4 @@
-import AppHeader from "@/components/common/AppHeader";
+
 import ProblemList from "@/components/problems/ProblemList";
 import { useState, useEffect, useCallback } from "react";
 import problemService from "@/services/problem.service";
@@ -27,7 +27,6 @@ export default function Problems() {
 
     return (
         <>
-            <AppHeader />
             <div style={{ margin: '16px 48px' }}>
                 <ProblemList data={problems} />
             </div>

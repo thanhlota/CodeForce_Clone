@@ -1,0 +1,43 @@
+.page_container {
+    background-color: #fff;
+}
+
+.header {
+    text-align: center;
+}
+
+.contest_name {
+    font-size: 17px;
+    font-weight: 700;
+}
+
+.content {
+    display: flex;
+    justify-content: center;
+}
+
+.field_name {
+    text-align: right;
+    padding: .5em 2em .5em .5em;
+    width: 8.5em;
+    font-size: 18px;
+}
+
+.field_container {
+    padding: 16px;
+    display: flex;
+    align-items: center;
+}
+
+.table_form {
+    width: 90%;
+    margin-top: 1em;
+}
+
+.limit {
+    width: 300px;
+    display: flex;
+    justify-content: space-between;
+    margin-left: 8px;
+    font-size: 13px;
+}

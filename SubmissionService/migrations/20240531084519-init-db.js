@@ -52,7 +52,8 @@ module.exports = {
               model: 'submissions',
               key: 'id'
             },
-            onDelete: 'CASCADE'
+            onDelete: 'CASCADE',
+            allowNull: false
           },
           testcase_id: {
             type: Sequelize.INTEGER,
