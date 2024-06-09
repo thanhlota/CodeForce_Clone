@@ -15,9 +15,9 @@ TestCaseRouter.post(
 //     "/admin/update/:id", TestCaseController.update
 // )
 
-// TestCaseRouter.get(
-//     "/all", TestCaseController.getTestCases
-// )
+TestCaseRouter.get(
+    "/all", TestCaseController.getTestcases
+)
 
 
 module.exports = TestCaseRouter;

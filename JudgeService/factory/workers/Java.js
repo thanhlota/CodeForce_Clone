@@ -23,13 +23,16 @@ class Java extends Worker {
   async processJob(job) {
     const { mem, time, code, testcases, worker_response, submission_id } = job;
     const response = [];
-    let data = {};
+    let data = { exitCode: null, output: "", verdict: "", submission_id, time: "", memory: "" };
     try {
       for (let i = 0; i < testcases.length; i++) {
         data = {
-          exitCode: null, output: "", verdict: "", submission_id, time: "", memory: "",
-          testcase_id: testcases[i].id, name: `Test_case_${i + 1}`
-        }
+          ...data,
+          testcase_id: testcases[i].id,
+          name: `Test_case_${i + 1}`,
+          expected_output: testcases[i].expected_output,
+          input: testcases[i].input
+        };
         const endCharacter = "\n\x04";
         const input = testcases[i].input + endCharacter;
         if (this.container) {

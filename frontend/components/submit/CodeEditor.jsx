@@ -6,22 +6,41 @@ import { java } from '@codemirror/lang-java';
 import { cpp } from '@codemirror/lang-cpp';
 import styles from './CodeEditor.module.css'
 
-const CodeEditor = ({ language, setSrcCode }) => {
+function getLangState(lang) {
+    switch (lang) {
+        case 'JAVA':
+            return java();
+        case 'C++':
+            return cpp();
+        case 'C':
+            return cpp();
+        default:
+            return javascript();
+    }
+}
+
+const CodeEditor = ({ language, setSrcCode, editable, srcCode, fullWidth, customBackground }) => {
     const editorRef = useRef(null);
     const [editView, setEditView] = useState(null);
 
     useEffect(() => {
         if (editorRef.current) {
             const startState = EditorState.create({
-                doc: '',
+                doc: srcCode ? srcCode : "",
                 extensions: [
                     basicSetup,
-                    javascript(),
+                    getLangState(language),
+                    EditorView.editable.of(editable),
                     EditorView.updateListener.of((update) => {
                         if (update.docChanged) {
-                            setSrcCode(update.state.doc.toString());
+                            if (setSrcCode) setSrcCode(update.state.doc.toString());
                         }
-                    })
+                    }),
+                    EditorView.theme({
+                        "&": {
+                            backgroundColor: customBackground ? customBackground : "#fff",
+                        }
+                    }, { dark: false })
                 ],
             });
 
@@ -40,22 +59,10 @@ const CodeEditor = ({ language, setSrcCode }) => {
 
     useEffect(() => {
         if (editView) {
-            const languageExtension = (lang) => {
-                switch (lang) {
-                    case 'JAVA':
-                        return java();
-                    case 'C++':
-                        return cpp();
-                    case 'C':
-                        return cpp();
-                    default:
-                        return javascript();
-                }
-            };
             editView.dispatch({
                 effects: StateEffect.reconfigure.of([
                     basicSetup,
-                    languageExtension(language),
+                    getLangState(language),
                     EditorView.updateListener.of((update) => {
                         if (update.docChanged) {
                             setSrcCode(update.state.doc.toString());
@@ -66,7 +73,7 @@ const CodeEditor = ({ language, setSrcCode }) => {
     }, [language])
 
     return (
-        <div className={styles.container} ref={editorRef}></div>
+        <div className={`${styles.container} ${fullWidth && styles.fullWidth}`} ref={editorRef}></div>
     );
 }
 

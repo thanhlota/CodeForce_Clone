@@ -5,6 +5,7 @@ import submitService from "@/services/submit.service";
 import { useRouter } from "next/router";
 import ContestLayout from "@/components/layout/ContestLayout";
 import SubmissionList from "@/components/submit/SubmissionList";
+
 const Submissions = () => {
     const router = useRouter();
     const { contestId } = router.query;

@@ -16,7 +16,7 @@ async function create(req, res) {
         }
         const submission = await SubmissionService.create(user_id, problem_id, code, language, contest_id);
         if (submission && submission.id) {
-            const testcases = await TestcaseService.getTestcase(problem_id);
+            const { testcases } = await TestcaseService.getTestcase(problem_id);
             const publisher = Publisher.getInstance();
             const job = {
                 submission_id: submission.id,

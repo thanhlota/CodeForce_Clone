@@ -177,7 +177,7 @@ const SubmitPage = () => {
                             <tr>
                                 <td className={styles.field_name}>Source code:</td>
                                 <td>
-                                    <CodeEditor language={selectedLanguage} setSrcCode={setSrcCode} />
+                                    <CodeEditor language={selectedLanguage} setSrcCode={setSrcCode} editable={true} />
                                 </td>
                             </tr>
                             <tr>

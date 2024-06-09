@@ -43,7 +43,15 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.STRING,
             allowNull: false
         },
+        input: {
+            allowNull: false,
+            type: DataTypes.TEXT
+        },
         output: {
+            allowNull: false,
+            type: DataTypes.TEXT
+        },
+        expected_output: {
             allowNull: false,
             type: DataTypes.TEXT
         },

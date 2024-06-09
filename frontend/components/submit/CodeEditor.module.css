@@ -7,3 +7,7 @@
     min-height: 300px;
     overflow: hidden;
 }
+
+.fullWidth {
+    width: 95%;
+}

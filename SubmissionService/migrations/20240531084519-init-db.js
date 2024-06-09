@@ -85,7 +85,15 @@ module.exports = {
             type: Sequelize.STRING,
             allowNull: false
           },
+          input: {
+            allowNull: false,
+            type: Sequelize.TEXT
+          },
           output: {
+            allowNull: false,
+            type: Sequelize.TEXT
+          },
+          expected_output: {
             allowNull: false,
             type: Sequelize.TEXT
           },

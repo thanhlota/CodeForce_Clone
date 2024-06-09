@@ -2,6 +2,8 @@ const { ErrorHandler, DefaultError } = require("../utils/error");
 const ERROR = require("../enum/error");
 const ProblemService = require("../services/problem.service");
 const TestCaseService = require("../services/testcase.service");
+const { Op } = require("sequelize");
+
 async function create(req, res) {
     try {
         const { problem_id, input, expected_output, isSample } = req.body;
@@ -147,30 +149,30 @@ async function create(req, res) {
 //     }
 // }
 
-// async function getProblems(req, res) {
-//     try {
-//         const { ns, cgs } = req.query;
-//         const searchConditions = [];
-//         if (ns) searchConditions.push({ name: { [Op.like]: `%${ns}%` } });
-//         const filter = {
-//             [Op.and]: searchConditions
-//         }
-//         const problems = await ProblemService.getProblems(filter);
+async function getTestcases(req, res) {
+    try {
+        const { pq } = req.query;
+        const searchConditions = [];
+        if (pq) searchConditions.push({ problem_id: pq });
+        const filter = {
+            [Op.and]: searchConditions
+        }
+        const testcases = await TestCaseService.getTestcases(filter);
 
-//         return res.status(200).send({
-//             problems
-//         })
-//     }
-//     catch (e) {
-//         console.log("Get contests failed with error:", e.message);
-//         return DefaultError.httpResponse(res);
-//     }
-// }
+        return res.status(200).send({
+            testcases
+        })
+    }
+    catch (e) {
+        console.log("Get testcases failed with error:", e.message);
+        return DefaultError.httpResponse(res);
+    }
+}
 
 module.exports = {
     create,
     // remove,
     // update,
     // getProblemById,
-    // getProblems
+    getTestcases
 }
