@@ -16,6 +16,10 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.INTEGER,
             allowNull: false
         },
+        contest_id: {
+            type: DataTypes.INTEGER,
+            allowNull: false
+        },
         code: {
             type: DataTypes.TEXT,
             allowNull: false
@@ -33,9 +37,9 @@ module.exports = (sequelize, DataTypes) => {
             allowNull: false,
             type: DataTypes.STRING
         }
-    }, 
-    {
-        timestamps: false,
-    });
+    },
+        {
+            timestamps: false,
+        });
     return Submission;
 }

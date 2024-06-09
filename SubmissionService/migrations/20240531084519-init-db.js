@@ -21,6 +21,10 @@ module.exports = {
             type: Sequelize.INTEGER,
             allowNull: false
           },
+          contest_id: {
+            type: Sequelize.INTEGER,
+            allowNull: false
+          },
           code: {
             type: Sequelize.TEXT,
             allowNull: false

@@ -6,6 +6,7 @@ const QUEUE = 'jobs';
 const ROUTING_KEY = 'task_queue';
 const RESPONSE_QUEUE = 'responses';
 const ResultService = require("../services/result.service");
+const SubmissionService = require("../services/submission.service");
 class Publisher {
     static instance = null;
     channel = null;
@@ -73,6 +74,14 @@ class Publisher {
                 const responseObject = JSON.parse(responseString);
                 this.channel.ack(msg);
                 ResultService.createResults(responseObject);
+                if (responseObject.length) {
+                    const result = responseObject[responseObject.length - 1];
+                    if (result.submission_id) {
+                        SubmissionService.update(result.submission_id, {
+                            verdict: result.verdict
+                        })
+                    }
+                }
             }, { noAck: false })
         }
         catch (e) {

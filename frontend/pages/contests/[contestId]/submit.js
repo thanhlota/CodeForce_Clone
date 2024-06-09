@@ -5,7 +5,11 @@ import contestService from "@/services/contest.service";
 import { useRouter } from "next/router";
 import languages from "@/constants/languages";
 import ContestLayout from "@/components/layout/ContestLayout";
-import { FormControl, InputLabel, Select, MenuItem, Typography } from '@mui/material';
+import { FormControl, InputLabel, Select, MenuItem, Button } from '@mui/material';
+import UpFileBtn from "@/components/common/UpFileBtn";
+import { useSelector } from "react-redux";
+import { userIdSelector } from "@/redux/reducers/user.reducer";
+import submitService from "@/services/submit.service";
 
 const ProblemDropdown = ({ problems, selectedProblem, onProblemSelect }) => {
     return (
@@ -58,8 +62,8 @@ const LanguageDropdown = ({ languages, selectedLanguage, onLanguageSelect }) => 
 const SubmitPage = () => {
     const router = useRouter();
     const { contestId } = router.query;
-
-    const [source, setSource] = useState("");
+    const userId = useSelector(userIdSelector);
+    const [srcCode, setSrcCode] = useState("");
 
     const [contest, setContest] = useState({
         name: "",
@@ -99,6 +103,23 @@ const SubmitPage = () => {
             console.log("ERROR", e);
         }
     }, [contestId]);
+
+    const handleSubmit = async () => {
+        try {
+            const data = {
+                user_id: userId,
+                problem_id: selectedProblem,
+                language: selectedLanguage,
+                code: srcCode,
+                contest_id: contestId
+            }
+            await submitService.create(data);
+            router.push(`/contests/${contestId}/submissions`)
+        }
+        catch (e) {
+            console.log("ERROR", e);
+        }
+    }
 
     useEffect(() => {
         if (contestId) {
@@ -156,19 +177,28 @@ const SubmitPage = () => {
                             <tr>
                                 <td className={styles.field_name}>Source code:</td>
                                 <td>
-                                    <CodeEditor language={selectedLanguage} />
+                                    <CodeEditor language={selectedLanguage} setSrcCode={setSrcCode} />
                                 </td>
                             </tr>
                             <tr>
                                 <td className={styles.field_name}>Or choose file:</td>
                                 <td>
-
+                                    <UpFileBtn />
                                 </td>
                             </tr>
                             <tr>
                                 <td className={styles.field_name}></td>
                                 <td>
-
+                                    <Button type="submit" variant="contained" color="primary" sx={{ marginLeft: '20%', marginBottom: '16px' }}
+                                        disabled={
+                                            !(srcCode.trim())
+                                            || !selectedLanguage
+                                            || !selectedProblem
+                                        }
+                                        onClick={handleSubmit}
+                                    >
+                                        Submit code
+                                    </Button>
                                 </td>
                             </tr>
                         </table>

@@ -2,21 +2,19 @@ const { ErrorHandler, DefaultError } = require("../utils/error");
 const ERROR = require("../enum/error");
 const SubmissionService = require("../services/submission.service");
 const TestcaseService = require("../services/testcase.service");
-const ResultService = require("../services/result.service");
 const { Op } = require("sequelize");
-const callWorker = require("../utils/callWorker");
 const Publisher = require("../queues/publisher");
 
 async function create(req, res) {
     try {
-        const { user_id, problem_id, code, language } = req.body;
-        if (!user_id || !problem_id || !code || !language) {
+        const { user_id, problem_id, contest_id, code, language } = req.body;
+        if (!user_id || !problem_id || !code || !language || !contest_id) {
             return new ErrorHandler(
                 ERROR.MISSING_SUBMISSION_INFO.status,
                 ERROR.MISSING_SUBMISSION_INFO.message
             ).httpResponse(res);
         }
-        const submission = await SubmissionService.create(user_id, problem_id, code, language);
+        const submission = await SubmissionService.create(user_id, problem_id, code, language, contest_id);
         if (submission && submission.id) {
             const testcases = await TestcaseService.getTestcase(problem_id);
             const publisher = Publisher.getInstance();
@@ -67,9 +65,12 @@ async function getById(req, res) {
 
 async function getSubmissions(req, res) {
     try {
-        const { uq } = req.query;
+        const { uq, ctq } = req.query;
         const searchConditions = [];
         if (uq) searchConditions.push({ user_id: uq });
+        if (ctq) {
+            searchConditions.push({ contest_id: ctq });
+        }
         const filter = {
             [Op.and]: searchConditions
         }

@@ -48,7 +48,6 @@ class C extends Worker {
           data.verdict = Verdict.WA;
         }
         response.push(data);
-        this.container.clearData();
       }
       // await this.container.stopContainer();
     } catch (e) {
@@ -79,7 +78,7 @@ class C extends Worker {
       }
       response.push(data);
     }
-    this.container.clearData();
+    if (this.container) this.container.clearData();
     if (data.exitCode === CodeError.SERVER_ERROR) {
       await this.handleServerError();
     } else if (

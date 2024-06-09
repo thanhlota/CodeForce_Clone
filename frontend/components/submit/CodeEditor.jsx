@@ -6,10 +6,9 @@ import { java } from '@codemirror/lang-java';
 import { cpp } from '@codemirror/lang-cpp';
 import styles from './CodeEditor.module.css'
 
-const CodeEditor = ({ language }) => {
+const CodeEditor = ({ language, setSrcCode }) => {
     const editorRef = useRef(null);
     const [editView, setEditView] = useState(null);
-    const [docs, setDocs] = useState("");
 
     useEffect(() => {
         if (editorRef.current) {
@@ -20,7 +19,7 @@ const CodeEditor = ({ language }) => {
                     javascript(),
                     EditorView.updateListener.of((update) => {
                         if (update.docChanged) {
-                            setDocs(update.state.doc.toString());
+                            setSrcCode(update.state.doc.toString());
                         }
                     })
                 ],
@@ -54,7 +53,14 @@ const CodeEditor = ({ language }) => {
                 }
             };
             editView.dispatch({
-                effects: StateEffect.reconfigure.of([basicSetup, languageExtension(language)]),
+                effects: StateEffect.reconfigure.of([
+                    basicSetup,
+                    languageExtension(language),
+                    EditorView.updateListener.of((update) => {
+                        if (update.docChanged) {
+                            setSrcCode(update.state.doc.toString());
+                        }
+                    })]),
             });
         }
     }, [language])
