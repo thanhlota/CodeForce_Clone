@@ -1,6 +1,6 @@
 import CodeEditor from "@/components/submit/CodeEditor";
 import styles from "@/styles/submit.module.css";
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import contestService from "@/services/contest.service";
 import { useRouter } from "next/router";
 import languages from "@/constants/languages";
@@ -121,7 +121,7 @@ const SubmitPage = () => {
             await submitService.create(data);
             setSnackbarMessage('Submission has been created successful!');
             setSnackbarSeverity('success');
-            setTimeout(() => router.push(`/contests/${contestId}/submissions`), 2000);
+            setTimeout(() => router.push(`/contests/${contestId}/submissions`), 500);
         }
         catch (e) {
             console.log("ERROR", e);

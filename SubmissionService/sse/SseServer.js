@@ -10,14 +10,13 @@ class SseServer {
         res.setHeader('Connection', 'keep-alive');
         res.flushHeaders();
         res.on('close', () => {
-            console.log("Connection has been removed by client!");
-            res.end();
+            console.log(`Connection has been removed by client: ${client.id}`);
         })
-        clients.push(client);
+        SseServer.clients.push(client);
         console.log(`Client: ${client.id} established connection successfully!`);
     }
 
-    sentEvent(submissionId, verdict) {
+    sendEvent(submissionId, verdict) {
         if (!submissionId) {
             console.log("Missing submission id!");
             return;
@@ -31,34 +30,39 @@ class SseServer {
         for (let i = 0; i < SseServer.clients.length; i++) {
             const client = SseServer.clients[i];
             const id = Date.now();
-            if (client.submissionIds.includes(submissionId)) {
+            if (client.submission_ids.includes(submissionId)) {
                 client.response.write(`id: ${id}\n`);
-                client.response.write(`data: ${JSON.stringify(verdict)}\n\n`);
-                client.submissionIds = client.submissionIds.filter((id) => id != submissionId);
-                if (client.submissionIds.length == 0) {
+                client.response.write(`data: ${JSON.stringify({
+                    submissionId,
+                    verdict
+                })}\n\n`);
+                client.submission_ids = client.submission_ids.filter((id) => id != submissionId);
+                if (client.submission_ids.length == 0) {
                     SseServer.closeConnection(client.id);
                 }
             }
         }
     }
 
-    static sendDisconnectEvent(clientId) {
-
+    static sendDisconnectEvent(client) {
+        client.response.write(`data: ${JSON.stringify({
+            type: "disconnect"
+        })}\n\n`)
     }
 
     static closeConnection(clientId) {
         for (let i = 0; i < SseServer.clients.length; i++) {
             const client = SseServer.clients[i];
             if (client.id === clientId) {
-                // SseServer.sendDisconnectEvent(clientId);
-                // setTimeout(() => {
-                //     client.response.end();
-                // }, 10000);
-                client.response.end();
+                SseServer.sendDisconnectEvent(client);
+                setTimeout(() => {
+                    client.response.end();
+                    console.log(`Connection with client: ${client.id} has been removed by server!`)
+                }, 5000);
                 break;
             }
         }
-        clients = clients.filter(client => client.id !== clientId);
+        SseServer.clients = SseServer.clients.filter(client => client.id !== clientId);
     }
 
     static getInstance() {
@@ -68,3 +72,6 @@ class SseServer {
         return SseServer.instance;
     }
 }
+
+
+module.exports = SseServer;

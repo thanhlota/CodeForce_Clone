@@ -89,11 +89,12 @@ async function getSubmissions(req, res) {
 
 async function getStatus(req, res) {
     try {
-        const { submission_ids } = req.body;
+        const { submissionIds } = req.query;
+        const format = submissionIds.split(',');
         const timestamp = new Date().getTime().toString(16);
         const random = Math.random().toString(16).substr(2, 8);
         const id = timestamp + random;
-        const newClient = new Client(id, submission_ids, res);
+        const newClient = new Client(id, format, res);
         const server = SseServer.getInstance();
         server.establishConnection(newClient);
     }

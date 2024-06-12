@@ -90,7 +90,7 @@ class Publisher {
                 }
                 await Promise.all([resultPromise, submissionPromise]);
                 const server = SseServer.getInstance();
-                server.sendEvent(submissionId, verdict)
+                server.sendEvent(submissionId.toString(), verdict)
                 this.channel.ack(msg);
             }, { noAck: false })
         }

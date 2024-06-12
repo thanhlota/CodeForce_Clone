@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
 import { userIdSelector } from "@/redux/reducers/user.reducer";
 import submitService from "@/services/submit.service";
@@ -13,13 +13,15 @@ const Submissions = () => {
     const { contestId } = router.query;
     const userId = useSelector(userIdSelector);
     const [submissions, setSubmissions] = useState(null);
+    const hasFetched = useRef(false);
+    const eventSourceRef = useRef(null);
 
     const fetchSubmissions = useCallback(async () => {
         try {
             const { submissions } = await submitService.getByUserAndContest(userId, contestId);
-            const unfulfilledSubmissions = submissions.find((submission) => submission.verdict == Verdict.TT);
+            const unfulfilledSubmissions = submissions.filter((submission) => submission.verdict == Verdict.TT);
             if (unfulfilledSubmissions?.length) {
-                sseClient(unfulfilledSubmissions, updateSubmissions);
+                eventSourceRef.current = sseClient(unfulfilledSubmissions, submissions, setSubmissions);
             }
             setSubmissions(submissions);
         }
@@ -29,20 +31,21 @@ const Submissions = () => {
 
     }, [contestId, userId]);
 
-    const updateSubmissions = useCallback((submissionId, verdict) => {
-        const updatedSubmissions = [...submissions];
-        const submissionIndex = updatedSubmissions.findIndex(submission => submission.id == submissionId);
-        if (submissionIndex !== -1) {
-            updatedSubmissions[submissionIndex].verdict = verdict;
-            setSubmissions(updatedSubmissions);
-        }
-    }, [submissions]);
-
     useEffect(() => {
-        if (userId && contestId) {
+        if (userId && contestId && !hasFetched.current) {
             fetchSubmissions();
+            hasFetched.current = true;
         }
     }, [userId, contestId]);
+
+    useEffect(() => {
+        return () => {
+            if (eventSourceRef.current) {
+                eventSourceRef.current.close();
+                console.log('SSE CONNECTION CLOSED!');
+            }
+        };
+    }, []);
 
     return (
         <ContestLayout>
