@@ -90,7 +90,7 @@ const SubmissionList = ({ data }) => {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {data && data.length && data.map((submission) => {
+                        {(data && data.length) ? data.map((submission) => {
                             const { formattedDate, utc } = formatDate(submission.createdAt);
                             let verdictClass = "";
                             if (submission.verdict === verdict.TT) {
@@ -128,7 +128,7 @@ const SubmissionList = ({ data }) => {
                                     </TableCell>
                                 </TableRow>
                             )
-                        })}
+                        }) : null}
                     </TableBody>
                 </Table>
             </TableContainer>

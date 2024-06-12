@@ -5,6 +5,8 @@ import submitService from "@/services/submit.service";
 import { useRouter } from "next/router";
 import ContestLayout from "@/components/layout/ContestLayout";
 import SubmissionList from "@/components/submit/SubmissionList";
+import Verdict from "@/constants/verdict";
+import sseClient from "@/utils/sseClient";
 
 const Submissions = () => {
     const router = useRouter();
@@ -15,6 +17,10 @@ const Submissions = () => {
     const fetchSubmissions = useCallback(async () => {
         try {
             const { submissions } = await submitService.getByUserAndContest(userId, contestId);
+            const unfulfilledSubmissions = submissions.find((submission) => submission.verdict == Verdict.TT);
+            if (unfulfilledSubmissions?.length) {
+                sseClient(unfulfilledSubmissions, updateSubmissions);
+            }
             setSubmissions(submissions);
         }
         catch (e) {
@@ -22,6 +28,15 @@ const Submissions = () => {
         }
 
     }, [contestId, userId]);
+
+    const updateSubmissions = useCallback((submissionId, verdict) => {
+        const updatedSubmissions = [...submissions];
+        const submissionIndex = updatedSubmissions.findIndex(submission => submission.id == submissionId);
+        if (submissionIndex !== -1) {
+            updatedSubmissions[submissionIndex].verdict = verdict;
+            setSubmissions(updatedSubmissions);
+        }
+    }, [submissions]);
 
     useEffect(() => {
         if (userId && contestId) {

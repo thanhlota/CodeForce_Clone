@@ -7,6 +7,8 @@ const ROUTING_KEY = 'task_queue';
 const RESPONSE_QUEUE = 'responses';
 const ResultService = require("../services/result.service");
 const SubmissionService = require("../services/submission.service");
+const SseServer = require("../sse/SseServer");
+
 class Publisher {
     static instance = null;
     channel = null;
@@ -69,19 +71,27 @@ class Publisher {
             this.channel.publish(EXCHANGE, ROUTING_KEY, Buffer.from(JSON.stringify(job)), {
                 replyTo: RESPONSE_QUEUE
             });
-            this.channel.consume(RESPONSE_QUEUE, (msg) => {
+            this.channel.consume(RESPONSE_QUEUE, async (msg) => {
                 const responseString = msg.content.toString();
                 const responseObject = JSON.parse(responseString);
-                this.channel.ack(msg);
-                ResultService.createResults(responseObject);
+                const resultPromise = ResultService.createResults(responseObject);
+                let submissionPromise = Promise.resolve();
+                let verdict = null;
+                let submissionId = null;
                 if (responseObject.length) {
                     const result = responseObject[responseObject.length - 1];
                     if (result.submission_id) {
-                        SubmissionService.update(result.submission_id, {
+                        submissionPromise = SubmissionService.update(result.submission_id, {
                             verdict: result.verdict
                         })
                     }
+                    verdict = result.verdict;
+                    submissionId = result.submission_id;
                 }
+                await Promise.all([resultPromise, submissionPromise]);
+                const server = SseServer.getInstance();
+                server.sendEvent(submissionId, verdict)
+                this.channel.ack(msg);
             }, { noAck: false })
         }
         catch (e) {

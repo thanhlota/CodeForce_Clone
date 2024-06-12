@@ -5,7 +5,7 @@ import contestService from "@/services/contest.service";
 import { useRouter } from "next/router";
 import languages from "@/constants/languages";
 import ContestLayout from "@/components/layout/ContestLayout";
-import { FormControl, InputLabel, Select, MenuItem, Button } from '@mui/material';
+import { FormControl, InputLabel, Select, MenuItem, Button, CircularProgress, Snackbar, Alert } from '@mui/material';
 import UpFileBtn from "@/components/common/UpFileBtn";
 import { useSelector } from "react-redux";
 import { userIdSelector } from "@/redux/reducers/user.reducer";
@@ -74,6 +74,10 @@ const SubmitPage = () => {
     const [selectedLanguage, setSelectedLanguage] = useState("");
     const [timeLimit, setTimeLimit] = useState("");
     const [memoryLimit, setMemoryLimit] = useState("");
+    const [loading, setLoading] = useState("");
+    const [snackbarOpen, setSnackbarOpen] = useState(false);
+    const [snackbarMessage, setSnackbarMessage] = useState('');
+    const [snackbarSeverity, setSnackbarSeverity] = useState('success');
 
     const handleProblemSelect = (event) => {
         setSelectedProblem(event.target.value);
@@ -106,6 +110,7 @@ const SubmitPage = () => {
 
     const handleSubmit = async () => {
         try {
+            setLoading(true);
             const data = {
                 user_id: userId,
                 problem_id: selectedProblem,
@@ -114,12 +119,22 @@ const SubmitPage = () => {
                 contest_id: contestId
             }
             await submitService.create(data);
-            router.push(`/contests/${contestId}/submissions`)
+            setSnackbarMessage('Submission has been created successful!');
+            setSnackbarSeverity('success');
+            setTimeout(() => router.push(`/contests/${contestId}/submissions`), 2000);
         }
         catch (e) {
             console.log("ERROR", e);
+            setSnackbarMessage(' Submission has been created failed!');
+            setSnackbarSeverity('error');
         }
+        setLoading(false);
+        setSnackbarOpen(true);
     }
+
+    const handleSnackbarClose = useCallback(() => {
+        setSnackbarOpen(false);
+    }, []);
 
     useEffect(() => {
         if (contestId) {
@@ -189,16 +204,27 @@ const SubmitPage = () => {
                             <tr>
                                 <td className={styles.field_name}></td>
                                 <td>
-                                    <Button type="submit" variant="contained" color="primary" sx={{ marginLeft: '20%', marginBottom: '16px' }}
+                                    <Button type="submit" variant="contained" color="primary" sx={{ marginLeft: '20%', marginBottom: '16px', minWidth: '125px' }}
                                         disabled={
                                             !(srcCode.trim())
                                             || !selectedLanguage
                                             || !selectedProblem
+                                            || loading
                                         }
                                         onClick={handleSubmit}
                                     >
-                                        Submit code
+                                        {loading ? <CircularProgress size={24} thickness={5} /> : "Submit Code"}
                                     </Button>
+                                    <Snackbar
+                                        open={snackbarOpen}
+                                        autoHideDuration={2000}
+                                        onClose={handleSnackbarClose}
+                                        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+                                    >
+                                        <Alert onClose={handleSnackbarClose} severity={snackbarSeverity} sx={{ width: '100%' }}>
+                                            {snackbarMessage}
+                                        </Alert>
+                                    </Snackbar>
                                 </td>
                             </tr>
                         </table>

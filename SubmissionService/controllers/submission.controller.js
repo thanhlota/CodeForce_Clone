@@ -4,6 +4,8 @@ const SubmissionService = require("../services/submission.service");
 const TestcaseService = require("../services/testcase.service");
 const { Op } = require("sequelize");
 const Publisher = require("../queues/publisher");
+const Client = require("../sse/Client.js");
+const SseServer = require("../sse/SseServer.js");
 
 async function create(req, res) {
     try {
@@ -85,8 +87,25 @@ async function getSubmissions(req, res) {
     }
 }
 
+async function getStatus(req, res) {
+    try {
+        const { submission_ids } = req.body;
+        const timestamp = new Date().getTime().toString(16);
+        const random = Math.random().toString(16).substr(2, 8);
+        const id = timestamp + random;
+        const newClient = new Client(id, submission_ids, res);
+        const server = SseServer.getInstance();
+        server.establishConnection(newClient);
+    }
+    catch (e) {
+        console.log("Get submission status failed with error:", e.message);
+        return DefaultError.httpResponse(res);
+    }
+}
+
 module.exports = {
     create,
     getById,
     getSubmissions,
+    getStatus
 }
