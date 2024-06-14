@@ -3,5 +3,7 @@ WORKDIR /app
 COPY package.json .
 RUN npm install 
 COPY . ./
-EXPOSE 3000
+COPY ./entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/entrypoint.sh
+ENTRYPOINT ["entrypoint.sh"]
 CMD ["npm","run","dev"]

@@ -1,5 +1,5 @@
 'use strict';
-import ROLE from '../enum/role'
+const ROLE = require('../enum/role');
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {

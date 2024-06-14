@@ -1,5 +1,5 @@
 const users = require("../models").users;
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 
 async function createOne(email, username, role, password) {
     const user = users.build({

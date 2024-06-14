@@ -1,6 +1,6 @@
 import CodeEditor from "@/components/submit/CodeEditor";
 import styles from "@/styles/submit.module.css";
-import { useState, useCallback, useEffect, useRef } from "react";
+import { useState, useCallback, useEffect } from "react";
 import contestService from "@/services/contest.service";
 import { useRouter } from "next/router";
 import languages from "@/constants/languages";
@@ -64,7 +64,7 @@ const SubmitPage = () => {
     const { contestId } = router.query;
     const userId = useSelector(userIdSelector);
     const [srcCode, setSrcCode] = useState("");
-
+    const [fileContent, setFileContent] = useState(null);
     const [contest, setContest] = useState({
         name: "",
         problems: [],
@@ -132,6 +132,40 @@ const SubmitPage = () => {
         setSnackbarOpen(true);
     }
 
+    const onUploadFinished = async () => {
+        try {
+            setLoading(true);
+            const data = {
+                user_id: userId,
+                problem_id: selectedProblem,
+                language: selectedLanguage,
+                code: fileContent,
+                contest_id: contestId
+            }
+            await submitService.create(data);
+            setSnackbarMessage('Submission has been created successful!');
+            setSnackbarSeverity('success');
+            setTimeout(() => router.push(`/contests/${contestId}/submissions`), 500);
+        }
+        catch (e) {
+            console.log("ERROR", e);
+            setSnackbarMessage(' Submission has been created failed!');
+            setSnackbarSeverity('error');
+        }
+        setLoading(false);
+        setSnackbarOpen(true);
+    }
+
+    const canUploadFile = () => {
+        if (!selectedProblem) {
+            return "Problem has not been selected!"
+        }
+
+        if (!selectedLanguage) {
+            return "Language has not been selected!";
+        }
+    }
+
     const handleSnackbarClose = useCallback(() => {
         setSnackbarOpen(false);
     }, []);
@@ -141,6 +175,12 @@ const SubmitPage = () => {
             fetchContest();
         }
     }, [contestId]);
+
+    useEffect(() => {
+        if (fileContent) {
+            onUploadFinished();
+        }
+    }, [fileContent])
 
     return (
         <ContestLayout>
@@ -190,7 +230,9 @@ const SubmitPage = () => {
                                 </td>
                             </tr>
                             <tr>
-                                <td className={styles.field_name}>Source code:</td>
+                                <td className={styles.field_name}>
+                                    Source code:
+                                </td>
                                 <td>
                                     <CodeEditor language={selectedLanguage} setSrcCode={setSrcCode} editable={true} />
                                 </td>
@@ -198,7 +240,10 @@ const SubmitPage = () => {
                             <tr>
                                 <td className={styles.field_name}>Or choose file:</td>
                                 <td>
-                                    <UpFileBtn />
+                                    <UpFileBtn
+                                        canUploadFile={canUploadFile}
+                                        setFileContent={setFileContent}
+                                    />
                                 </td>
                             </tr>
                             <tr>

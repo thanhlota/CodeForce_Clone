@@ -1,8 +1,14 @@
 version: "3"
 services:
-  node-app:
+  judge-service:
     build: .
     ports:
       - ${HOST_PORT}:${CONTAINER_PORT}
     volumes:
       - ./:/app
+    networks:
+      - cf_network
+
+networks:
+  cf_network:
+    external: true

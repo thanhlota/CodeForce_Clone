@@ -1,23 +1,31 @@
 version: "3"
 services:
-  node-app:
+  contest-service:
     build: .
     ports:
       - ${HOST_PORT}:${CONTAINER_PORT}
     volumes:
       - ./:/app
+    networks:
+      - cf_network
     depends_on:
-      - mysqldb
-  mysqldb:
+      - contest_db
+  contest_db:
     image: mysql:8.4.0
     restart: always
     volumes:
-      - mysql-db:/var/lib/mysql
+      - contest-db:/var/lib/mysql
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ${MYSQL_DATABASE}
       MYSQL_TCP_PORT: ${MYSQL_PORT}
     ports:
       - ${DB_HOST_PORT}:${DB_CONTAINER_PORT}
+    networks:
+      - cf_network
 volumes:
-  mysql-db:
+  contest-db:
+
+networks:
+  cf_network:
+    external: true

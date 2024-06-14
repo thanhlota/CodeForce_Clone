@@ -17,7 +17,7 @@ function containerConfig(name) {
 
 function startConfig(code, inPath) {
   return {
-    Cmd: ["sh", "-c", `echo "${code}" > ${inPath}`],
+    Cmd: ["sh", "-c", `echo '${code}' > ${inPath}`],
     AttachStdin: true,
     AttachStdout: true,
     AttachStderr: true,

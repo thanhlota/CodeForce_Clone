@@ -10,6 +10,7 @@ import verdict from "@/constants/verdict";
 import CodeEditor from "@/components/submit/CodeEditor";
 import submitService from '@/services/submit.service';
 import formatVerdict from '@/utils/formatVerdict';
+import CloseIcon from '@mui/icons-material/Close';
 
 const TestItem = ({ index, time, memory, verdict, input, output, expected_output }) => {
     let title = `Test: #${index + 1}`;
@@ -137,6 +138,7 @@ const SubmissionList = ({ data }) => {
                 onClose={handleClose}
             >
                 <div className={styles.modal_content}>
+                    <div className={styles.close_button} onClick={handleClose}><CloseIcon /></div>
                     <CodeEditor srcCode={srcCode} editable={false} language={language} fullWidth={true} customBackground={"#f0f0f0"} />
                     <hr />
                     <div className={styles.test_container}>

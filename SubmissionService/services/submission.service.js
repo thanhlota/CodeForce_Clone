@@ -21,15 +21,15 @@ async function getById(id) {
             model: results,
             required: false
         },
-        order: [
-            ['createdAt', 'DESC']
-        ]
     });
 }
 
 async function getSubmissions(filter = {}) {
     return await submissions.findAll({
         where: filter,
+        order: [
+            ['createdAt', 'DESC']
+        ]
     });
 }
 

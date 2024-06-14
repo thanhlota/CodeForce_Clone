@@ -3,7 +3,7 @@ const ERROR = require("../enum/error");
 const ROLE = require("../enum/role");
 const UserService = require("../services/user.service");
 const { Op } = require('sequelize');
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
 async function signUp(req, res) {

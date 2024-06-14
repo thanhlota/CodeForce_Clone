@@ -65,7 +65,8 @@
   flex-direction: column;
   align-items: center;
   border: 3px solid transparent;
-  box-shadow: 0 0 18px rgba(0, 0, 0, .4)
+  box-shadow: 0 0 18px rgba(0, 0, 0, .4);
+  max-height: 90vh;
 }
 
 .test_container {
@@ -97,4 +98,14 @@
   word-wrap: break-word;
   border: 1px solid #aaa;
   background-color: #eee;
+}
+
+.close_button {
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
 }

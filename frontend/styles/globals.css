@@ -81,6 +81,11 @@ a {
   text-decoration: none;
 }
 
+.cm-scroller {
+  max-height: 60vh;
+  overflow: auto;
+}
+
 .ͼ1.cm-focused {
   outline: none !important;
 }
@@ -89,3 +94,45 @@ a {
   min-height: 300px;
 }
 
+.custom-radio {
+  display: none;
+}
+
+.custom-radio-label {
+  display: inline-block;
+  cursor: pointer;
+  padding-left: 25px;
+  position: relative;
+  margin-right: 20px;
+  user-select: none;
+}
+
+.custom-radio-label::before {
+  content: '';
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  border: 2px solid #000;
+  border-radius: 50%;
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.custom-radio:checked+.custom-radio-label::before {
+  background-color: #000;
+}
+
+.custom-radio:checked+.custom-radio-label::after {
+  content: '';
+  display: block;
+  width: 8px;
+  height: 8px;
+  background: #fff;
+  border-radius: 50%;
+  position: absolute;
+  left: 5px;
+  top: 50%;
+  transform: translateY(-50%);
+}

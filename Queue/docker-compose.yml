@@ -7,6 +7,12 @@ services:
       - ${MANAGEMENT_PORT}:${CONTAINER_MANAGEMENT_PORT}
     volumes:
       - 'cf_rabbitmq_data:/data'
+    networks:
+      - cf_network
 
 volumes:
   cf_rabbitmq_data:
+
+networks:
+  cf_network:
+    external: true

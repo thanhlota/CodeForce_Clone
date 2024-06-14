@@ -61,7 +61,7 @@ class Publisher {
             console.log(`Exchange, queue and callback_queue established connection successfully!`);
         }
         catch (e) {
-            console.log("Error when init publisher", e.message);
+            console.log("Error when init publisher", e);
         }
 
     }
