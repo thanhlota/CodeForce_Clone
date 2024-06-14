@@ -2,6 +2,7 @@ version: "3"
 services:
   submission-service:
     build: .
+    restart: always
     ports:
       - ${HOST_PORT}:${CONTAINER_PORT}
     volumes:

@@ -2,10 +2,12 @@ version: "3"
 services:
   judge-service:
     build: .
+    restart: always
     ports:
       - ${HOST_PORT}:${CONTAINER_PORT}
     volumes:
       - ./:/app
+      - //var/run/docker.sock:/var/run/docker.sock
     networks:
       - cf_network
 

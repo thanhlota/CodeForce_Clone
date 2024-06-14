@@ -26,11 +26,12 @@ class Cplusplus extends Worker {
     let data = { exitCode: null, output: "", verdict: "", submission_id, time: "", memory: "" };
     try {
       for (let i = 0; i < testcases.length; i++) {
-        data = { ...data, 
+        data = {
+          ...data,
           testcase_id: testcases[i].id,
-         name: `Test_case_${i + 1}`,
-         expected_output: testcases[i].expected_output,
-         input:testcases[i].input
+          name: `Test_case_${i + 1}`,
+          expected_output: testcases[i].expected_output,
+          input: testcases[i].input
         };
         const endCharacter = "\x04";
         const input = testcases[i].input + endCharacter;

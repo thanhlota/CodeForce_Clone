@@ -2,6 +2,7 @@ version: "3"
 services:
  cf_rabbitmq:
     image: "rabbitmq:3.13-management"
+    restart: always
     ports:
       - ${HOST_PORT}:${CONTAINER_PORT}
       - ${MANAGEMENT_PORT}:${CONTAINER_MANAGEMENT_PORT}

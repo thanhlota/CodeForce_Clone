@@ -2,6 +2,7 @@ version: "3"
 services:
   user-service:
     build: .
+    restart: always
     ports:
       - ${HOST_PORT}:${CONTAINER_PORT}
     volumes:
