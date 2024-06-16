@@ -1,6 +1,6 @@
 import CodeEditor from "@/components/submit/CodeEditor";
 import styles from "@/styles/submit.module.css";
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import contestService from "@/services/contest.service";
 import { useRouter } from "next/router";
 import languages from "@/constants/languages";
@@ -62,6 +62,7 @@ const LanguageDropdown = ({ languages, selectedLanguage, onLanguageSelect }) => 
 const SubmitPage = () => {
     const router = useRouter();
     const { contestId } = router.query;
+    const hasFetched = useRef(false);
     const userId = useSelector(userIdSelector);
     const [srcCode, setSrcCode] = useState("");
     const [fileContent, setFileContent] = useState(null);
@@ -171,8 +172,9 @@ const SubmitPage = () => {
     }, []);
 
     useEffect(() => {
-        if (contestId) {
+        if (contestId && !hasFetched.current) {
             fetchContest();
+            hasFetched.current = true;
         }
     }, [contestId]);
 

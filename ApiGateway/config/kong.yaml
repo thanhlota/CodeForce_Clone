@@ -8,25 +8,37 @@ services:
     port: 7000
     protocol: http
     routes:
-    - name: user-service-route
-      paths:
-      - /users
-      strip_path: true
+      - name: user-service-route
+        paths:
+          - /users
+        strip_path: true
   - host: contest-service
     name: contest-service
     port: 7700
     protocol: http
     routes:
-    - name: contest-service-route
-      paths:
-      - /contests
-      strip_path: true
+      - name: contest-service-route
+        paths:
+          - /contests
+        strip_path: true
+    plugins:
+      - name: auth-plugin
+        config:
+          validation_endpoint: http://192.168.172.82:7000/api/user/validateToken
+          ssl_verify: false
+          user_header: X-User-Info
   - host: submission-service
     name: submission-service
     port: 7770
     protocol: http
     routes:
-    - name: submission-service-route
-      paths:
-      - /submissions
-      strip_path: true
+      - name: submission-service-route
+        paths:
+          - /submissions
+        strip_path: true
+    plugins:
+      - name: auth-plugin
+        config:
+          validation_endpoint: http://192.168.172.82:7000/api/user/validateToken
+          ssl_verify: false
+          user_header: X-User-Info

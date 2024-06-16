@@ -1,8 +1,9 @@
 
 import ProblemList from "@/components/problems/ProblemList";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import problemService from "@/services/problem.service";
 export default function Problems() {
+    const hasFetched = useRef(false);
     const [problems, setProblems] = useState([]);
 
     const fetchProblemsData = useCallback(async () => {
@@ -22,7 +23,10 @@ export default function Problems() {
     }, []);
 
     useEffect(() => {
-        fetchProblemsData();
+        if (!hasFetched.current) {
+            fetchProblemsData();
+            hasFetched.current = true;
+        }
     }, []);
 
     return (

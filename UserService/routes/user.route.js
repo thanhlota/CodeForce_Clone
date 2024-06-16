@@ -3,6 +3,10 @@ const UserController = require("../controllers/user.controller.js");
 const express = require('express');
 const UserRouter = express.Router();
 
+UserRouter.get(
+    "/validateToken",UserController.validateToken
+)
+
 UserRouter.post(
     "/signup", UserController.signUp
 );
@@ -29,5 +33,6 @@ UserRouter.get(
     "/:id",
     UserController.getUserById
 );
+
 
 module.exports = UserRouter;

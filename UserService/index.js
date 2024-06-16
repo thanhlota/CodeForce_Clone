@@ -3,6 +3,7 @@ const express = require("express");
 const app = express();
 const cors = require("cors");
 const route = require("./routes");
+const cookieParser = require('cookie-parser');
 
 app.use(cors({
     origin: '*',
@@ -21,6 +22,7 @@ app.use(cors({
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 const port = process.env.HOST_PORT || 6000;
 

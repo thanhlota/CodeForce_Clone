@@ -1,0 +1,42 @@
+const { ErrorHandler, DefaultError } = require("../utils/error");
+const ERROR = require("../enum/error");
+const ROLE = require("../enum/role");
+
+async function verifyUser(req, res, next) {
+    try {
+        const userInfo = req.headers['x-user-info'];
+
+        if (!userInfo || !userInfo.id || !userInfo.role) {
+            return new ErrorHandler(
+                ERROR.INVALID_USER_INFO.status,
+                ERROR.INVALID_USER_INFO.message
+            ).httpResponse(res);
+        }
+
+        if (userInfo.role != ROLE.USER) {
+            return new ErrorHandler(
+                ERROR.FORBIDDEN_RESOURCE.status,
+                ERROR.FORBIDDEN_RESOURCE.message
+            ).httpResponse(res);
+        }
+
+        const { user_id } = req.body;
+            
+        if (user_id != userInfo.id) {
+            return new ErrorHandler(
+                ERROR.MALFORMED_REQUEST.status,
+                ERROR.MALFORMED_REQUEST.message
+            ).httpResponse(res);
+        }
+
+        next()
+    }
+    catch (e) {
+        console.log("Verify admin failed with error:", e.message);
+        return DefaultError.httpResponse(res);
+    }
+}
+
+module.exports = {
+    verifyUser
+}

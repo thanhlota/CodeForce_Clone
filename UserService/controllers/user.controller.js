@@ -84,12 +84,21 @@ async function logIn(req, res) {
             {
                 email: user.email,
                 id: user.id,
+                role: user.role
             },
             process.env.ACCESS_TOKEN_SECRET,
             {
                 expiresIn: 86400,
             }
         );
+
+        res.cookie('access_token', accessToken, {
+            httpOnly: true,
+            secure: false,
+            sameSite: 'Strict',
+            maxAge: 86400
+        });
+
         res.status(200).send({
             id: user.id,
             email: user.email,
@@ -219,11 +228,56 @@ async function getUsers(req, res) {
     }
 }
 
+async function validateToken(req, res) {
+    const authorization = req.headers["authorization"];
+
+    if (!authorization) {
+        return new ErrorHandler(
+            ERROR.INVALID_ACCESS_TOKEN.status,
+            ERROR.INVALID_ACCESS_TOKEN.message
+        ).httpResponse(res);
+    }
+
+    const token = authorization.replace("Bearer ", "");
+
+    try {
+        const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, {
+            clockTolerance: 5,
+        });
+        
+        if (!decoded) {
+            return new ErrorHandler(
+                ERROR.INVALID_ACCESS_TOKEN.status,
+                ERROR.INVALID_ACCESS_TOKEN.message
+            ).httpResponse(res);
+        }
+        const user = await UserService.getById(decoded.id);
+
+        if (!user) {
+            return new ErrorHandler(
+                ERROR.INVALID_ACCESS_TOKEN.status,
+                ERROR.INVALID_ACCESS_TOKEN.message
+            ).httpResponse(res);
+        }
+
+        res.status(200).send(
+            {
+                id: user.id,
+                role: user.role
+            })
+
+    } catch (e) {
+        console.log("User authenticate failed", e.message);
+        return DefaultError.httpResponse(res);
+    }
+}
+
 module.exports = {
     signUp,
     logIn,
     addUser,
     removeUser,
     getUserById,
-    getUsers
+    getUsers,
+    validateToken
 }

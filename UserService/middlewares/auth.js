@@ -2,18 +2,17 @@ const jwt = require("jsonwebtoken");
 const { ErrorHandler, DefaultError } = require("../utils/error");
 const ERROR = require("../enum/error");
 const ROLE = require("../enum/role");
-const UserService = require("../services/user.service")
+const UserService = require("../services/user.service");
 
 async function verifyAdmin(req, res, next) {
-    const authorization = req.headers["authorization"];
+    const token = req.cookies.access_token;
 
-    if (!authorization) {
+    if (!token) {
         return new ErrorHandler(
             ERROR.INVALID_ACCESS_TOKEN.status,
             ERROR.INVALID_ACCESS_TOKEN.message
         ).httpResponse(res);
     }
-    const token = authorization.replace("Bearer ", "");
 
     try {
         const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, {

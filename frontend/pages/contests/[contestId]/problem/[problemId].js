@@ -1,5 +1,5 @@
 import { useRouter } from "next/router";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import problemService from "@/services/problem.service";
 import styles from "@/styles/problem.module.css";
 import TestTable from "@/components/problems/TestTable";
@@ -7,6 +7,7 @@ import ContestLayout from "@/components/layout/ContestLayout";
 
 const ProblemItem = () => {
     const router = useRouter();
+    const hasFetched = useRef(false);
     const { problemId } = router.query;
     const [problemInfo, setProblemInfo] = useState({
         title: "",
@@ -38,8 +39,9 @@ const ProblemItem = () => {
     }, [problemId]);
 
     useEffect(() => {
-        if (problemId) {
+        if (problemId && !hasFetched.current) {
             fetchProblem();
+            hasFetched.current = true;
         }
     }, [problemId]);
 

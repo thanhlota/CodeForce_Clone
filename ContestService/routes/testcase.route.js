@@ -1,10 +1,10 @@
 const TestCaseController = require("../controllers/testcase.controller.js");
 const express = require('express');
 const TestCaseRouter = express.Router();
+const { verifyAdmin } = require("../middlewares/auth.js");
 
-// TestCaseRouter.post("/admin/file", TestCaseController.uploadFile);
 TestCaseRouter.post(
-    "/admin/create", TestCaseController.create
+    "/admin/create", verifyAdmin, TestCaseController.create
 );
 
 // TestCaseRouter.delete(

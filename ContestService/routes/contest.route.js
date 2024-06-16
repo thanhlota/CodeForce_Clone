@@ -1,17 +1,18 @@
 const ContestController = require("../controllers/contest.controller.js");
 const express = require('express');
 const ContestRouter = express.Router();
+const { verifyAdmin } = require("../middlewares/auth.js");
 
 ContestRouter.post(
-    "/admin/create", ContestController.create
+    "/admin/create", verifyAdmin, ContestController.create
 );
 
 ContestRouter.delete(
-    "/admin/remove/:id", ContestController.remove
+    "/admin/remove/:id", verifyAdmin, ContestController.remove
 )
 
 ContestRouter.put(
-    "/admin/update/:id", ContestController.update
+    "/admin/update/:id", verifyAdmin, ContestController.update
 )
 
 ContestRouter.get(
