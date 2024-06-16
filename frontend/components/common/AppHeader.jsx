@@ -9,13 +9,12 @@ import { Typography, Avatar } from '@mui/material';
 import { useState, useCallback } from 'react';
 import LoginModal from './LoginModal';
 import { useSelector } from 'react-redux';
-import { accessTokenSelector, userNameSelector } from '@/redux/reducers/user.reducer';
+import {  userNameSelector } from '@/redux/reducers/user.reducer';
 import { deepOrange } from '@mui/material/colors';
 
 export default function Header() {
     const router = useRouter();
     const [open, setOpen] = useState(false);
-    const accessToken = useSelector(accessTokenSelector);
     const username = useSelector(userNameSelector);
 
     const toggleOpen = useCallback(() => {
@@ -48,7 +47,7 @@ export default function Header() {
             </div>
             <div className={styles.right_navigation}>
                 {
-                    accessToken ?
+                    username ?
                         <Avatar sx={{ bgcolor: deepOrange[500] }} className={styles.avatar}>{username[0]}</Avatar>
                         :
                         <div className={styles.login_btn} onClick={toggleOpen}>

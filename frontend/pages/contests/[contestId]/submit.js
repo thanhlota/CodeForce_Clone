@@ -10,6 +10,7 @@ import UpFileBtn from "@/components/common/UpFileBtn";
 import { useSelector } from "react-redux";
 import { userIdSelector } from "@/redux/reducers/user.reducer";
 import submitService from "@/services/submit.service";
+import { authorizeUser } from "@/utils/auth";
 
 const ProblemDropdown = ({ problems, selectedProblem, onProblemSelect }) => {
     return (
@@ -284,3 +285,5 @@ const SubmitPage = () => {
 };
 
 export default SubmitPage;
+
+export const getServerSideProps = authorizeUser;

@@ -4,6 +4,7 @@ import problemService from "@/services/problem.service";
 import styles from "@/styles/problem.module.css";
 import TestTable from "@/components/problems/TestTable";
 import ContestLayout from "@/components/layout/ContestLayout";
+import { updateUserInfo } from "@/utils/auth";
 
 const ProblemItem = () => {
     const router = useRouter();
@@ -101,3 +102,5 @@ const ProblemItem = () => {
     )
 }
 export default ProblemItem;
+
+export const getServerSideProps = updateUserInfo;

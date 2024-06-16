@@ -2,6 +2,8 @@
 import ProblemList from "@/components/problems/ProblemList";
 import { useState, useEffect, useCallback, useRef } from "react";
 import problemService from "@/services/problem.service";
+import { updateUserInfo } from "@/utils/auth";
+
 export default function Problems() {
     const hasFetched = useRef(false);
     const [problems, setProblems] = useState([]);
@@ -37,3 +39,5 @@ export default function Problems() {
         </>
     );
 }
+
+export const getServerSideProps = updateUserInfo;

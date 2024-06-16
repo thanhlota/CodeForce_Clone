@@ -1,14 +1,12 @@
 
 import { createSlice } from '@reduxjs/toolkit';
-import storageHelper from '@/utils/localStorage';
+import { HYDRATE } from 'next-redux-wrapper';
 
 const initialState = {
-    id: 1,
+    id: null,
     username: null,
-    accessToken: null,
+    role: null
 };
-
-
 
 const userSlice = createSlice({
     name: 'user',
@@ -17,28 +15,32 @@ const userSlice = createSlice({
         loginSuccess: (state, action) => {
             state.id = action.payload.id;
             state.username = action.payload.username;
-            state.accessToken = action.payload.accessToken;
-            storageHelper.setUser({
-                id: action.payload.id,
-                username: action.payload.username,
-                accessToken: action.payload.accessToken
-            })
+            state.role = action.payload.role;
         },
         logout: (state) => {
             state.id = null;
             state.username = null;
-            state.accessToken = null;
+            state.role = null;
         },
         initUser: (state, action) => {
             state.id = action.payload.id;
             state.username = action.payload.username;
-            state.accessToken = action.payload.accessToken;
+            state.role = action.payload.role;
         }
+    },
+    extraReducers: (builder) => {
+        builder
+            .addCase(HYDRATE, (state, action) => {
+                return {
+                    ...state,
+                    ...action.payload.user,
+                };
+            });
     },
 });
 
 export const { loginSuccess, logout, initUser } = userSlice.actions;
-export const accessTokenSelector = (state) => state.user.accessToken
+export const roleSelector = (state) => state.user.role
 export const userNameSelector = (state) => state.user.username;
 export const userIdSelector = (state) => state.user.id;
 

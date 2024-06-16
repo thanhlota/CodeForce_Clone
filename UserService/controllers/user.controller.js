@@ -96,7 +96,7 @@ async function logIn(req, res) {
             httpOnly: true,
             secure: false,
             sameSite: 'Strict',
-            maxAge: 86400
+            maxAge: 86400000
         });
 
         res.status(200).send({
@@ -244,7 +244,7 @@ async function validateToken(req, res) {
         const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, {
             clockTolerance: 5,
         });
-        
+
         if (!decoded) {
             return new ErrorHandler(
                 ERROR.INVALID_ACCESS_TOKEN.status,
@@ -263,6 +263,7 @@ async function validateToken(req, res) {
         res.status(200).send(
             {
                 id: user.id,
+                username: user.username,
                 role: user.role
             })
 

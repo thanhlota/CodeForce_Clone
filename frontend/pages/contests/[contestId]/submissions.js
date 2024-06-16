@@ -7,6 +7,7 @@ import ContestLayout from "@/components/layout/ContestLayout";
 import SubmissionList from "@/components/submit/SubmissionList";
 import Verdict from "@/constants/verdict";
 import sseClient from "@/utils/sseClient";
+import { authorizeUser } from "@/utils/auth";
 
 const Submissions = () => {
     const router = useRouter();
@@ -55,4 +56,6 @@ const Submissions = () => {
 
 }
 
-module.exports = Submissions;
+export default Submissions;
+
+export const getServerSideProps = authorizeUser;

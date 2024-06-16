@@ -6,7 +6,7 @@ const route = require("./routes");
 const Publisher = require("./queues/publisher");
 
 app.use(cors({
-    origin: '*',
+    origin: ['http://localhost:3000','http://192.168.172.82:3000'],
     allowMethods: ["GET", "OPTIONS", "POST", "PUT", "PATCH", "DELETE"],
     allowHeaders: [
         "DNT",
@@ -19,7 +19,9 @@ app.use(cors({
         "authentication",
         "Authorization"
     ],
+    credentials: true
 }));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 const port = process.env.HOST_PORT || 6000;

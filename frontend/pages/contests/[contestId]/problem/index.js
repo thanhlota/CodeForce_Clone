@@ -1,3 +1,4 @@
+import { updateUserInfo } from "@/utils/auth";
 
 const problemPage = ()=>{
  return(
@@ -8,3 +9,5 @@ const problemPage = ()=>{
 }
 
 export default problemPage;
+
+export const getServerSideProps = updateUserInfo;
