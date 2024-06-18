@@ -4,6 +4,12 @@
     display: flex;
     flex-direction: row;
     min-height: 64px;
+    z-index: 1201;
+    position: relative;
+}
+
+.custom_header {
+    box-shadow: none;
 }
 
 .left_navigation {
