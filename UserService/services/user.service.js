@@ -33,11 +33,18 @@ async function remove(user) {
     return await user.destroy();
 }
 
+async function update(user, updateFields = {}) {
+    for (let [key, value] of Object.entries(updateFields)) {
+        user[key] = value;
+    }
+    return await user.save();
+}
 
 module.exports = {
     createOne,
     getById,
     getUserByFilter,
     getUsersByFilter,
-    remove
+    remove,
+    update
 }

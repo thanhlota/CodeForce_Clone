@@ -4,7 +4,7 @@ const express = require('express');
 const UserRouter = express.Router();
 
 UserRouter.get(
-    "/validateToken",UserController.validateToken
+    "/validateToken", UserController.validateToken
 )
 
 UserRouter.post(
@@ -19,13 +19,22 @@ UserRouter.post(
     verifyAdmin,
     UserController.addUser
 );
+
+UserRouter.put(
+    "/admin/update-user",
+    verifyAdmin,
+    UserController.updateUser
+);
+
 UserRouter.delete(
     "/admin/remove-user/:id",
     verifyAdmin,
     UserController.removeUser
 );
+
 UserRouter.get(
     "/all",
+    verifyAdmin,
     UserController.getUsers
 )
 

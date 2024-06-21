@@ -1,21 +1,15 @@
-// components/UserTable.js
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
     Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
     Paper, IconButton, Button, TextField, Typography, Box, Modal,
-    FormControl, InputLabel, Select, MenuItem
+    FormControl, InputLabel, Select, MenuItem,
+    Snackbar, Alert, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle,
 } from '@mui/material';
 import { Add, Delete, Edit, Search } from '@mui/icons-material';
+import UserService from '@/services/user.service';
 import styles from "./UserTable.module.css";
 
-const initialUsers = [
-    { id: 1, username: 'user1', email: 'user1@example.com', role: 'admin' },
-    { id: 2, username: 'user2', email: 'user2@example.com', role: 'user' },
-];
-
-
-const UserTable = () => {
-    const [users, setUsers] = useState(initialUsers);
+const UserTable = ({ users, setUsers, accessToken }) => {
     const [searchTerm, setSearchTerm] = useState('');
     const [openModal, setOpenModal] = useState(false);
     const [modalMode, setModalMode] = useState('add');
@@ -29,9 +23,27 @@ const UserTable = () => {
     });
 
     const [errors, setErrors] = useState({});
+    const [snackbarOpen, setSnackbarOpen] = useState(false);
+    const [snackbarMessage, setSnackbarMessage] = useState('');
+    const [snackbarSeverity, setSnackbarSeverity] = useState('success');
+    const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+    const [deleteUserId, setDeleteUserId] = useState(null);
+
+    const handleOpenDeleteDialog = (id) => {
+        setDeleteUserId(id);
+        setOpenDeleteDialog(true);
+    };
+
+    const handleCloseDeleteDialog = () => {
+        setOpenDeleteDialog(false);
+    };
 
     const handleSearch = (event) => {
         setSearchTerm(event.target.value);
+    };
+
+    const handleCloseSnackbar = () => {
+        setSnackbarOpen(false);
     };
 
     const handleOpenModal = (mode, user) => {
@@ -49,33 +61,101 @@ const UserTable = () => {
         setOpenModal(false);
     };
 
-    const handleSaveUser = () => {
+    const handleAddUser = useCallback(async (userInfo) => {
+        try {
+            const res = await UserService.addUser(accessToken, userInfo);
+            if (!res.newUser) {
+                setSnackbarMessage(res.message);
+                setSnackbarSeverity('error');
+            }
+            else {
+                setSnackbarMessage('User added successfully!');
+                setSnackbarSeverity('success');
+            }
+            setSnackbarOpen(true);
+            return res;
+        }
+        catch (e) {
+            console.log("ERROR", e);
+            setSnackbarMessage('Failed to add user.');
+            setSnackbarSeverity('error');
+        }
+        setSnackbarOpen(true);
+        return null;
+
+    }, [accessToken]);
+
+    const handleUpdateUser = useCallback(async (userInfo) => {
+        try {
+            const res = await UserService.updateUser(accessToken, userInfo);
+            if (!res.updateUser) {
+                setSnackbarMessage(res.message);
+                setSnackbarSeverity('error');
+            }
+            else {
+                setSnackbarMessage('User updated successfully!');
+                setSnackbarSeverity('success');
+            }
+            setSnackbarOpen(true);
+            return res;
+        }
+        catch (e) {
+            console.log("ERROR", e);
+            setSnackbarMessage('Failed to update user');
+            setSnackbarSeverity('error');
+        }
+        setSnackbarOpen(true);
+        return null;
+    }, [accessToken]);
+
+    const handleSaveUser = async () => {
         const newErrors = {};
         if (!currentUser.username) newErrors.username = 'Username is required';
         if (!currentUser.email) newErrors.email = 'Email is required';
         if (!currentUser.role) newErrors.role = 'Role is required';
-        
+        if (modalMode === 'add' && !currentUser.password) newErrors.password = 'Password is required';
+        if (modalMode === 'add' && !currentUser.confirmPassword) newErrors.confirmPassword = 'Confirm Password is required';
+        if (currentUser.password !== currentUser.confirmPassword) newErrors.confirmPassword = 'Passwords do not match';
+
         if (Object.keys(newErrors).length > 0) {
             setErrors(newErrors);
             return;
         }
         if (modalMode === 'add') {
-            setUsers([...users, { ...currentUser, id: users.length + 1 }]);
+            const { newUser } = await handleAddUser(currentUser);
+            if (newUser) {
+                setUsers([...users, { ...newUser }]);
+            }
         } else {
-            setUsers(users.map(user => (user.id === currentUser.id ? currentUser : user)));
+            const { updateUser } = await handleUpdateUser(currentUser);
+            if (updateUser) {
+                setUsers(users.map(user => (user.id === currentUser.id ? currentUser : user)));
+            }
         }
         handleCloseModal();
     };
 
-    const handleDeleteUser = (id) => {
-        setUsers(users.filter(user => user.id !== id));
+    const handleDeleteUser = async () => {
+        try {
+            const res = await UserService.deleteUser(accessToken, deleteUserId);
+            setUsers(users.filter(user => user.id !== deleteUserId));
+            setSnackbarMessage('User removed successfully!');
+            setSnackbarSeverity('success');
+        }
+        catch (e) {
+            console.log("ERROR", e);
+            setSnackbarMessage('Failed to delete user');
+            setSnackbarSeverity('error');
+        }
+        setSnackbarOpen(true);
+        handleCloseDeleteDialog();
     };
 
-    const filteredUsers = users.filter(user =>
+    const filteredUsers = users ? users.filter(user =>
         user.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
         user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
         user.role.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    ) : [];
 
     return (
         <>
@@ -127,7 +207,7 @@ const UserTable = () => {
                                     <IconButton onClick={() => handleOpenModal('edit', user)}>
                                         <Edit />
                                     </IconButton>
-                                    <IconButton onClick={() => handleDeleteUser(user.id)}>
+                                    <IconButton onClick={() => handleOpenDeleteDialog(user.id)}>
                                         <Delete />
                                     </IconButton>
                                 </TableCell>
@@ -183,16 +263,22 @@ const UserTable = () => {
                             <TextField
                                 label="Password"
                                 value={currentUser.password}
+                                type="password"
                                 onChange={(e) => setCurrentUser({ ...currentUser, password: e.target.value })}
                                 fullWidth
                                 margin="normal"
+                                error={!!errors.password}
+                                helperText={errors.password}
                             />
                             <TextField
                                 label="Confirm Password"
                                 value={currentUser.confirmPassword}
+                                type="password"
                                 onChange={(e) => setCurrentUser({ ...currentUser, confirmPassword: e.target.value })}
                                 fullWidth
                                 margin="normal"
+                                error={!!errors.confirmPassword}
+                                helperText={errors.confirmPassword}
                             />
                         </>
                     }
@@ -207,6 +293,7 @@ const UserTable = () => {
                             <MenuItem value="user">User</MenuItem>
                             <MenuItem value="admin">Admin</MenuItem>
                         </Select>
+                        {errors.role && <Typography color="error">{errors.role}</Typography>}
                     </FormControl>
                     <Box display="flex" justifyContent="flex-end" mt={2}>
                         <Button onClick={handleCloseModal} color="primary">
@@ -218,8 +305,39 @@ const UserTable = () => {
                     </Box>
                 </Box>
             </Modal>
+            <Dialog
+                open={openDeleteDialog}
+                onClose={handleCloseDeleteDialog}
+                aria-labelledby="delete-dialog-title"
+                aria-describedby="delete-dialog-description"
+            >
+                <DialogTitle id="delete-dialog-title">Delete User</DialogTitle>
+                <DialogContent>
+                    <DialogContentText id="delete-dialog-description">
+                        Are you sure you want to delete this user?
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCloseDeleteDialog} color="primary">
+                        Cancel
+                    </Button>
+                    <Button onClick={handleDeleteUser} color="primary" variant="contained" autoFocus>
+                        Delete
+                    </Button>
+                </DialogActions>
+            </Dialog>
+            <Snackbar
+                open={snackbarOpen}
+                autoHideDuration={3000}
+                onClose={handleCloseSnackbar}
+            >
+                <Alert onClose={handleCloseSnackbar} severity={snackbarSeverity} sx={{ width: '100%' }}>
+                    {snackbarMessage}
+                </Alert>
+            </Snackbar>
         </>
     );
 };
 
 export default UserTable;
+

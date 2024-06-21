@@ -5,7 +5,7 @@ import { HYDRATE } from 'next-redux-wrapper';
 const initialState = {
     id: null,
     username: null,
-    role: null
+    role: null,
 };
 
 const userSlice = createSlice({
@@ -43,6 +43,5 @@ export const { loginSuccess, logout, initUser } = userSlice.actions;
 export const roleSelector = (state) => state.user.role
 export const userNameSelector = (state) => state.user.username;
 export const userIdSelector = (state) => state.user.id;
-
 
 export default userSlice.reducer;

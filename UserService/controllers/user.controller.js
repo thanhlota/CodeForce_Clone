@@ -13,7 +13,7 @@ async function signUp(req, res) {
             return new ErrorHandler(
                 ERROR.MISSING_USER_INFO.status,
                 ERROR.MISSING_USER_INFO.message
-            ).httpResponse(res).httpResponse(res);
+            ).httpResponse(res);
         }
         if (password.trim() !== confirmPassword.trim()) {
             return new ErrorHandler(
@@ -114,13 +114,13 @@ async function logIn(req, res) {
 }
 
 async function addUser(req, res) {
-    const { username, password, confirmPassword, email } = req.body;
+    const { username, password, confirmPassword, email, role } = req.body;
     try {
-        if (!email || !password || !username || !confirmPassword) {
+        if (!email || !password || !username || !confirmPassword || !role) {
             return new ErrorHandler(
                 ERROR.MISSING_USER_INFO.status,
                 ERROR.MISSING_USER_INFO.message
-            ).httpResponse(res).httpResponse(res);
+            ).httpResponse(res);
         }
         if (password.trim() !== confirmPassword.trim()) {
             return new ErrorHandler(
@@ -150,11 +150,84 @@ async function addUser(req, res) {
                 ).httpResponse(res);
             }
         }
-        await UserService.createOne(email, username, ROLE.USER, password);
-        return res.status(200).send({ message: 'User register successfull!' });
+        const newUser = await UserService.createOne(email, username, role, password);
+        return res.status(200).send({
+            message: 'User added successfull!',
+            newUser
+        });
     }
     catch (e) {
         console.log("Add user failed with error: ", e.message);
+        return DefaultError.httpResponse(res);
+    }
+}
+
+async function updateUser(req, res) {
+    const { id, username, email, role } = req.body;
+    try {
+        if (!id || !email || !username || !role) {
+            return new ErrorHandler(
+                ERROR.MISSING_USER_INFO.status,
+                ERROR.MISSING_USER_INFO.message
+            ).httpResponse(res);
+        }
+
+        const user = await UserService.getById(id);
+
+        if (!user) {
+            return new ErrorHandler(
+                ERROR.NON_EXISTED_USER.status,
+                ERROR.NON_EXISTED_USER.message
+            ).httpResponse(res);
+        }
+
+        const filter = {
+            [Op.and]: [
+                {
+                    id: {
+                        [Op.not]: id
+                    }
+                },
+                {
+                    [Op.or]: [
+                        { username: username },
+                        { email: email }
+                    ]
+                }
+            ]
+
+        }
+        const existedUser = await UserService.getUserByFilter(filter);
+        if (existedUser) {
+            if (existedUser.username == username) {
+                return new ErrorHandler(
+                    ERROR.USERNAME_EXISTED.status,
+                    ERROR.USERNAME_EXISTED.message
+                ).httpResponse(res);
+            }
+            if (existedUser.email == email) {
+                return new ErrorHandler(
+                    ERROR.EMAIL_EXISTED.status,
+                    ERROR.EMAIL_EXISTED.message
+                ).httpResponse(res);
+            }
+        }
+
+        const updateFields = {
+            email,
+            username,
+            role
+        }
+
+        const updateUser = await UserService.update(user, updateFields);
+
+        return res.status(200).send({
+            message: 'User updated successfull!',
+            updateUser
+        });
+    }
+    catch (e) {
+        console.log("Update user failed with error: ", e.message);
         return DefaultError.httpResponse(res);
     }
 }
@@ -206,15 +279,16 @@ async function getUsers(req, res) {
         const searchConditions = [];
         if (ns) searchConditions.push({ username: { [Op.like]: `%${ns}%` } });
         const filter = {
-            [Op.or]: searchConditions
+            [Op.and]: searchConditions
         }
         let users = await UserService.getUsersByFilter(filter);
         users = users.map((user) => {
             return (
                 {
+                    id: user.id,
                     username: user.username,
                     email: user.email,
-
+                    role: user.role,
                 })
         })
         res.status(200).send({
@@ -264,7 +338,8 @@ async function validateToken(req, res) {
             {
                 id: user.id,
                 username: user.username,
-                role: user.role
+                role: user.role,
+
             })
 
     } catch (e) {
@@ -277,6 +352,7 @@ module.exports = {
     signUp,
     logIn,
     addUser,
+    updateUser,
     removeUser,
     getUserById,
     getUsers,
