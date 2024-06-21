@@ -67,6 +67,7 @@ const UserTable = ({ users, setUsers, accessToken }) => {
             if (!res.newUser) {
                 setSnackbarMessage(res.message);
                 setSnackbarSeverity('error');
+                return;
             }
             else {
                 setSnackbarMessage('User added successfully!');
@@ -91,6 +92,7 @@ const UserTable = ({ users, setUsers, accessToken }) => {
             if (!res.updateUser) {
                 setSnackbarMessage(res.message);
                 setSnackbarSeverity('error');
+                return;
             }
             else {
                 setSnackbarMessage('User updated successfully!');
@@ -122,13 +124,13 @@ const UserTable = ({ users, setUsers, accessToken }) => {
             return;
         }
         if (modalMode === 'add') {
-            const { newUser } = await handleAddUser(currentUser);
-            if (newUser) {
-                setUsers([...users, { ...newUser }]);
+            const res = await handleAddUser(currentUser);
+            if (res && res.newUser) {
+                setUsers([...users, { ...res.newUser }]);
             }
         } else {
-            const { updateUser } = await handleUpdateUser(currentUser);
-            if (updateUser) {
+            const res = await handleUpdateUser(currentUser);
+            if (res && res.updateUser) {
                 setUsers(users.map(user => (user.id === currentUser.id ? currentUser : user)));
             }
         }

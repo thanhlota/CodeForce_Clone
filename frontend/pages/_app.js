@@ -4,7 +4,6 @@ import { wrapper } from "@/redux/store";
 import AppHeader from "@/components/common/AppHeader";
 
 const App = ({ Component, pageProps }) => {
-
   return (
     <AppCacheProvider {...pageProps}>
       <AppHeader />
@@ -14,3 +13,4 @@ const App = ({ Component, pageProps }) => {
 }
 
 export default wrapper.withRedux(App);
+

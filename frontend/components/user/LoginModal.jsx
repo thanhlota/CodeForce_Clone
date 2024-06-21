@@ -1,12 +1,12 @@
 import React, { useCallback, useState } from 'react';
-import { Modal, Box, Button, TextField, Typography, Snackbar, CircularProgress, Alert } from '@mui/material';
+import { Modal, Box, Button, TextField, Typography, Snackbar, CircularProgress, Alert, Link } from '@mui/material';
 import styles from './LoginModal.module.css';
 import Verify from '@/utils/verify';
 import UserService from '@/services/user.service';
 import { useDispatch } from 'react-redux';
 import { loginSuccess } from '@/redux/reducers/user.reducer';
 
-const LoginModal = ({ open, handleClose }) => {
+const LoginModal = ({ open, handleClose, toggleRegister }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [errors, setErrors] = useState({});
@@ -15,6 +15,11 @@ const LoginModal = ({ open, handleClose }) => {
     const [snackbarOpen, setSnackbarOpen] = useState(false);
     const [snackbarSeverity, setSnackbarSeverity] = useState('');
     const dispatch = useDispatch();
+
+    const handleRegisterClick = () => {
+        handleClose();
+        toggleRegister();
+    }
 
     const fetchLogin = useCallback(async (info) => {
         try {
@@ -129,6 +134,9 @@ const LoginModal = ({ open, handleClose }) => {
                         >
                             {loading ? <CircularProgress size={24} /> : "Sign In"}
                         </Button>
+                        <Typography variant="body2" align="center" className={styles.register_link}>
+                            Don't have an account? <Link sx={{ cursor: 'pointer' }} onClick={handleRegisterClick}>Register here</Link>
+                        </Typography>
                     </form>
                 </Box>
             </Modal>

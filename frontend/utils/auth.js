@@ -1,6 +1,6 @@
 import { wrapper } from "@/redux/store";
 import UserService from "@/services/user.service";
-import { initUser } from "@/redux/reducers/user.reducer";
+import { logout, initUser } from "@/redux/reducers/user.reducer";
 
 const updateUserInfo = wrapper.getServerSideProps((store) => async ({ req }) => {
     let accessToken = req.cookies["access_token"];
@@ -21,7 +21,9 @@ const updateUserInfo = wrapper.getServerSideProps((store) => async ({ req }) => 
     }
 
     return {
-        props: {},
+        props: {
+           
+        },
     };
 })
 

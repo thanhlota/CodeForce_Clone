@@ -5,22 +5,68 @@ import HomeIcon from '@mui/icons-material/Home';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import QuizIcon from '@mui/icons-material/Quiz';
 import { useRouter } from "next/router";
-import { Typography, Avatar } from '@mui/material';
+import { Typography, Avatar, Menu, MenuItem, Snackbar, Alert } from '@mui/material';
 import { useState, useCallback } from 'react';
-import LoginModal from './LoginModal';
-import { useSelector } from 'react-redux';
-import { userNameSelector } from '@/redux/reducers/user.reducer';
+import LoginModal from '@/components/user/LoginModal';
+import RegisterModal from '@/components/user/RegisterModal';
+import { useSelector, useDispatch } from 'react-redux';
+import { userNameSelector, accessTokenSelector, logout } from '@/redux/reducers/user.reducer';
 import { deepOrange } from '@mui/material/colors';
+import UserService from '@/services/user.service';
 
 export default function Header() {
     const router = useRouter();
+    const dispatch = useDispatch();
     const [open, setOpen] = useState(false);
+    const [registerOpen, setRegisterOpen] = useState(false);
+    const [anchorEl, setAnchorEl] = useState(null);
     const username = useSelector(userNameSelector);
     const isAdminRoute = router.pathname.includes("/admin");
+    const accessToken = useSelector(accessTokenSelector);
+    const [snackbarOpen, setSnackbarOpen] = useState(false);
+    const [snackbarMessage, setSnackbarMessage] = useState('');
+    const [snackbarSeverity, setSnackbarSeverity] = useState('success');
 
     const toggleOpen = useCallback(() => {
         setOpen((prevOpen) => !prevOpen);
     }, [])
+
+    const toggleRegister = useCallback(() => {
+        setRegisterOpen((preOpen) => !preOpen);
+    }, []);
+
+    const handleMenuClose = () => {
+        setAnchorEl(null);
+    };
+
+    const handleAvatarClick = (event) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleLogout = async () => {
+        try {
+            const res = await UserService.logOut(accessToken);
+            if (res.status == 200) {
+                dispatch(logout());
+                setSnackbarMessage('User logout successfully!');
+                setSnackbarSeverity('success');
+            }
+            else {
+                setSnackbarMessage('User logout failed!');
+                setSnackbarSeverity('error');
+            }
+            setAnchorEl(null);
+            setSnackbarOpen(true);
+            router.push("/");
+        }
+        catch (e) {
+            console.log("ERROR:", e);
+        }
+    };
+
+    const handleCloseSnackbar = () => {
+        setSnackbarOpen(false);
+    };
 
     return (
         <div className={`${styles.header} ${isAdminRoute ? styles.custom_header : ''}`}>
@@ -66,7 +112,22 @@ export default function Header() {
             <div className={styles.right_navigation}>
                 {
                     username ?
-                        <Avatar sx={{ bgcolor: deepOrange[500] }} className={styles.avatar}>{username[0]}</Avatar>
+                        <>
+                            <Avatar
+                                sx={{ bgcolor: deepOrange[500], cursor: 'pointer' }}
+                                className={styles.avatar}
+                                onClick={handleAvatarClick}
+                            >
+                                {username[0]}
+                            </Avatar>
+                            <Menu
+                                anchorEl={anchorEl}
+                                open={Boolean(anchorEl)}
+                                onClose={handleMenuClose}
+                            >
+                                <MenuItem onClick={handleLogout}>Logout</MenuItem>
+                            </Menu>
+                        </>
                         :
                         <div className={styles.login_btn} onClick={toggleOpen}>
                             Login
@@ -74,7 +135,17 @@ export default function Header() {
                 }
 
             </div>
-            <LoginModal open={open} handleClose={toggleOpen} />
+            <LoginModal open={open} handleClose={toggleOpen} toggleRegister={toggleRegister} />
+            <RegisterModal registerOpen={registerOpen} toggleRegister={toggleRegister} toggleOpen={toggleOpen} />
+            <Snackbar
+                open={snackbarOpen}
+                autoHideDuration={3000}
+                onClose={handleCloseSnackbar}
+            >
+                <Alert onClose={handleCloseSnackbar} severity={snackbarSeverity} sx={{ width: '100%' }}>
+                    {snackbarMessage}
+                </Alert>
+            </Snackbar>
         </div >
     );
 }
