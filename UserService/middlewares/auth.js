@@ -5,16 +5,7 @@ const ROLE = require("../enum/role");
 const UserService = require("../services/user.service");
 
 async function verifyAdmin(req, res, next) {
-    const authorization = req.headers["authorization"];
-
-    if (!authorization) {
-        return new ErrorHandler(
-            ERROR.INVALID_ACCESS_TOKEN.status,
-            ERROR.INVALID_ACCESS_TOKEN.message
-        ).httpResponse(res);
-    }
-
-    const token = authorization.replace("Bearer ", "");
+    const token = req.cookies["access_token"];
 
     if (!token) {
         return new ErrorHandler(

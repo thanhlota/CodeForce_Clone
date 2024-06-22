@@ -153,25 +153,21 @@ async function getContests(req, res) {
             [Op.and]: searchConditions
         }
         const contests = await ContestService.getContests(filter);
-        const now = Date.now();
-        const ongoingContests = [];
-        const upcomingContests = [];
-        const pastContests = [];
-        contests.forEach(contest => {
-            if (contest.start_time <= now && contest.end_time >= now) {
-                ongoingContests.push(contest);
-            } else if (contest.start_time > now) {
-                upcomingContests.push(contest);
-            } else if (contest.end_time < now) {
-                pastContests.push(contest);
-            }
-        });
+        // const now = Date.now();
+        // const ongoingContests = [];
+        // const upcomingContests = [];
+        // const pastContests = [];
+        // contests.forEach(contest => {
+        //     if (contest.start_time <= now && contest.end_time >= now) {
+        //         ongoingContests.push(contest);
+        //     } else if (contest.start_time > now) {
+        //         upcomingContests.push(contest);
+        //     } else if (contest.end_time < now) {
+        //         pastContests.push(contest);
+        //     }
+        // });
         return res.status(200).send({
-            contests: {
-                ongoingContests,
-                upcomingContests,
-                pastContests
-            }
+            contests
         })
     }
     catch (e) {

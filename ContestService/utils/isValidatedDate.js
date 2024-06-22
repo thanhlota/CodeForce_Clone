@@ -1,6 +1,13 @@
 function isValidISODate(dateString) {
-    const isoDatePattern = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?Z$/;
-    return isoDatePattern.test(dateString);
+    const regex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/;
+
+    if (!regex.test(dateString)) {
+        return false;
+    }
+
+    const date = new Date(dateString);
+
+    return !isNaN(date.getTime());
 }
 
 module.exports = isValidISODate;

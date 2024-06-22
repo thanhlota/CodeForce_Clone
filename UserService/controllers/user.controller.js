@@ -339,9 +339,48 @@ async function validateToken(req, res) {
                 id: user.id,
                 username: user.username,
                 role: user.role,
-
+                accessToken: token
             })
 
+    } catch (e) {
+        console.log("User authenticate failed", e.message);
+        return DefaultError.httpResponse(res);
+    }
+}
+
+async function logOut(req, res) {
+    const token = req.cookies["access_token"];
+
+    if (!token) {
+        return new ErrorHandler(
+            ERROR.INVALID_ACCESS_TOKEN.status,
+            ERROR.INVALID_ACCESS_TOKEN.message
+        ).httpResponse(res);
+    }
+    try {
+        const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, {
+            clockTolerance: 5,
+        });
+
+        if (!decoded) {
+            return new ErrorHandler(
+                ERROR.INVALID_ACCESS_TOKEN.status,
+                ERROR.INVALID_ACCESS_TOKEN.message
+            ).httpResponse(res);
+        }
+        const user = await UserService.getById(decoded.id);
+
+        if (!user) {
+            return new ErrorHandler(
+                ERROR.INVALID_ACCESS_TOKEN.status,
+                ERROR.INVALID_ACCESS_TOKEN.message
+            ).httpResponse(res);
+        }
+        res.clearCookie('access_token');
+        res.status(200).send(
+            {
+                message: "Logout successful"
+            })
     } catch (e) {
         console.log("User authenticate failed", e.message);
         return DefaultError.httpResponse(res);
@@ -351,6 +390,7 @@ async function validateToken(req, res) {
 module.exports = {
     signUp,
     logIn,
+    logOut,
     addUser,
     updateUser,
     removeUser,

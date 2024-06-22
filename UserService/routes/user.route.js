@@ -14,6 +14,9 @@ UserRouter.post(
     "/login",
     UserController.logIn
 );
+UserRouter.post("/logout",
+    UserController.logOut
+)
 UserRouter.post(
     "/admin/add-user",
     verifyAdmin,

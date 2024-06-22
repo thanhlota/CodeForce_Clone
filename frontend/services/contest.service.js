@@ -18,6 +18,36 @@ const contestService = {
             },
         )
         return await res.json();
+    },
+
+    addContest: async (info) => {
+        const res = await fetch(
+            `http://${process.env.NEXT_PUBLIC_CONTEST_SERVICE_URI}/api/contest/admin/create`,
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                credentials: 'include',
+                body: JSON.stringify(info),
+            },
+        );
+        return res;
+    },
+
+    updateContest: async (id, info) => {
+        const res = await fetch(
+            `http://${process.env.NEXT_PUBLIC_CONTEST_SERVICE_URI}/api/contest/admin/update/${id}`,
+            {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                credentials: 'include',
+                body: JSON.stringify(info),
+            },
+        );
+        return res;
     }
 }
 export default contestService;

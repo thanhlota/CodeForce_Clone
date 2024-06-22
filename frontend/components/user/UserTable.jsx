@@ -206,10 +206,10 @@ const UserTable = ({ users, setUsers, accessToken }) => {
                                 <TableCell>{user.email}</TableCell>
                                 <TableCell>{user.role}</TableCell>
                                 <TableCell>
-                                    <IconButton onClick={() => handleOpenModal('edit', user)}>
+                                    <IconButton color="primary" onClick={() => handleOpenModal('edit', user)}>
                                         <Edit />
                                     </IconButton>
-                                    <IconButton onClick={() => handleOpenDeleteDialog(user.id)}>
+                                    <IconButton color="secondary" onClick={() => handleOpenDeleteDialog(user.id)}>
                                         <Delete />
                                     </IconButton>
                                 </TableCell>
