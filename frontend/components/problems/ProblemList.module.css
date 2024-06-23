@@ -36,17 +36,14 @@
     flex-direction: row;
     justify-content: space-between;
     flex: 1;
+    border-bottom: none !important;
 }
 
 .custom_table {
     width: 100%;
 }
 
-.custom_table th,
-.custom_table td {
-    border-bottom: 1px solid #ddd;
-    border-right: 1px solid #ddd;
-}
+
 
 .search_bar {
     background-color: #fff;

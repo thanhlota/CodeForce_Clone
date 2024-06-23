@@ -187,9 +187,10 @@ async function getProblemById(req, res) {
 
 async function getProblems(req, res) {
     try {
-        const { ns, cgs } = req.query;
+        const { ns, cs, cgs } = req.query;
         const searchConditions = [];
         if (ns) searchConditions.push({ name: { [Op.like]: `%${ns}%` } });
+        if (cs) searchConditions.push({ contest_id: { [Op.eq]: cs } });
         const filter = {
             [Op.and]: searchConditions
         }
@@ -199,7 +200,7 @@ async function getProblems(req, res) {
         })
     }
     catch (e) {
-        console.log("Get contests failed with error:", e.message);
+        console.log("Get problems failed with error:", e.message);
         return DefaultError.httpResponse(res);
     }
 }

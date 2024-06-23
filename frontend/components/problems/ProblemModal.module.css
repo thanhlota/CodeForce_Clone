@@ -1,0 +1,9 @@
+.custom_btn {
+    max-width: 200px;
+}
+
+.custom {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}

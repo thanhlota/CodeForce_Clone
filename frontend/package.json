@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@ckeditor/ckeditor5-build-classic": "^41.4.2",
     "@codemirror/lang-cpp": "^6.0.2",
     "@codemirror/lang-java": "^6.0.1",
     "@codemirror/lang-javascript": "^6.2.2",
@@ -24,12 +25,17 @@
     "@reduxjs/toolkit": "^2.2.5",
     "codemirror": "^6.0.1",
     "js-cookie": "^3.0.5",
+    "katex": "^0.16.10",
+    "mathquill4quill": "^2.4.0",
     "moment-timezone": "^0.5.45",
     "next": "14.2.3",
     "next-redux-wrapper": "^8.1.0",
     "node-fetch": "^3.3.2",
+    "quill": "^2.0.2",
+    "quill-better-table": "^1.2.10",
     "react": "^18",
     "react-dom": "^18",
+    "react-quill": "^2.0.0",
     "react-redux": "^9.1.2"
   }
 }

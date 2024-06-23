@@ -1,4 +1,3 @@
-// src/App.js
 import React, { useState } from 'react';
 import {
     Typography,
@@ -19,17 +18,21 @@ import {
     TextField,
     Box,
     Snackbar,
-    CircularProgress
+    CircularProgress,
+    Link
 } from '@mui/material';
 import { Add, Edit, Delete, Search } from '@mui/icons-material';
 import MuiAlert from '@mui/material/Alert';
 import contestService from '@/services/contest.service';
+import { useRouter } from 'next/router';
 
 const Alert = React.forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
 
 const ContestTable = ({ contests, setContests }) => {
+    const router = useRouter();
+
     const [searchTerm, setSearchTerm] = useState('');
     const [open, setOpen] = useState(false);
     const [currentContest, setCurrentContest] = useState({ id: '', name: '', start_time: '', end_time: '' });
@@ -220,6 +223,10 @@ const ContestTable = ({ contests, setContests }) => {
         setSnackbarOpen(false);
     };
 
+    const handleIdClick = (id) => {
+        router.push(`/admin/contest/${id}`);
+    }
+
     return (
         <>
             <TableContainer component={Paper} style={{ marginTop: 20 }}>
@@ -264,7 +271,11 @@ const ContestTable = ({ contests, setContests }) => {
                     <TableBody>
                         {filteredContests.map((contest) => (
                             <TableRow key={contest.id}>
-                                <TableCell>{contest.id}</TableCell>
+                                <TableCell>
+                                    <Link sx={{ cursor: 'pointer' }} onClick={() => handleIdClick(contest.id)}>
+                                        #{contest.id}
+                                    </Link>
+                                </TableCell>
                                 <TableCell>{contest.name}</TableCell>
                                 <TableCell>{contest.start_time}</TableCell>
                                 <TableCell>{contest.end_time}</TableCell>
@@ -384,3 +395,4 @@ const ContestTable = ({ contests, setContests }) => {
 };
 
 export default ContestTable;
+
