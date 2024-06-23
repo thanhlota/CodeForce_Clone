@@ -39,25 +39,13 @@ const ContestTable = ({ contests, setContests }) => {
     const [snackbarSeverity, setSnackbarSeverity] = useState('success');
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
+    const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+    const [deleteContestId, setDeleteContestId] = useState(null);
 
     const filteredContests = contests ? contests.filter((contest) =>
         contest.name.toLowerCase().includes(searchTerm.toLowerCase())
+        || contest.state.toLowerCase().includes(searchTerm.toLowerCase())
     ) : [];
-
-    const handleOpen = (contest = { id: '', name: '', start_time: '', end_time: '' }) => {
-        setIsEditing(!!contest.id);
-        setCurrentContest(contest);
-        setOpen(true);
-    };
-
-    const handleClose = () => {
-        setOpen(false);
-    };
-
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setCurrentContest((prev) => ({ ...prev, [name]: value }));
-    };
 
     const getState = (start_time, end_time) => {
         const now = new Date();
@@ -88,7 +76,38 @@ const ContestTable = ({ contests, setContests }) => {
         return `${year}-${month}-${date}T${hours}:${minutes}`;
     };
 
+
     const minDateTime = getCurrentDateTime();
+
+    const handleOpenDeleteDialog = (id) => {
+        setDeleteContestId(id);
+        setOpenDeleteDialog(true);
+    };
+
+    const handleCloseDeleteDialog = () => {
+        setOpenDeleteDialog(false);
+    };
+
+    const handleOpen = (contest = { id: '', name: '', start_time: '', end_time: '' }) => {
+        setIsEditing(!!contest.id);
+        if (contest?.start_time) {
+            contest.start_time = getCurrentDateTime(contest.start_time);
+        }
+        if (contest?.end_time) {
+            contest.end_time = getCurrentDateTime(contest.end_time);
+        }
+        setCurrentContest(contest);
+        setOpen(true);
+    };
+
+    const handleClose = () => {
+        setOpen(false);
+    };
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setCurrentContest((prev) => ({ ...prev, [name]: value }));
+    };
 
     const getColor = (state) => {
         switch (state) {
@@ -133,16 +152,35 @@ const ContestTable = ({ contests, setContests }) => {
 
     const handleUpdate = async () => {
         try {
-
+            setLoading(true);
+            const res = await contestService.updateContest(currentContest);
+            if (res.status != 200) {
+                setSnackbarMessage(res.message);
+                setSnackbarSeverity('error');
+            }
+            else {
+                const { contest } = await res.json();
+                setContests((prev) =>
+                    prev.map((item) =>
+                        item.id === contest.id ? { ...contest, state: getState(contest.start_time, contest.end_time) } : item
+                    )
+                );
+                setSnackbarMessage("Contest updated successfully!");
+                setSnackbarSeverity('success');
+                handleClose();
+            }
         }
         catch (e) {
             console.log("ERROR", e);
+            setSnackbarMessage("INTERNAL SERVER ERROR");
+            setSnackbarSeverity('error');
         }
+        setLoading(false);
+        setSnackbarOpen(true);
     }
 
     const handleSave = () => {
         const tempErrors = validate();
-
 
         if (Object.keys(tempErrors).length !== 0) {
             setErrors(tempErrors);
@@ -151,18 +189,27 @@ const ContestTable = ({ contests, setContests }) => {
 
         if (isEditing) {
             handleUpdate();
-            // setContests((prev) =>
-            //     prev.map((contest) =>
-            //         contest.id === currentContest.id ? { ...currentContest, state: getState(currentContest.start_time, currentContest.end_time) } : contest
-            //     )
-            // );
         } else {
             handleAdd();
         }
     };
 
-    const handleDelete = (id) => {
-        setContests((prev) => prev.filter((contest) => contest.id !== id));
+    const handleDeleteContest = async () => {
+        try {
+            setLoading(true);
+            await contestService.deleteContest(deleteContestId);
+            setContests(contests.filter(contest => contest.id !== deleteContestId));
+            setSnackbarMessage('Contest removed successfully!');
+            setSnackbarSeverity('success');
+        }
+        catch (e) {
+            console.log("ERROR", e);
+            setSnackbarMessage('Failed to delete contest');
+            setSnackbarSeverity('error');
+        }
+        setLoading(false);
+        handleCloseDeleteDialog();
+        setSnackbarOpen(true);
     };
 
     const handleSearch = (event) => {
@@ -235,10 +282,10 @@ const ContestTable = ({ contests, setContests }) => {
                                     </Box>
                                 </TableCell>
                                 <TableCell>
-                                    <IconButton color="primary" onClick={() => handleOpen(contest)}>
+                                    <IconButton disabled={contest.state === 'ongoing'} color="primary" onClick={() => handleOpen(contest)}>
                                         <Edit />
                                     </IconButton>
-                                    <IconButton color="secondary" onClick={() => handleDelete(contest.id)}>
+                                    <IconButton disabled={contest.state === 'ongoing'} color="secondary" onClick={() => handleOpenDeleteDialog(contest.id)}>
                                         <Delete />
                                     </IconButton>
                                 </TableCell>
@@ -303,6 +350,27 @@ const ContestTable = ({ contests, setContests }) => {
                         disabled={loading}
                     >
                         {loading ? <CircularProgress size={24} /> : "Save"}
+                    </Button>
+                </DialogActions>
+            </Dialog>
+            <Dialog
+                open={openDeleteDialog}
+                onClose={handleCloseDeleteDialog}
+                aria-labelledby="delete-dialog-title"
+                aria-describedby="delete-dialog-description"
+            >
+                <DialogTitle id="delete-dialog-title">Delete Contest</DialogTitle>
+                <DialogContent>
+                    <DialogContentText id="delete-dialog-description">
+                        Are you sure you want to delete this contest?
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCloseDeleteDialog} color="primary">
+                        Cancel
+                    </Button>
+                    <Button onClick={handleDeleteContest} color="primary" variant="contained" autoFocus>
+                        Delete
                     </Button>
                 </DialogActions>
             </Dialog>

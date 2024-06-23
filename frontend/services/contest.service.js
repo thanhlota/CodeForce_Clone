@@ -35,9 +35,9 @@ const contestService = {
         return res;
     },
 
-    updateContest: async (id, info) => {
+    updateContest: async (info) => {
         const res = await fetch(
-            `http://${process.env.NEXT_PUBLIC_CONTEST_SERVICE_URI}/api/contest/admin/update/${id}`,
+            `http://${process.env.NEXT_PUBLIC_CONTEST_SERVICE_URI}/api/contest/admin/update/${info.id}`,
             {
                 method: "PUT",
                 headers: {
@@ -48,6 +48,20 @@ const contestService = {
             },
         );
         return res;
+    },
+
+    deleteContest: async (id) => {
+        const res = await fetch(
+            `http://${process.env.NEXT_PUBLIC_CONTEST_SERVICE_URI}/api/contest/admin/remove/${id}`,
+            {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                credentials: 'include',
+            }
+        );
+        return await res.json();
     }
 }
 export default contestService;
