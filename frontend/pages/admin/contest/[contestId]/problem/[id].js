@@ -25,7 +25,7 @@ import {
 } from '@mui/material';
 import Category from "@/components/problems/Category.jsx";
 import dynamic from 'next/dynamic';
-const TextEditor = dynamic(() => import('@/components/problems/TextEditor'), { ssr: false });
+const TextEditor = dynamic(() => import('@/components/problems/TextEditor').then((mod) => mod.default), { ssr: false, loading: () => <p>Editor loading ...</p> });
 import styles from "@/components/problems/ProblemModal.module.css";
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import DeleteIcon from '@mui/icons-material/Delete';

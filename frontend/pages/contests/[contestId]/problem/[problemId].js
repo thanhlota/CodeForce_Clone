@@ -5,6 +5,7 @@ import styles from "@/styles/problem.module.css";
 import TestTable from "@/components/problems/TestTable";
 import ContestLayout from "@/components/layout/ContestLayout";
 import { updateUserInfo } from "@/utils/auth";
+import dynamic from 'next/dynamic';
 
 const ProblemItem = () => {
     const router = useRouter();
@@ -71,15 +72,24 @@ const ProblemItem = () => {
                     </div>
                     <div className={styles.problem_description}>
                         <div className={styles.problem_title}>Problem Description</div>
-                        <div className={styles.content}>{problemInfo.description}</div>
+                        <div dangerouslySetInnerHTML={{ __html: problemInfo.description }}
+                            className={styles.content}
+                        >
+                        </div>
                     </div>
                     <div className={styles.guide_input}>
                         <div className={styles.problem_title}>Input</div>
-                        <div className={styles.content}>{problemInfo.guide_input}</div>
+                        <div dangerouslySetInnerHTML={{ __html: problemInfo.guide_input }}
+                            className={styles.content}
+                        >
+                        </div>
                     </div>
                     <div className={styles.guide_output}>
                         <div className={styles.problem_title}>Output</div>
-                        <div className={styles.content}>{problemInfo.guide_output}</div>
+                        <div dangerouslySetInnerHTML={{ __html: problemInfo.guide_output }}
+                            className={styles.content}
+                        >
+                        </div>
                     </div>
                     <div className={styles.sample_tests}>
                         <div className={styles.problem_title}>Example</div>
