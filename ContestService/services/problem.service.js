@@ -28,6 +28,22 @@ async function getById(id) {
     });
 }
 
+async function adminGetById(id) {
+    return await problems.findByPk(id, {
+        include: [{
+            model: categories,
+            through: { attributes: [] },
+            required: false
+        },
+        {
+            model: testcases,
+            attributes: ['id', 'input', 'expected_output', 'isSample'],
+            required: false
+        }
+        ]
+    });
+}
+
 async function getProblems(filter = {}) {
     return await problems.findAll({
         where: filter,
@@ -53,7 +69,7 @@ async function getProblem(filter = {}) {
         include: {
             model: categories,
             through: { attributes: [] },
-            
+
         }
     });
 }
@@ -75,5 +91,6 @@ module.exports = {
     getProblem,
     getProblems,
     remove,
-    update
+    update,
+    adminGetById
 }

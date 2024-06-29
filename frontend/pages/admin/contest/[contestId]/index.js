@@ -9,7 +9,7 @@ export default function ContestPage() {
     const router = useRouter();
     const [problems, setProblems] = useState(null);
     const hasFetched = useRef(false);
-    const { id: contestId } = router.query;
+    const { contestId } = router.query;
     const fetchProblems = useCallback(async () => {
         try {
             const { problems } = await problemService.getProblemByContest(contestId);

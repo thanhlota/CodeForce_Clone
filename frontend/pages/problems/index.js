@@ -12,9 +12,10 @@ export default function Problems() {
         try {
             const { problems } = await problemService.getProblems();
             problems.forEach((item) => {
-                let merge_categories = item.categories.map((category) => category.type);
-                merge_categories = merge_categories.join(", ");
+                const merge_categories = item.categories.map((category) => category.type);
+                const display_categories = merge_categories.join(", ");
                 item.categories = merge_categories;
+                item.display_categories = display_categories;
                 item.limit = item.time_limit / 1000 + " s, " + item.memory_limit + " MB";
             });
             setProblems(problems);

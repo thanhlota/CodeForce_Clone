@@ -4,12 +4,17 @@ const ProblemRouter = express.Router();
 const { verifyAdmin } = require("../middlewares/auth.js");
 
 ProblemRouter.get(
+    "/admin/:id", verifyAdmin, ProblemController.getProblemById
+)
+
+ProblemRouter.get(
     "/all", ProblemController.getProblems
 )
 
 ProblemRouter.get(
     "/:id", ProblemController.getProblemById
 )
+
 
 ProblemRouter.post(
     "/admin/create", verifyAdmin, ProblemController.create

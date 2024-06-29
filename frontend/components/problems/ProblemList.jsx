@@ -9,15 +9,32 @@ import Paper from '@mui/material/Paper';
 import TextField from '@mui/material/TextField';
 import styles from './ProblemList.module.css';
 import { useRouter } from 'next/router';
-import { IconButton, Box, Typography, Button, Snackbar, Alert } from '@mui/material';
+import {
+    IconButton,
+    Box,
+    Typography,
+    Button,
+    Snackbar,
+    Alert,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogContentText,
+    DialogTitle,
+    CircularProgress
+} from '@mui/material';
 import { Add, Edit, Delete, Search } from '@mui/icons-material';
 import ProblemModal from '@/components/problems/ProblemModal.jsx';
+import problemService from "@/services/problem.service";
 
 export default function CustomTable({ data, setData, admin }) {
     const router = useRouter();
+    const { contestId } = router.query;
     const [searchTerm, setSearchTerm] = useState('');
-
+    const contestName = data?.length ? data[0].contest.name : null;
     const [currentProblem, setCurrentProblem] = useState({
+        id: '',
+        contest_id: '',
         title: '',
         description: '',
         guide_input: '',
@@ -25,7 +42,8 @@ export default function CustomTable({ data, setData, admin }) {
         time_limit: '',
         memory_limit: '',
         categories: [],
-        display_categories: ''
+        display_categories: '',
+        testcases: []
     });
 
     const [isEditing, setIsEditing] = useState(false);
@@ -44,6 +62,13 @@ export default function CustomTable({ data, setData, admin }) {
         }));
     };
 
+    const setTestcases = (newTestcases) => {
+        setCurrentProblem((prev) => ({
+            ...prev,
+            testcases: newTestcases
+        }))
+    }
+
     const handleClose = () => {
         setOpen(false);
     }
@@ -61,11 +86,74 @@ export default function CustomTable({ data, setData, admin }) {
         router.push(`/contests/${contestId}/problem/${problemId}`);
     }, []);
 
-    const handleOpen = (problem = {}) => {
-        setIsEditing(!!problem);
+    const handleOpen = (problem = { contest_id: contestId, contest: { name: contestName } }) => {
+        setIsEditing(!!problem.id);
         setCurrentProblem(problem);
         setOpen(true);
     }
+
+    const handleAdd = async () => {
+        try {
+            const res = await problemService.addProblem(currentProblem);
+            if (res.status == 200) {
+                setSnackbarMessage("Problem added successfully!");
+                setSnackbarSeverity('success');
+                setData((prev) => [
+                    ...prev,
+                    { ...currentProblem, display_categories: currentProblem.categories.join(", ") },
+                ]);
+                handleClose();
+            }
+            else {
+                setSnackbarMessage("Problem added failed!");
+                setSnackbarSeverity('error');
+            }
+        }
+        catch (e) {
+            setSnackbarMessage("Problem added failed!");
+            setSnackbarSeverity('error');
+        }
+        setSnackbarOpen(true);
+    }
+
+    const handleUpdate = async (problemId) => {
+        router.push(`/admin/contest/${contestId}/problem/${problemId}`)
+    }
+
+    const handleSubmit = async () => {
+        if (!isEditing) {
+            await handleAdd();
+        }
+        else await handleUpdate();
+    };
+
+    const handleDeleteProblem = async () => {
+        try {
+            setLoading(true);
+            await problemService.deleteProblem(deleteProblemId);
+            setData(data.filter(problem => problem.id !== deleteProblemId));
+            setSnackbarMessage('Problem removed successfully!');
+            setSnackbarSeverity('success');
+        }
+        catch (e) {
+            console.log("ERROR", e);
+            setSnackbarMessage('Failed to delete problem');
+            setSnackbarSeverity('error');
+        }
+        setLoading(false);
+        handleCloseDeleteDialog();
+        setSnackbarOpen(true);
+    };
+
+    const handleCloseDeleteDialog = () => {
+        setOpenDeleteDialog(false);
+    };
+
+    const handleOpenDeleteDialog = (id) => {
+        setDeleteProblemId(id);
+        setOpenDeleteDialog(true);
+    };
+
 
     return (
         <div className={styles.custom_table}>
@@ -116,7 +204,7 @@ export default function CustomTable({ data, setData, admin }) {
                                 className={styles.table_row}
                             >
                                 <TableCell className={styles.custom_cell}>
-                                    <span className={styles.problem} onClick={() => handleProblemClick(row.contest.id, row.id)}>
+                                    <span className={styles.problem} onClick={() => handleProblemClick(row.contest_id, row.id)}>
                                         {row.title}
                                     </span>
                                     <div className={styles.limit_container}>
@@ -128,10 +216,10 @@ export default function CustomTable({ data, setData, admin }) {
                                 <TableCell align="right" className={styles.contest}>{row.contest.name}</TableCell>
                                 {admin &&
                                     <TableCell align="right">
-                                        <IconButton color="primary">
+                                        <IconButton color="primary" onClick={() => handleUpdate(row.id)}>
                                             <Edit />
                                         </IconButton>
-                                        <IconButton color="secondary" >
+                                        <IconButton color="secondary" onClick={() => handleOpenDeleteDialog(row.id)} >
                                             <Delete />
                                         </IconButton>
                                     </TableCell>
@@ -147,9 +235,36 @@ export default function CustomTable({ data, setData, admin }) {
                 handleClose={handleClose}
                 problem={currentProblem}
                 setProblem={setCurrentProblem}
-                selectedCategories={problem.categories}
+                selectedCategories={currentProblem.categories ? currentProblem.categories : []}
                 setSelectedCategories={setCategories}
+                testcases={currentProblem.testcases ? currentProblem.testcases : []}
+                setTestcases={setTestcases}
+                handleSubmit={handleSubmit}
             />
+            <Dialog
+                open={openDeleteDialog}
+                onClose={handleCloseDeleteDialog}
+                aria-labelledby="delete-dialog-title"
+                aria-describedby="delete-dialog-description"
+            >
+                <DialogTitle id="delete-dialog-title">Delete Problem</DialogTitle>
+                <DialogContent>
+                    <DialogContentText id="delete-dialog-description">
+                        Are you sure you want to delete this problem?
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCloseDeleteDialog} color="primary">
+                        Cancel
+                    </Button>
+                    <Button onClick={handleDeleteProblem} color="primary" variant="contained" autoFocus
+                        disabled={loading}
+                        startIcon={loading && <CircularProgress size={20} />}
+                    >
+                        Delete
+                    </Button>
+                </DialogActions>
+            </Dialog>
             <Snackbar open={snackbarOpen} autoHideDuration={3000} onClose={handleSnackbarClose}>
                 <Alert onClose={handleSnackbarClose} severity={snackbarSeverity}>
                     {snackbarMessage}

@@ -55,6 +55,10 @@ const ERROR = {
         status: 404,
         message: "Problem is not existed"
     },
+    NON_EXISTED_TESTCASE: {
+        status: 404,
+        message: "Testcase is not existed"
+    },
     INCORRECT: {
         status: 401,
         message: "Incorrect email or password"

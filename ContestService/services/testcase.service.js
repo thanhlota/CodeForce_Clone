@@ -1,10 +1,12 @@
 const testcases = require("../models").testcases;
 
-async function create(problem_id, input, expected_output, isSample) {
-    const testcase = testcases.build({
-        problem_id, input, expected_output, isSample
-    })
-    return await testcase.save();
+async function create(problem_id, input, expected_output, isSample, option = {}) {
+    return await testcases.create(
+        {
+            problem_id, input, expected_output, isSample
+        },
+        option
+    )
 }
 
 async function getById(id) {

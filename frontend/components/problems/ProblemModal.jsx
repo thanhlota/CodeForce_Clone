@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Modal, Box, TextField, Button, Typography } from '@mui/material';
+import { Modal, Box, TextField, Button, Typography, CircularProgress } from '@mui/material';
 import dynamic from 'next/dynamic';
 import styles from "./ProblemModal.module.css";
+import Category from "./Category";
 
 const TextEditor = dynamic(() => import('@/components/problems/TextEditor'), { ssr: false });
 
@@ -10,7 +11,7 @@ const style = {
     top: '50%',
     left: '50%',
     transform: 'translate(-50%, -50%)',
-    width: 1000,
+    width: 800,
     maxHeight: '90vh',
     bgcolor: 'background.paper',
     border: '2px solid #000',
@@ -24,10 +25,18 @@ const MIN_TIME_LIMIT = 0;
 const MAX_MEMORY_LIMIT = 500;
 const MIN_MEMORY_LIMIT = 0;
 
-const ProblemModal = ({ isEditing, open, handleClose, problem, setProblem, selectedCategories, setSelectedCategories }) => {
+const ProblemModal = ({
+    isEditing,
+    open,
+    handleClose,
+    problem,
+    setProblem,
+    selectedCategories,
+    setSelectedCategories,
+    handleSubmit
+}) => {
     const [errors, setErrors] = useState({});
-  
-
+    const [loading, setLoading] = useState(false);
     const handleAddCategory = (category) => {
         if (!selectedCategories.includes(category)) {
             setSelectedCategories([...selectedCategories, category]);
@@ -38,9 +47,6 @@ const ProblemModal = ({ isEditing, open, handleClose, problem, setProblem, selec
         setSelectedCategories(selectedCategories.filter((category) => category !== categoryToDelete));
     };
 
-    const handleSearchChange = (e) => {
-        setSearchQuery(e.target.value);
-    };
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -50,10 +56,6 @@ const ProblemModal = ({ isEditing, open, handleClose, problem, setProblem, selec
         }));
     };
 
-    const handleSubmit = () => {
-        console.log(problem);
-        handleClose();
-    };
 
     const handleDescriptionChange = (value) => {
         setProblem(prevProblem => ({
@@ -97,6 +99,12 @@ const ProblemModal = ({ isEditing, open, handleClose, problem, setProblem, selec
         }));
     }
 
+    const handleSubmitClick = () => {
+        setLoading(true);
+        handleSubmit();
+        setLoading(false);
+    }
+
     return (
         <Modal
             open={open}
@@ -125,7 +133,7 @@ const ProblemModal = ({ isEditing, open, handleClose, problem, setProblem, selec
                 />
                 <div style={{ margin: '5px 0px' }}>
                     <Typography variant="h5" component="label" gutterBottom >
-                        Guide output
+                        Guide input
                     </Typography>
                 </div>
                 <TextEditor
@@ -134,7 +142,7 @@ const ProblemModal = ({ isEditing, open, handleClose, problem, setProblem, selec
                 />
                 <div style={{ margin: '5px 0px' }}>
                     <Typography variant="h5" component="label" gutterBottom >
-                        Guide Input
+                        Guide output
                     </Typography>
                 </div>
                 <TextEditor
@@ -150,11 +158,6 @@ const ProblemModal = ({ isEditing, open, handleClose, problem, setProblem, selec
                         fullWidth
                         margin="normal"
                         type="number"
-                        inputProps={{
-                            inputProps: {
-                                max: MAX_TIME_LIMIT, min: MIN_TIME_LIMIT
-                            }
-                        }}
                     />
                 </div>
                 <div className={styles.custom_btn}>
@@ -166,15 +169,19 @@ const ProblemModal = ({ isEditing, open, handleClose, problem, setProblem, selec
                         fullWidth
                         margin="normal"
                         type="number"
-                        inputProps={{
-                            inputProps: {
-                                max: MAX_MEMORY_LIMIT, min: MIN_MEMORY_LIMIT
-                            }
-                        }}
                     />
                 </div>
+                <Category
+                    selectedCategories={selectedCategories}
+                    handleAddCategory={handleAddCategory}
+                    handleDeleteCategory={handleDeleteCategory}
+                />
+
                 <div className={styles.custom}>
-                    <Button variant="contained" color="primary" onClick={handleSubmit} fullWidth sx={{ maxWidth: '200px' }}>
+                    <Button variant="contained" color="primary" onClick={handleSubmitClick} fullWidth sx={{ maxWidth: '200px' }}
+                        disabled={loading}
+                        startIcon={loading && <CircularProgress size={20} />}
+                    >
                         Submit
                     </Button>
                 </div>

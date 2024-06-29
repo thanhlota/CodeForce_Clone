@@ -3,14 +3,34 @@ const ERROR = require("../enum/error");
 const ContestService = require("../services/contest.service");
 const ProblemService = require("../services/problem.service");
 const CategoryService = require("../services/category.service");
+const TestcaseService = require("../services/testcase.service");
+
 const { Op } = require("sequelize");
 const { sequelize } = require("../models");
 
 async function create(req, res) {
     const t = await sequelize.transaction();
     try {
-        const { contest_id, title, description, guide_input, guide_output, time_limit, memory_limit, categories } = req.body;
-        if (!contest_id || !title || !description || !guide_input || !guide_output | !time_limit || !memory_limit || !categories || !categories.length) {
+        const {
+            contest_id,
+            title,
+            description,
+            guide_input,
+            guide_output,
+            time_limit,
+            memory_limit,
+            categories,
+            testcases
+        } = req.body;
+        if (!contest_id ||
+            !title ||
+            !description ||
+            !guide_input ||
+            !guide_output ||
+            !time_limit ||
+            !memory_limit ||
+            !categories ||
+            !categories.length) {
             return new ErrorHandler(
                 ERROR.MISSING_PROBLEM_INFO.status,
                 ERROR.MISSING_PROBLEM_INFO.message
@@ -54,7 +74,21 @@ async function create(req, res) {
         const problem = await ProblemService.create(contest_id, title, description, guide_input, guide_output, time_limit, memory_limit,
             { transaction: t }
         );
+
         await problem.setCategories(db_categories, { transaction: t });
+
+        const createdTestCases = await Promise.all(
+            testcases.map(async (testCase) => {
+                return await TestcaseService.create(
+                    problem.id,
+                    testCase.input,
+                    testCase.expected_output,
+                    true,
+                    { transaction: t }
+                );
+            })
+        );
+
         await t.commit();
         res.status(200).send({
             problem
@@ -168,7 +202,11 @@ async function getProblemById(req, res) {
                 ERROR.NON_EXISTED_PROBLEM.message
             ).httpResponse(res);
         }
-        const problem = await ProblemService.getById(id);
+        let problem = null;
+        const { role } = req.query;
+        if (!role)
+            problem = await ProblemService.getById(id);
+        else problem = await ProblemService.adminGetById(id);
         if (!problem) {
             return new ErrorHandler(
                 ERROR.NON_EXISTED_PROBLEM.status,
@@ -184,6 +222,7 @@ async function getProblemById(req, res) {
         return DefaultError.httpResponse(res);
     }
 }
+
 
 async function getProblems(req, res) {
     try {
