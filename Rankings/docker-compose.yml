@@ -11,6 +11,7 @@ services:
       - cf_network
     depends_on:
       - redis_db
+      - ranking_db
   redis_db:
     image: redis:6.0
     restart: always
@@ -18,9 +19,23 @@ services:
       - redis-data:/data
     networks:
       - cf_network
+  ranking_db:
+    image: mysql:8.4.0
+    restart: always
+    volumes:
+      - ranking-db:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_TCP_PORT: ${MYSQL_PORT}
+    ports:
+      - ${DB_HOST_PORT}:${DB_CONTAINER_PORT}
+    networks:
+      - cf_network
 volumes:
   redis-data:
     driver: local
+  ranking-db:
 
 networks:
   cf_network:
