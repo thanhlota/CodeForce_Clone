@@ -14,23 +14,39 @@ const Submissions = () => {
     const { contestId } = router.query;
     const userId = useSelector(userIdSelector);
     const [submissions, setSubmissions] = useState(null);
+    const [page, setPage] = useState(0);
+    const [totalPages, setTotalPages] = useState(0);
+
     const hasFetched = useRef(false);
     const eventSourceRef = useRef(null);
 
     const fetchSubmissions = useCallback(async () => {
         try {
-            const { submissions } = await submitService.getByUserAndContest(userId, contestId);
+            const { submissions, totalPages } = await submitService.getByUserAndContest(userId, contestId, 1);
             const unfulfilledSubmissions = submissions.filter((submission) => submission.verdict == Verdict.TT);
             if (unfulfilledSubmissions?.length) {
                 eventSourceRef.current = sseClient(unfulfilledSubmissions, submissions, setSubmissions);
             }
             setSubmissions(submissions);
+            setTotalPages(totalPages);
         }
         catch (e) {
             console.log('ERROR', e);
         }
 
     }, [contestId, userId]);
+
+    const handlePageChange = async (event, value) => {
+        setSubmissions([]);
+        setPage(value);
+        try {
+            const { submissions, totalPages } = await submitService.getByUserAndContest(userId, contestId, value);
+            setSubmissions(submissions);
+            setTotalPages(totalPages);
+        } catch (e) {
+            console.log("ERROR", e);
+        }
+    };
 
     useEffect(() => {
         if (userId && contestId && !hasFetched.current) {
@@ -50,7 +66,12 @@ const Submissions = () => {
 
     return (
         <ContestLayout>
-            <SubmissionList data={submissions} />
+            <SubmissionList
+                data={submissions}
+                page={page}
+                totalPages={totalPages}
+                handlePageChange={handlePageChange}
+            />
         </ContestLayout>
     );
 

@@ -65,3 +65,4 @@ yarn.lock
 
 output/
 pnpm-lock.yaml
+performance_testing/*.txt

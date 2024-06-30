@@ -6,11 +6,12 @@ const { Op } = require("sequelize");
 const Publisher = require("../queues/publisher");
 const Client = require("../sse/Client.js");
 const SseServer = require("../sse/SseServer.js");
+const PAGE_LIMIT = 20;
 
 async function create(req, res) {
     try {
-        const { user_id, problem_id, contest_id, code, language } = req.body;
-        if (!user_id || !problem_id || !code || !language || !contest_id) {
+        const { user_id, problem_id, contest_id, code, language, mem, time } = req.body;
+        if (!user_id || !problem_id || !code || !language || !contest_id || !mem || !time) {
             return new ErrorHandler(
                 ERROR.MISSING_SUBMISSION_INFO.status,
                 ERROR.MISSING_SUBMISSION_INFO.message
@@ -22,6 +23,8 @@ async function create(req, res) {
             const publisher = Publisher.getInstance();
             const job = {
                 submission_id: submission.id,
+                mem,
+                time,
                 code,
                 lang: language,
                 testcases
@@ -67,18 +70,23 @@ async function getById(req, res) {
 
 async function getSubmissions(req, res) {
     try {
-        const { uq, ctq } = req.query;
+        let { uq, ctq, page } = req.query;
         const searchConditions = [];
         if (uq) searchConditions.push({ user_id: uq });
         if (ctq) {
             searchConditions.push({ contest_id: ctq });
         }
+        if (!page) {
+            page = 1;
+        }
+        const offset = (page - 1) * PAGE_LIMIT;
         const filter = {
             [Op.and]: searchConditions
         }
-        const submissions = await SubmissionService.getSubmissions(filter);
+        const { submissions, totalSubmissions } = await SubmissionService.getSubmissions(filter, PAGE_LIMIT, offset);
         return res.status(200).send({
-            submissions
+            submissions,
+            totalPages: Math.ceil(totalSubmissions / PAGE_LIMIT)
         })
     }
     catch (e) {

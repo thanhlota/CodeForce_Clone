@@ -3,7 +3,6 @@ const ERROR = require("../enum/error");
 const ContestService = require("../services/contest.service");
 const ProblemService = require("../services/problem.service");
 const CategoryService = require("../services/category.service");
-const TestcaseService = require("../services/testcase.service");
 
 const { Op } = require("sequelize");
 const { sequelize } = require("../models");
@@ -76,19 +75,6 @@ async function create(req, res) {
         );
 
         await problem.setCategories(db_categories, { transaction: t });
-
-        const createdTestCases = await Promise.all(
-            testcases.map(async (testCase) => {
-                return await TestcaseService.create(
-                    problem.id,
-                    testCase.input,
-                    testCase.expected_output,
-                    true,
-                    { transaction: t }
-                );
-            })
-        );
-
         await t.commit();
         res.status(200).send({
             problem

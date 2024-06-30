@@ -5,14 +5,16 @@ const submitService = {
             {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
+                credentials: 'include',
                 body: JSON.stringify(data)
             },
+
         );
         return await res.json();
     },
-    getByUserAndContest: async (userId, contestId) => {
+    getByUserAndContest: async (userId, contestId, page) => {
         const res = await fetch(
-            `http://${process.env.NEXT_PUBLIC_SUBMISSION_SERVICE_URI}/api/submission/all?uq=${userId}&ctq=${contestId}`,
+            `http://${process.env.NEXT_PUBLIC_SUBMISSION_SERVICE_URI}/api/submission/all?uq=${userId}&ctq=${contestId}&page=${page}`,
             {
                 method: "GET",
                 headers: { "Content-Type": "application/json" },

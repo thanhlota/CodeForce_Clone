@@ -6,7 +6,7 @@ const route = require("./routes");
 const Publisher = require("./queues/publisher");
 
 app.use(cors({
-    origin: ['http://localhost:3000','http://192.168.172.82:3000'],
+    origin: ['http://localhost:3000', 'http://192.168.172.82:3000'],
     allowMethods: ["GET", "OPTIONS", "POST", "PUT", "PATCH", "DELETE"],
     allowHeaders: [
         "DNT",

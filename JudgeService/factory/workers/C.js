@@ -23,15 +23,16 @@ class C extends Worker {
   async processJob(job) {
     const { mem, time, code, testcases, worker_response, submission_id } = job;
     const response = [];
-    let data = { exitCode: null, output: "", verdict: "", submission_id, time: "", memory: "" };
+    let data = {};
     try {
       for (let i = 0; i < testcases.length; i++) {
-        data = { ...data, 
-            testcase_id: testcases[i].id,
-           name: `Test_case_${i + 1}`,
-           expected_output: testcases[i].expected_output,
-           input:testcases[i].input
-          };
+        data = {
+          exitCode: null, output: "", verdict: "", submission_id, time: "", memory: "",
+          testcase_id: testcases[i].id,
+          name: `Test_case_${i + 1}`,
+          expected_output: testcases[i].expected_output,
+          input: testcases[i].input
+        };
         const endCharacter = "\x04";
         const input = testcases[i].input + endCharacter;
         if (this.container) {
@@ -41,8 +42,10 @@ class C extends Worker {
           await this.container.createContainer();
           await this.container.startContainer();
         }
-        await this.container.createFile();
-        await this.container.buildCode();
+        if (i == 0) {
+          await this.container.createFile();
+          await this.container.buildCode();
+        }
         await this.container.runCode();
         const output = this.container.getOutput();
         data = { ...data, output: output?.result, memory: output.memUsage, time: output.cpuUsage };
@@ -53,6 +56,10 @@ class C extends Worker {
           data.verdict = Verdict.WA;
         }
         response.push(data);
+        if (data.verdict == Verdict.WA) {
+          console.log("WRONG ANSWER");
+          break;
+        }
       }
       // await this.container.stopContainer();
     } catch (e) {
@@ -60,6 +67,10 @@ class C extends Worker {
       data.output = e.message;
       data.exitCode = exitCode;
       switch (exitCode) {
+        case CodeError.WRONG_ANSWER:
+          console.log("WRONG ANSWER", e.message);
+          data.verdict = Verdict.WA;
+          break;
         case CodeError.COMPILE_ERROR:
           console.log("COMPILE ERROR", e.message);
           data.verdict = Verdict.CE;

@@ -96,11 +96,12 @@ export default function CustomTable({ data, setData, admin }) {
         try {
             const res = await problemService.addProblem(currentProblem);
             if (res.status == 200) {
+                const { problem } = await res.json();
                 setSnackbarMessage("Problem added successfully!");
                 setSnackbarSeverity('success');
                 setData((prev) => [
                     ...prev,
-                    { ...currentProblem, display_categories: currentProblem.categories.join(", ") },
+                    { ...currentProblem, display_categories: currentProblem.categories.join(", "), id: problem.id },
                 ]);
                 handleClose();
             }

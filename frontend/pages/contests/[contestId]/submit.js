@@ -118,7 +118,9 @@ const SubmitPage = () => {
                 problem_id: selectedProblem,
                 language: selectedLanguage,
                 code: srcCode,
-                contest_id: contestId
+                contest_id: contestId,
+                mem: memoryLimit * 1024 * 1024,
+                time: timeLimit * 1000000000,
             }
             await submitService.create(data);
             setSnackbarMessage('Submission has been created successful!');

@@ -4,24 +4,26 @@ const ROLE = require("../enum/role");
 
 async function verifyUser(req, res, next) {
     try {
-        const userInfo = req.headers['x-user-info'];
+        let userInfo = req.headers['x-user-info'];
 
-        if (!userInfo || !userInfo.id || !userInfo.role) {
+        if (!userInfo) {
             return new ErrorHandler(
                 ERROR.INVALID_USER_INFO.status,
                 ERROR.INVALID_USER_INFO.message
             ).httpResponse(res);
         }
 
-        if (userInfo.role != ROLE.USER) {
+        userInfo = JSON.parse(JSON.parse(userInfo));
+
+        if (!userInfo.id || !userInfo.role) {
             return new ErrorHandler(
-                ERROR.FORBIDDEN_RESOURCE.status,
-                ERROR.FORBIDDEN_RESOURCE.message
+                ERROR.INVALID_USER_INFO.status,
+                ERROR.INVALID_USER_INFO.message
             ).httpResponse(res);
         }
 
         const { user_id } = req.body;
-            
+
         if (user_id != userInfo.id) {
             return new ErrorHandler(
                 ERROR.MALFORMED_REQUEST.status,

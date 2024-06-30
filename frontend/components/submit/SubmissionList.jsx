@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
 import {
     Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper,
-    Modal
+    Modal, Pagination
 } from '@mui/material';
 import styles from './SubmissionList.module.css';
 import formatDate from '@/utils/formatDate';
@@ -37,7 +37,7 @@ const TestItem = ({ index, time, memory, verdict, input, output, expected_output
         </div>
     )
 }
-const SubmissionList = ({ data }) => {
+const SubmissionList = ({ data, page, totalPages,handlePageChange }) => {
     const router = useRouter();
     const { contestId } = router.query;
     const [open, setOpen] = useState(false);
@@ -75,6 +75,7 @@ const SubmissionList = ({ data }) => {
     const handleClose = () => {
         setOpen(false);
     };
+
 
 
     return (
@@ -133,6 +134,15 @@ const SubmissionList = ({ data }) => {
                     </TableBody>
                 </Table>
             </TableContainer>
+            {
+                totalPages ?
+                    <Pagination
+                        count={totalPages}
+                        page={page}
+                        onChange={handlePageChange}
+                        className={styles.pagination}
+                    /> : null
+            }
             <Modal
                 open={open}
                 onClose={handleClose}
