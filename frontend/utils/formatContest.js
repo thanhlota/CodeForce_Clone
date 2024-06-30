@@ -30,4 +30,27 @@ const formatDateString = (dateString) => {
     return `${year}-${month}-${day}T${hours}:${minutes}`;
 };
 
+const formatContest2 = (contests) => {
+    const now = new Date();
+
+    const ongoingContests = [];
+    const upcomingContests = [];
+    const endedContests = [];
+    contests.forEach(contest => {
+        const startTime = new Date(contest.start_time);
+        const endTime = new Date(contest.end_time);
+
+        if (startTime <= now && endTime >= now) {
+            ongoingContests.push(contest);
+        } else if (startTime > now) {
+            upcomingContests.push(contest);
+        } else if (endTime < now) {
+            endedContests.push(contest);
+        }
+    });
+
+    return { ongoingContests, upcomingContests, endedContests };
+}
+export { formatContest2 };
+
 export default formatContest;

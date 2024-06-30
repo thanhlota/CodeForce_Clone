@@ -1,0 +1,13 @@
+# git
+
+.git
+.gitignore
+README.md
+# directory
+
+.dockerignore
+*Dockerfile*
+*docker-compose*
+node_modules
+.eslintignore
+.eslintrc.js

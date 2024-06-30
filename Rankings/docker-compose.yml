@@ -1,0 +1,27 @@
+version: "3"
+services:
+  ranking-service:
+    build: .
+    restart: always
+    ports:
+      - ${HOST_PORT}:${CONTAINER_PORT}
+    volumes:
+      - ./:/app
+    networks:
+      - cf_network
+    depends_on:
+      - redis_db
+  redis_db:
+    image: redis:6.0
+    restart: always
+    volumes:
+      - redis-data:/data
+    networks:
+      - cf_network
+volumes:
+  redis-data:
+    driver: local
+
+networks:
+  cf_network:
+    external: true

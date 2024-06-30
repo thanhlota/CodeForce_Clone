@@ -32,12 +32,27 @@ app.post('/api/process-job', (req, res) => {
     const newJob = new Job(lang, mem, time, code, testcases, worker_response, submission_id);
     FactoryInstance.distributeWorker(newJob);
 });
-
-const Consumer = require("./queues/consumer");
-
+const Publisher = require("./queues/publisher");
 (async (
 ) => {
-    const consumer = new Consumer();
+    const publisher = Publisher.getInstance();
+    await publisher.init();
+})();
+
+
+app.post('/api/rank', (req, res) => {
+    const publisher = Publisher.getInstance();
+    publisher.pushJob({
+        Test: true
+    })
+    res.status(200).send({ message: "OK" })
+})
+
+const Consumer = require("./queues/consumer");
+(async (
+) => {
+    const consumer = Consumer.getInstance();
     await consumer.init();
     consumer.receiveJob();
 })();
+

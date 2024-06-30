@@ -97,7 +97,7 @@ export default function Header() {
                                     <span className={styles.custom_icon}><HomeIcon fontSize="10px" /></span>
                                     <span>Home</span>
                                 </div>
-                                <div className={styles.navigation_item}>
+                                <div className={styles.navigation_item} onClick={() => router.push("/contests")}>
                                     <span className={styles.custom_icon} ><EmojiEventsIcon fontSize="10px" /></span>
                                     <span>Contests</span>
                                 </div>

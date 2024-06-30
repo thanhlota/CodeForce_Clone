@@ -12,6 +12,7 @@ services:
         paths:
           - /users
         strip_path: true
+
   - host: contest-service
     name: contest-service
     port: 7700
@@ -27,6 +28,7 @@ services:
           validation_endpoint: http://192.168.172.82:7000/api/user/validateToken
           ssl_verify: false
           user_header: X-User-Info
+
   - host: submission-service
     name: submission-service
     port: 7770
@@ -42,3 +44,13 @@ services:
           validation_endpoint: http://192.168.172.82:7000/api/user/validateToken
           ssl_verify: false
           user_header: X-User-Info
+
+  - host: ranking-service
+    name: ranking-service
+    port: 7171
+    protocol: http
+    routes:
+      - name: ranking-service-route
+        paths:
+          - /rankings
+        strip_path: true
