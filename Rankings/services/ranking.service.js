@@ -27,25 +27,68 @@ async function getRedisRanking(filter = {}) {
             const users = await client.sendCommand(['ZREVRANGE', `contest:${contest_id}_scores`, start.toString(), end.toString(), 'WITHSCORES']);
             for (let i = 0; i < users.length; i += 2) {
                 const userContestKey = `${users[i]}_contest:${contest_id}`;
-                const userName = await client.hGet(userContestKey, 'user_name');
+                const keys = await client.hGetAll(userContestKey);
+                let userName = null;
+                let problems = [];
+                for (const [key, value] of Object.entries(keys)) {
+                    if (key == 'user_name') {
+                        userName = value;
+                    }
+                    else {
+                        const id = key.split(':')[1];
+                        problems.push({
+                            id: id,
+                            verdict: value
+                        })
+                    }
+                }
+                problems.sort((a, b) => parseInt(a.id) - parseInt(b.id));
                 userScores.push({
                     id: users[i].split(':')[1],
                     userName,
+                    problems,
                     score: users[i + 1]
                 })
             }
         }
         else {
             const users = await client.sendCommand(['ZREVRANGE', `contest:${contest_id}_scores`, '0', '-1', 'WITHSCORES']);
-            for (let i = 0; i < users.length; i+=2) {
+            for (let i = 0; i < users.length; i += 2) {
                 const userContestKey = `${users[i]}_contest:${contest_id}`;
-                const userName = await client.hGet(userContestKey, 'user_name');
-                if (userName && userName.toLowerCase().includes(user_name.toLowerCase())) {
-                    userScores.push({ id: users[i].split(':')[1], userName, score: users[i+1] });
+                const keys = await client.hGetAll(userContestKey);
+                let userName = null;
+                let problems = [];
+                let isValidUser = true;
+                for (const [key, value] of Object.entries(keys)) {
+                    if (key == 'user_name') {
+                        if (value.toLowerCase().includes(user_name.toLowerCase())) {
+                            userName = value;
+                        }
+                        else {
+                            isValidUser = false;
+                            break;
+                        }
+                    }
+                    else {
+                        const id = key.split(':')[1];
+                        problems.push({
+                            id: id,
+                            verdict: value
+                        })
+                    }
                 }
-                userScores = userScores.slice(start, end + 1);
+                if (isValidUser) {
+                    problems.sort((a, b) => parseInt(a.id) - parseInt(b.id));
+                    userScores.push({
+                        id: users[i].split(':')[1],
+                        userName,
+                        problems,
+                        score: users[i + 1]
+                    })
+                }
             }
         }
+        userScores = userScores.slice(start, end + 1);
         return userScores;
     }
     catch (e) {
@@ -70,7 +113,12 @@ async function updateRedisRanking(userId, userName, contestId, problemId, verdic
         if (!existingVerdict || (existingVerdict !== 'pass')) {
             await client.hSet(userContestKey, problemKey, verdict);
             const score = verdict === 'pass' ? 10 : 0;
-            await client.zAdd(`contest:${contestId}_scores`, { score, value: `user:${userId}` });
+            const existingScore = await client.zScore(`contest:${contestId}_scores`, `user:${userId}`);
+            if (existingScore !== null) {
+                await client.zAdd(`contest:${contestId}_scores`, { score: existingScore + score, value: `user:${userId}` });
+            } else {
+                await client.zAdd(`contest:${contestId}_scores`, { score, value: `user:${userId}` });
+            }
         }
     }
     catch (e) {

@@ -90,7 +90,7 @@ const ContestList = ({ contests, type }) => {
                                 </TableCell>
                                 <TableCell>
                                     <Link sx={{ cursor: 'pointer' }} onClick={() => handleIdClick(contest.id)}>
-
+                                      Final standings
                                     </Link>
                                 </TableCell>
                                 <TableCell>

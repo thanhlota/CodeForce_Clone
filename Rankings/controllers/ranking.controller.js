@@ -14,11 +14,11 @@ async function getRankingByContest(req, res) {
         }
         let { page, user_name } = req.query;
         if (!page) {
-            page = 0;
+            page = 1;
         }
         const userScores = await RankingService.getRedisRanking({ page, user_name, contest_id });
         return res.status(200).send({
-            score: userScores
+            scores: userScores
         })
 
     }

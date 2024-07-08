@@ -24,13 +24,21 @@ async function getById(id) {
     });
 }
 
-async function getSubmissions(filter = {}, limit, offset) {
-    const { count, rows } = await submissions.findAndCountAll({
+async function getSubmissions(filter = {}, limit = null, offset = null) {
+    const options = {
         where: filter,
-        order: [['createdAt', 'DESC']],
-        limit,
-        offset
-    });
+        order: [['createdAt', 'DESC']]
+    };
+
+    if (limit !== null) {
+        options.limit = limit;
+    }
+
+    if (offset !== null) {
+        options.offset = offset;
+    }
+
+    const { count, rows } = await submissions.findAndCountAll(options);
     return { submissions: rows, totalSubmissions: count };
 }
 

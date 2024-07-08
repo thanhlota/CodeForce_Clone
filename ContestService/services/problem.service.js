@@ -56,7 +56,7 @@ async function getProblems(filter = {}) {
             },
             {
                 model: contests,
-                attributes: ['id', 'name'],
+                attributes: ['id', 'name','start_time'],
                 required: false
             }
         ]

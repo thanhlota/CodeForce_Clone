@@ -31,6 +31,16 @@ const submitService = {
             },
         );
         return await res.json();
+    },
+    getByUserAndProblem: async (userId, problemId) => {
+        const res = await fetch(
+            `http://${process.env.NEXT_PUBLIC_SUBMISSION_SERVICE_URI}/api/submission/all?uq=${userId}&pq=${problemId}`,
+            {
+                method: "GET",
+                headers: { "Content-Type": "application/json" },
+            },
+        );
+        return await res.json();
     }
 }
 export default submitService;

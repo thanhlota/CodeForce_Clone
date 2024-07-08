@@ -47,36 +47,3 @@ app.use('/api', route);
     const redis = Redis.getInstance();
     await redis.init();
 })();
-
-
-// app.get('/contest-ranking/:contest_id', async (req, res) => {
-//     const { contest_id } = req.params;
-
-//     // Lấy danh sách user_id từ sorted set
-//     const user_ids = await client.zRange(`contest:${contest_id}:rankings`, 0, -1);
-
-//     // Chuẩn bị kết quả
-//     const results = [];
-
-//     // Duyệt qua từng user_id để lấy thông tin chi tiết
-//     for (const user_id of user_ids) {
-//         const user_name = await client.hGet(`user:${user_id}:details`, 'user_name');
-//         const problems = await client.zRange(`contest:${contest_id}:user:${user_id}:problems`, 0, -1, 'WITHSCORES');
-
-//         // Format và thêm thông tin vào kết quả
-//         const user_result = {
-//             user_id,
-//             user_name,
-//             problems: {}
-//         };
-
-//         for (let i = 0; i < problems.length; i += 2) {
-//             const [problem_verdict, verdict] = problems[i].split(':');
-//             user_result.problems[problem_verdict] = verdict;
-//         }
-
-//         results.push(user_result);
-//     }
-
-//     res.json(results);
-// });

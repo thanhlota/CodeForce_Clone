@@ -70,12 +70,13 @@ async function getById(req, res) {
 
 async function getSubmissions(req, res) {
     try {
-        let { uq, ctq, page } = req.query;
+        let { uq, ctq, pq, page } = req.query;
         const searchConditions = [];
         if (uq) searchConditions.push({ user_id: uq });
         if (ctq) {
             searchConditions.push({ contest_id: ctq });
         }
+        if (pq) searchConditions.push({ problem_id: pq })
         if (!page) {
             page = 1;
         }
@@ -83,11 +84,19 @@ async function getSubmissions(req, res) {
         const filter = {
             [Op.and]: searchConditions
         }
-        const { submissions, totalSubmissions } = await SubmissionService.getSubmissions(filter, PAGE_LIMIT, offset);
-        return res.status(200).send({
-            submissions,
-            totalPages: Math.ceil(totalSubmissions / PAGE_LIMIT)
-        })
+        if (!pq) {
+            const { submissions, totalSubmissions } = await SubmissionService.getSubmissions(filter, PAGE_LIMIT, offset);
+            return res.status(200).send({
+                submissions,
+                totalPages: Math.ceil(totalSubmissions / PAGE_LIMIT)
+            })
+        }
+        else {
+            const { submissions } = await SubmissionService.getSubmissions(filter);
+            return res.status(200).send({
+                submissions
+            })
+        }
     }
     catch (e) {
         console.log("Get submissions failed with error:", e.message);

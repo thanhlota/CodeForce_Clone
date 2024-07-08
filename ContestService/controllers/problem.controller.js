@@ -19,7 +19,6 @@ async function create(req, res) {
             time_limit,
             memory_limit,
             categories,
-            testcases
         } = req.body;
         if (!contest_id ||
             !title ||
