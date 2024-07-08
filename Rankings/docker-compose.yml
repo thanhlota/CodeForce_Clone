@@ -19,6 +19,15 @@ services:
       - redis-data:/data
     networks:
       - cf_network
+  redis-insight:
+    image: redis/redisinsight:latest
+    restart: always
+    ports:
+      - "5540:5540"
+    volumes:
+      - redis-insight:/data
+    networks:
+      - cf_network
   ranking_db:
     image: mysql:8.4.0
     restart: always
@@ -36,6 +45,7 @@ volumes:
   redis-data:
     driver: local
   ranking-db:
+  redis-insight:
 
 networks:
   cf_network:

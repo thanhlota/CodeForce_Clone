@@ -25,6 +25,9 @@ import { Add, Edit, Delete, Search } from '@mui/icons-material';
 import MuiAlert from '@mui/material/Alert';
 import contestService from '@/services/contest.service';
 import { useRouter } from 'next/router';
+import { formatDateString, formatDateString2, getCurrentDate } from '@/utils/formatContest';
+import styles from "./ContestTable.module.css";
+
 
 const Alert = React.forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -69,19 +72,7 @@ const ContestTable = ({ contests, setContests }) => {
         return tempErrors;
     };
 
-    const getCurrentDateTime = () => {
-        const now = new Date();
-        const year = now.getFullYear();
-        const month = String(now.getMonth() + 1).padStart(2, '0');
-        const date = String(now.getDate()).padStart(2, '0');
-        const hours = String(now.getHours()).padStart(2, '0');
-        const minutes = String(now.getMinutes()).padStart(2, '0');
-        return `${year}-${month}-${date}T${hours}:${minutes}`;
-    };
-
-
-    const minDateTime = getCurrentDateTime();
-
+    const minDateTime = getCurrentDate();
     const handleOpenDeleteDialog = (id) => {
         setDeleteContestId(id);
         setOpenDeleteDialog(true);
@@ -93,11 +84,11 @@ const ContestTable = ({ contests, setContests }) => {
 
     const handleOpen = (contest = { id: '', name: '', start_time: '', end_time: '' }) => {
         setIsEditing(!!contest.id);
-        if (contest?.start_time) {
-            contest.start_time = getCurrentDateTime(contest.start_time);
+        if (!contest?.start_time) {
+            contest.start_time = getCurrentDate();
         }
-        if (contest?.end_time) {
-            contest.end_time = getCurrentDateTime(contest.end_time);
+        if (!contest?.end_time) {
+            contest.end_time = getCurrentDate();
         }
         setCurrentContest(contest);
         setOpen(true);
@@ -137,7 +128,14 @@ const ContestTable = ({ contests, setContests }) => {
                 const { contest } = await res.json();
                 setContests((prev) => [
                     ...prev,
-                    { ...contest, state: getState(contest.start_time, contest.end_time) },
+                    {
+                        ...contest,
+                        start_time: formatDateString2(contest.start_time),
+                        end_time: formatDateString2(contest.end_time),
+                        display_start: formatDateString(contest.start_time),
+                        display_end: formatDateString(contest.end_time),
+                        state: getState(contest.start_time, contest.end_time)
+                    },
                 ]);
                 setSnackbarMessage("Contest added successfully!");
                 setSnackbarSeverity('success');
@@ -158,14 +156,23 @@ const ContestTable = ({ contests, setContests }) => {
             setLoading(true);
             const res = await contestService.updateContest(currentContest);
             if (res.status != 200) {
-                setSnackbarMessage(res.message);
+                const { message } = await res.json();
+                setSnackbarMessage(message);
                 setSnackbarSeverity('error');
             }
             else {
                 const { contest } = await res.json();
                 setContests((prev) =>
                     prev.map((item) =>
-                        item.id === contest.id ? { ...contest, state: getState(contest.start_time, contest.end_time) } : item
+                        item.id === contest.id ?
+                            {
+                                ...contest,
+                                start_time: formatDateString2(contest.start_time),
+                                end_time: formatDateString2(contest.end_time),
+                                display_start: formatDateString(contest.start_time),
+                                display_end: formatDateString(contest.end_time),
+                                state: getState(contest.start_time, contest.end_time)
+                            } : item
                     )
                 );
                 setSnackbarMessage("Contest updated successfully!");
@@ -277,8 +284,18 @@ const ContestTable = ({ contests, setContests }) => {
                                     </Link>
                                 </TableCell>
                                 <TableCell>{contest.name}</TableCell>
-                                <TableCell>{contest.start_time}</TableCell>
-                                <TableCell>{contest.end_time}</TableCell>
+                                <TableCell>
+                                    <div className={styles.dateTime}>
+                                        {contest.display_start}
+                                        <span className={styles.utc}>UTC+0</span>
+                                    </div>
+                                </TableCell>
+                                <TableCell>
+                                    <div className={styles.dateTime}>
+                                        {contest.display_end}
+                                        <span className={styles.utc}>UTC+0</span>
+                                    </div>
+                                </TableCell>
                                 <TableCell>
                                     <Box display="flex" alignItems="center">
                                         <Box

@@ -2,9 +2,9 @@ require('dotenv').config();
 const express = require("express");
 const app = express();
 const cors = require("cors");
-// const route = require("./routes");
+const route = require("./routes");
 const Consumer = require("./queues/consumer");
-const client = require("./redisClient");
+const Redis = require("./redisClient");
 
 app.use(cors({
     origin: ['http://localhost:3000', 'http://192.168.172.82:3000'],
@@ -33,42 +33,50 @@ app.get("/", (req, res) => {
 
 app.listen(port, () => console.log(`listening on port ${port}`));
 
-// app.use('/api', route);
+app.use('/api', route);
+// init queue consumer
 (async (
 ) => {
     const consumer = Consumer.getInstance();
     await consumer.init();
     consumer.receiveJob();
 })();
+// init redis
+(async (
+) => {
+    const redis = Redis.getInstance();
+    await redis.init();
+})();
 
-app.get('/contest-ranking/:contest_id', async (req, res) => {
-    const { contest_id } = req.params;
 
-    // Lấy danh sách user_id từ sorted set
-    const user_ids = await client.zRange(`contest:${contest_id}:rankings`, 0, -1);
+// app.get('/contest-ranking/:contest_id', async (req, res) => {
+//     const { contest_id } = req.params;
 
-    // Chuẩn bị kết quả
-    const results = [];
+//     // Lấy danh sách user_id từ sorted set
+//     const user_ids = await client.zRange(`contest:${contest_id}:rankings`, 0, -1);
 
-    // Duyệt qua từng user_id để lấy thông tin chi tiết
-    for (const user_id of user_ids) {
-        const user_name = await client.hGet(`user:${user_id}:details`, 'user_name');
-        const problems = await client.zRange(`contest:${contest_id}:user:${user_id}:problems`, 0, -1, 'WITHSCORES');
+//     // Chuẩn bị kết quả
+//     const results = [];
 
-        // Format và thêm thông tin vào kết quả
-        const user_result = {
-            user_id,
-            user_name,
-            problems: {}
-        };
+//     // Duyệt qua từng user_id để lấy thông tin chi tiết
+//     for (const user_id of user_ids) {
+//         const user_name = await client.hGet(`user:${user_id}:details`, 'user_name');
+//         const problems = await client.zRange(`contest:${contest_id}:user:${user_id}:problems`, 0, -1, 'WITHSCORES');
 
-        for (let i = 0; i < problems.length; i += 2) {
-            const [problem_verdict, verdict] = problems[i].split(':');
-            user_result.problems[problem_verdict] = verdict;
-        }
+//         // Format và thêm thông tin vào kết quả
+//         const user_result = {
+//             user_id,
+//             user_name,
+//             problems: {}
+//         };
 
-        results.push(user_result);
-    }
+//         for (let i = 0; i < problems.length; i += 2) {
+//             const [problem_verdict, verdict] = problems[i].split(':');
+//             user_result.problems[problem_verdict] = verdict;
+//         }
 
-    res.json(results);
-});
+//         results.push(user_result);
+//     }
+
+//     res.json(results);
+// });

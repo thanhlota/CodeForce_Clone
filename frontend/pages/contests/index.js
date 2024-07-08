@@ -3,6 +3,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import contestService from "@/services/contest.service";
 import ContestList from "@/components/contest/ContestList";
 import { formatContest2 } from "@/utils/formatContest";
+import { Container, Typography, Box, Paper } from '@mui/material';
 
 export default function ContestPage() {
     const [contests, setContests] = useState(null);
@@ -28,29 +29,38 @@ export default function ContestPage() {
     }, []);
 
     return (
-        <div style={{ margin: '16px 48px' }}>
-            {
-                (contests?.ongoingContests && contests.ongoingContests.length) ?
-                    <>
-                        <h1>Ongoing contest</h1>
+        <Container maxWidth="lg" sx={{ mt: 4 }}>
+            <Box sx={{ mb: 4 }}>
+                {(contests?.ongoingContests && contests.ongoingContests.length) ? (
+                    <div>
+                        <Typography variant="h4" gutterBottom>
+                            Ongoing Contests
+                        </Typography>
                         <ContestList contests={contests.ongoingContests} type="ongoing" />
-                    </> : null
-            }
-            {
-                (contests?.upcomingContests && contests.upcomingContests.length) ?
-                    <>
-                        <h1>Upcoming contest</h1>
+                    </div>
+                ) : null}
+            </Box>
+            <Box sx={{ mb: 4 }}>
+                {(contests?.upcomingContests && contests.upcomingContests.length) ? (
+                    <div>
+                        <Typography variant="h4" gutterBottom>
+                            Upcoming Contests
+                        </Typography>
                         <ContestList contests={contests.upcomingContests} type="upcoming" />
-                    </> : null
-            }
-            {
-                (contests?.endedContests && contests.endedContests.length) ?
-                    <>
-                        <h1>Ended contest</h1>
+                    </div>
+                ) : null}
+            </Box>
+            <Box sx={{ mb: 4 }}>
+                {(contests?.endedContests && contests.endedContests.length) ? (
+                    <div>
+                        <Typography variant="h4" gutterBottom>
+                            Ended Contests
+                        </Typography>
                         <ContestList contests={contests.endedContests} type="ended" />
-                    </> : null
-            }
-        </div>
+                    </div>
+                ) : null}
+            </Box>
+        </Container>
     )
 }
 

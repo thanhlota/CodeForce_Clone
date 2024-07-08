@@ -1,3 +1,5 @@
+const moment = require('moment-timezone');
+
 const formatContest = (contests) => {
     return contests.map((contest) => {
         const { start_time, end_time } = contest;
@@ -8,28 +10,40 @@ const formatContest = (contests) => {
         if (now < startTime) state = 'upcoming';
         else if (now > endTime) state = 'end';
         else state = 'ongoing';
-        startTime = formatDateString(start_time);
-        endTime = formatDateString(end_time);
+        startTime = formatDateString2(start_time);
+        endTime = formatDateString2(end_time);
+        const display_start = formatDateString(start_time);
+        const display_end = formatDateString(end_time);
         return {
             ...contest,
             state,
             start_time: startTime,
-            end_time: endTime
+            end_time: endTime,
+            display_start,
+            display_end
         }
     });
 
 }
 
 const formatDateString = (dateString) => {
-    const date = new Date(dateString);
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    const hours = String(date.getHours()).padStart(2, '0');
-    const minutes = String(date.getMinutes()).padStart(2, '0');
-    return `${year}-${month}-${day}T${hours}:${minutes}`;
+    const momentDate = moment.utc(dateString);
+    const formattedDate = momentDate.format('MMM/DD/YYYY HH:mm');
+    return formattedDate;
 };
 
+const formatDateString2 = (dateString) => {
+    const formattedDate = moment.utc(dateString).format('YYYY-MM-DDTHH:mm');
+    return formattedDate;
+}
+
+const getCurrentDate = () => {
+    return moment().utc(false).format('YYYY-MM-DDTHH:mm');
+}
+
+const formatDateString3 = (dateString) => {
+    return moment(dateString).utc(true).format('MMM/DD/YYYY HH:mm');
+}
 const formatContest2 = (contests) => {
     const now = new Date();
 
@@ -39,7 +53,11 @@ const formatContest2 = (contests) => {
     contests.forEach(contest => {
         const startTime = new Date(contest.start_time);
         const endTime = new Date(contest.end_time);
-
+        const start_time = formatDateString2(contest.start_time);
+        const end_time = formatDateString2(contest.end_time);
+        const display_start = formatDateString3(contest.start_time);
+        const display_end = formatDateString3(contest.end_time);
+        contest = { ...contest, start_time, end_time, display_start, display_end };
         if (startTime <= now && endTime >= now) {
             ongoingContests.push(contest);
         } else if (startTime > now) {
@@ -51,6 +69,6 @@ const formatContest2 = (contests) => {
 
     return { ongoingContests, upcomingContests, endedContests };
 }
-export { formatContest2 };
+export { formatContest2, formatDateString, formatDateString2, getCurrentDate };
 
 export default formatContest;

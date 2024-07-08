@@ -1,0 +1,9 @@
+.dateTime {
+    position: relative;
+}
+
+.utc {
+    font-size: 0.8em;
+    position: absolute;
+    top: -10px;
+}
