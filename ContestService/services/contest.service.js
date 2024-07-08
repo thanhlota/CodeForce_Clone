@@ -1,5 +1,6 @@
 const contests = require("../models").contests;
 const problems = require("../models").problems;
+const users = require("../models").user_contests;
 
 async function create(name, start_time, end_time) {
     const contest = contests.build({
@@ -25,6 +26,13 @@ async function getById(id) {
 async function getContests(filter = {}) {
     return await contests.findAll({
         where: filter,
+        include: [
+            {
+                model: users,
+                attributes: ['user_id', 'username'],
+                required: false
+            }
+        ]
     });
 }
 
@@ -45,11 +53,31 @@ async function update(contest, updateFields = {}) {
     return await contest.save();
 }
 
+async function register(contestId, userId, userName) {
+    return await users.create({
+        user_id: userId,
+        username: userName,
+        contest_id: contestId,
+        createdAt: new Date()
+    });
+}
+
+async function unregister(contestId, userId) {
+    return await users.destroy({
+        where: {
+            user_id: userId,
+            contest_id: contestId
+        }
+    })
+}
+
 module.exports = {
     create,
     getById,
     getContest,
     getContests,
     remove,
-    update
+    update,
+    register,
+    unregister
 }

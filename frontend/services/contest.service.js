@@ -62,6 +62,37 @@ const contestService = {
             }
         );
         return await res.json();
+    },
+
+    registerContest: async (info) => {
+        const res = await fetch(
+            `http://${process.env.NEXT_PUBLIC_CONTEST_SERVICE_URI}/api/contest/register`,
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                credentials: 'include',
+                body: JSON.stringify(info),
+            },
+        );
+        return res;
+    },
+
+    unregisterContest: async (info) => {
+        const res = await fetch(
+            `http://${process.env.NEXT_PUBLIC_CONTEST_SERVICE_URI}/api/contest/unregister`,
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                credentials: 'include',
+                body: JSON.stringify(info),
+            },
+        );
+        return res;
     }
+
 }
 export default contestService;

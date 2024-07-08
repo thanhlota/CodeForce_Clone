@@ -179,7 +179,7 @@ module.exports = {
             defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
           }
         }),
-        queryInterface.createTable("user_contest", {
+        queryInterface.createTable("user_contests", {
           user_id: {
             type: Sequelize.INTEGER,
             onDelete: 'CASCADE',
@@ -224,7 +224,7 @@ module.exports = {
       await queryInterface.dropTable("problems", {
         transaction: t,
       });
-      await queryInterface.dropTable("user_contest", {
+      await queryInterface.dropTable("user_contests", {
         transaction: t,
       });
       await queryInterface.dropTable("contests", {

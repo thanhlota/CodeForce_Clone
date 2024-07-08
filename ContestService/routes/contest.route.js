@@ -1,7 +1,7 @@
 const ContestController = require("../controllers/contest.controller.js");
 const express = require('express');
 const ContestRouter = express.Router();
-const { verifyAdmin } = require("../middlewares/auth.js");
+const { verifyAdmin, verifyUser } = require("../middlewares/auth.js");
 
 ContestRouter.post(
     "/admin/create", verifyAdmin, ContestController.create
@@ -21,6 +21,14 @@ ContestRouter.get(
 
 ContestRouter.get(
     "/:id", ContestController.getContestById
+)
+
+ContestRouter.post(
+    "/register", verifyUser, ContestController.registerContest
+)
+
+ContestRouter.post(
+    "/unregister", verifyUser, ContestController.unregisterContest
 )
 
 module.exports = ContestRouter;

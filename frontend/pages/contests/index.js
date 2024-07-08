@@ -3,7 +3,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import contestService from "@/services/contest.service";
 import ContestList from "@/components/contest/ContestList";
 import { formatContest2 } from "@/utils/formatContest";
-import { Container, Typography, Box, Paper } from '@mui/material';
+import { Container, Typography, Box } from '@mui/material';
 
 export default function ContestPage() {
     const [contests, setContests] = useState(null);
@@ -20,6 +20,20 @@ export default function ContestPage() {
             console.log("ERROR", e);
         }
     }, []);
+
+    const updateContestContestants = (contestId, contestants) => {
+        const updatedUpcomingContests = contests.upcomingContests.map(contest => {
+            if (contest.id === contestId) {
+                return {
+                    ...contest,
+                    user_contests: contestants
+                };
+            }
+            return contest;
+        });
+        const updatedContests = { ...contests, upcomingContests: updatedUpcomingContests }
+        setContests(updatedContests);
+    }
 
     useEffect(() => {
         if (!hasFetched.current) {
@@ -46,7 +60,7 @@ export default function ContestPage() {
                         <Typography variant="h4" gutterBottom>
                             Upcoming Contests
                         </Typography>
-                        <ContestList contests={contests.upcomingContests} type="upcoming" />
+                        <ContestList updateContestContestants={updateContestContestants} contests={contests.upcomingContests} type="upcoming" />
                     </div>
                 ) : null}
             </Box>

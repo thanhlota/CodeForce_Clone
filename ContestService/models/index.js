@@ -58,8 +58,8 @@ db["categories"].belongsToMany(db["problems"], {
   otherKey: 'problem_id'
 });
 
-db["contests"].hasMany(db["user_contest"], { foreignKey: 'contest_id', onDelete: 'CASCADE' });
-db["user_contest"].belongsTo(db["contests"], { foreignKey: 'contest_id', onDelete: 'CASCADE' });
+db["contests"].hasMany(db["user_contests"], { foreignKey: 'contest_id', onDelete: 'CASCADE' });
+db["user_contests"].belongsTo(db["contests"], { foreignKey: 'contest_id', onDelete: 'CASCADE' });
 
 
 module.exports = db;

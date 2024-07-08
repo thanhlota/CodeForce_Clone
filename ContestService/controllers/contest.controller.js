@@ -144,6 +144,72 @@ async function getContestById(req, res) {
     }
 }
 
+async function registerContest(req, res) {
+    try {
+        const { user_id, user_name, contest_id } = req.body;
+        if (!user_id || !user_name) {
+            return new ErrorHandler(
+                ERROR.NON_EXISTED_USER.status,
+                ERROR.NON_EXISTED_USER.message
+            ).httpResponse(res);
+        }
+        if (!contest_id) {
+            return new ErrorHandler(
+                ERROR.NON_EXISTED_CONTEST.status,
+                ERROR.NON_EXISTED_CONTEST.message
+            ).httpResponse(res);
+        }
+        const contest = await ContestService.getById(contest_id);
+        if (!contest) {
+            return new ErrorHandler(
+                ERROR.NON_EXISTED_CONTEST.status,
+                ERROR.NON_EXISTED_CONTEST.message
+            ).httpResponse(res);
+        }
+        const contestant = await ContestService.register(contest_id, user_id, user_name)
+        return res.status(200).send({
+            contestant
+        })
+    }
+    catch (e) {
+        console.log("Register contest failed with error:", e.message);
+        return DefaultError.httpResponse(res);
+    }
+}
+
+async function unregisterContest(req, res) {
+    try {
+        const { user_id, contest_id } = req.body;
+        if (!user_id) {
+            return new ErrorHandler(
+                ERROR.NON_EXISTED_USER.status,
+                ERROR.NON_EXISTED_USER.message
+            ).httpResponse(res);
+        }
+        if (!contest_id) {
+            return new ErrorHandler(
+                ERROR.NON_EXISTED_CONTEST.status,
+                ERROR.NON_EXISTED_CONTEST.message
+            ).httpResponse(res);
+        }
+        const contest = await ContestService.getById(contest_id);
+        if (!contest) {
+            return new ErrorHandler(
+                ERROR.NON_EXISTED_CONTEST.status,
+                ERROR.NON_EXISTED_CONTEST.message
+            ).httpResponse(res);
+        }
+        await ContestService.unregister(contest_id, user_id)
+        return res.status(200).send({
+            message: "Unregister successfully!"
+        })
+    }
+    catch (e) {
+        console.log("Unregister contest failed with error:", e.message);
+        return DefaultError.httpResponse(res);
+    }
+}
+
 async function getContests(req, res) {
     try {
         const { ns } = req.query;
@@ -168,5 +234,7 @@ module.exports = {
     remove,
     update,
     getContestById,
-    getContests
+    getContests,
+    registerContest,
+    unregisterContest
 }

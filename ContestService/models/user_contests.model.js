@@ -1,7 +1,7 @@
 "use strict";
 const ROLE = require("../enum/role");
 module.exports = (sequelize, DataTypes) => {
-    const UserContest = sequelize.define('user_contest', {
+    const UserContest = sequelize.define('user_contests', {
         user_id: {
             type: DataTypes.INTEGER,
             onDelete: 'CASCADE',
