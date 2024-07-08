@@ -84,17 +84,18 @@ async function getSubmissions(req, res) {
         const filter = {
             [Op.and]: searchConditions
         }
-        if (!pq) {
-            const { submissions, totalSubmissions } = await SubmissionService.getSubmissions(filter, PAGE_LIMIT, offset);
-            return res.status(200).send({
-                submissions,
-                totalPages: Math.ceil(totalSubmissions / PAGE_LIMIT)
-            })
-        }
-        else {
+        if (uq && pq) {
             const { submissions } = await SubmissionService.getSubmissions(filter);
             return res.status(200).send({
                 submissions
+            })
+        }
+        else {
+            const { submissions, totalSubmissions } = await SubmissionService.getSubmissions(filter, PAGE_LIMIT, offset);
+            return res.status(200).send({
+                filter: searchConditions,
+                submissions,
+                totalPages: Math.ceil(totalSubmissions / PAGE_LIMIT)
             })
         }
     }

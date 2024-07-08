@@ -60,10 +60,6 @@ const ContestMenu = () => {
                     <span><GradeIcon fontSize="10px" sx={{ marginRight: 1, marginTop: '2px' }} /></span>
                     <span>Rankings</span>
                 </div>
-                <div className={styles.menu_item}>
-                    <span><FormatListBulletedIcon fontSize="10px" sx={{ marginRight: 1, marginTop: '2px' }} /></span>
-                    <span>All submissions</span>
-                </div>
             </div>
             <Snackbar open={showSnackbar} autoHideDuration={3000} onClose={() => setShowSnackbar(false)} className={styles.snackbarContainer}>
                 <Alert severity="error" onClose={() => setShowSnackbar(false)}>

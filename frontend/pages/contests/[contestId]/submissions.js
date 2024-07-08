@@ -14,7 +14,7 @@ const Submissions = () => {
     const { contestId } = router.query;
     const userId = useSelector(userIdSelector);
     const [submissions, setSubmissions] = useState(null);
-    const [page, setPage] = useState(0);
+    const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(0);
 
     const hasFetched = useRef(false);

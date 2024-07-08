@@ -22,6 +22,16 @@ const submitService = {
         );
         return await res.json();
     },
+    getByProblem: async (problemId, page) => {
+        const res = await fetch(
+            `http://${process.env.NEXT_PUBLIC_SUBMISSION_SERVICE_URI}/api/submission/all?pq=${problemId}&page=${page}`,
+            {
+                method: "GET",
+                headers: { "Content-Type": "application/json" },
+            },
+        );
+        return await res.json();
+    },
     getById: async (id) => {
         const res = await fetch(
             `http://${process.env.NEXT_PUBLIC_SUBMISSION_SERVICE_URI}/api/submission/${id}`,

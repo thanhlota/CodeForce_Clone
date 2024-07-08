@@ -1,43 +1,15 @@
 import { useState, useCallback } from 'react';
 import {
-    Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper,
-    Modal, Pagination
+    Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Pagination
 } from '@mui/material';
 import styles from './SubmissionList.module.css';
 import formatDate from '@/utils/formatDate';
 import { useRouter } from 'next/router';
 import verdict from "@/constants/verdict";
-import CodeEditor from "@/components/submit/CodeEditor";
 import submitService from '@/services/submit.service';
-import formatVerdict from '@/utils/formatVerdict';
-import CloseIcon from '@mui/icons-material/Close';
+import TestModal from '@/components/submit/TestModal';
 
-const TestItem = ({ index, time, memory, verdict, input, output, expected_output }) => {
-    let title = `Test: #${index + 1}`;
-    if (time) title += `, time: ${Math.floor(time / 1000000)} ms`;
-    if (memory) title += `, memory: ${Math.floor(memory / 1024)} KB`;
-    if (verdict) title += `, verdict:  ${formatVerdict(verdict)}`;
-    return (
-        <div className={styles.test_item}>
-            <div className={styles.test_item_header}>
-                {title}
-            </div>
-            <div className={styles.test_content}>
-                <div>Input</div>
-                <div className={styles.code_display}>{input}</div>
-            </div>
-            <div className={styles.test_content}>
-                <div>Output</div>
-                <div className={styles.code_display}>{output}</div>
-            </div>
-            <div className={styles.test_content}>
-                <div>Expected Output</div>
-                <div className={styles.code_display}>{expected_output}</div>
-            </div>
-        </div>
-    )
-}
-const SubmissionList = ({ data, page, totalPages,handlePageChange }) => {
+const SubmissionList = ({ data, page, totalPages, handlePageChange }) => {
     const router = useRouter();
     const { contestId } = router.query;
     const [open, setOpen] = useState(false);
@@ -46,7 +18,7 @@ const SubmissionList = ({ data, page, totalPages,handlePageChange }) => {
     const [language, setLanguage] = useState(null);
 
     const handleProblemClick = useCallback((problemId) => {
-        if (contestId) {
+        if (contestId) {s
             router.push(`/contests/${contestId}/problem/${problemId}`);
         }
     }, [contestId]);
@@ -75,8 +47,6 @@ const SubmissionList = ({ data, page, totalPages,handlePageChange }) => {
     const handleClose = () => {
         setOpen(false);
     };
-
-
 
     return (
         <>
@@ -143,37 +113,7 @@ const SubmissionList = ({ data, page, totalPages,handlePageChange }) => {
                         className={styles.pagination}
                     /> : null
             }
-            <Modal
-                open={open}
-                onClose={handleClose}
-            >
-                <div className={styles.modal_content}>
-                    <div className={styles.close_button} onClick={handleClose}><CloseIcon /></div>
-                    <CodeEditor srcCode={srcCode} editable={false} language={language} fullWidth={true} customBackground={"#f0f0f0"} />
-                    <hr />
-                    <div className={styles.test_container}>
-                        <div className={styles.header}>
-                            <h4>Judgement Protocol</h4>
-                        </div>
-                        {
-                            results && results.length && results.map((item, index) => {
-                                const { time, memory, output, expected_output, input, verdict } = item;
-                                return (
-                                    <TestItem
-                                        index={index}
-                                        time={time}
-                                        memory={memory}
-                                        input={input}
-                                        output={output}
-                                        expected_output={expected_output}
-                                        verdict={verdict}
-                                    />
-                                )
-                            })
-                        }
-                    </div>
-                </div>
-            </Modal>
+            <TestModal srcCode={srcCode} results={results} language={language} open={open} handleClose={handleClose} />
         </>
     );
 };

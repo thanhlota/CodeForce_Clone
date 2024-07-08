@@ -19,12 +19,13 @@ import SearchIcon from '@mui/icons-material/Search';
 import { useRouter } from 'next/router';
 import styles from "./ContestTable.module.css";
 import submitService from '@/services/submit.service';
+import moment from 'moment';
+import TestModal from '@/components/submit/TestModal';
 
 const getElapsedTime = (contestStartTime, submissionTime) => {
   const start = moment(contestStartTime);
   const submission = moment(submissionTime);
-  const duration = moment.duration(submission.diff(start));
-
+  const duration = moment.duration(start.diff(submission));
   const hours = String(duration.hours()).padStart(2, '0');
   const minutes = String(duration.minutes()).padStart(2, '0');
   const seconds = String(duration.seconds()).padStart(2, '0');
@@ -32,7 +33,7 @@ const getElapsedTime = (contestStartTime, submissionTime) => {
   return `${hours}:${minutes}:${seconds}`;
 };
 
-const SubmissionModal = ({ open, handleClose }) => {
+const SubmissionModal = ({ openDetailModal, contestTime, submissions, open, handleClose }) => {
   return (
     <Modal
       open={open}
@@ -43,12 +44,23 @@ const SubmissionModal = ({ open, handleClose }) => {
       <Box className={styles.modal}>
         <div className={styles.wrapper}>
           <div className={styles.inner}>
-            <Typography id="modal-modal-title" variant="h6" component="h2">
-              Text in a modal
-            </Typography>
-            <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-              Duis mollis, est non commodo luctus, nisi erat porttitor ligula.
-            </Typography>
+            {
+              submissions.map((item) => {
+                return (
+                  <div>
+                    {contestTime && <span className={styles.time}>{getElapsedTime(contestTime, item.createdAt)}</span>}
+                    <span className={item.verdict == "accepted" ? styles.pass : styles.fail}>{item.verdict}</span>
+                    <span> → </span>
+                    <span>
+                      <Link style={{ cursor: 'pointer' }} onClick={() => openDetailModal(item.id)}>
+                        {item.id}
+                      </Link>
+                    </span>
+                  </div>
+
+                )
+              })
+            }
           </div>
         </div>
       </Box>
@@ -74,11 +86,16 @@ function sortedScores(allProblemIds, userProblems) {
   });
 }
 
-const ContestRankings = ({ scores, problems }) => {
+const ContestRankings = ({ contestTime, scores, problems }) => {
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState('');
   const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
   const [open, setOpen] = useState(false);
+  const [submissions, setSubmissions] = useState([]);
+  const [detailOpen, setDetailOpen] = useState(false);
+  const [srcCode, setSrcCode] = useState(null);
+  const [results, setResults] = useState(null);
+  const [language, setLanguage] = useState(null);
 
   const handleOpen = () => {
     setOpen(true);
@@ -98,6 +115,7 @@ const ContestRankings = ({ scores, problems }) => {
       if (verdict != "-") {
         const { submissions } = await submitService.getByUserAndProblem(userId, 16);
         console.log('submissions', submissions);
+        setSubmissions(submissions);
         handleOpen();
       }
     }
@@ -106,12 +124,38 @@ const ContestRankings = ({ scores, problems }) => {
     }
   };
 
+  const openDetailModal = async (submissionId) => {
+    try {
+      if (submissionId) {
+        const { submission } = await submitService.getById(submissionId);
+        if (submission?.code) {
+          setSrcCode(submission.code);
+        }
+        if (submission?.language) {
+          setLanguage(submission.language);
+        }
+        if (submission?.results) {
+          setResults(submission.results);
+        }
+        setOpen(false);
+        setDetailOpen(true);
+      }
+    }
+    catch (e) {
+      console.log("ERROR", e);
+    }
+  }
+
+  const handleDetailClose = () => {
+    setDetailOpen(false);
+  }
+
   const filteredscores = scores.filter((score) =>
     score.userName.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
-    <Container maxWidth="lg">
+    <Container maxWidth="lg" className={styles.container}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
         <Typography variant="h4" gutterBottom>
           Contest Rankings
@@ -169,7 +213,20 @@ const ContestRankings = ({ scores, problems }) => {
           </TableBody>
         </Table>
       </TableContainer>
-      <SubmissionModal open={open} handleClose={handleClose} />
+      <SubmissionModal
+        contestTime={contestTime}
+        open={open}
+        handleClose={handleClose}
+        submissions={submissions}
+        openDetailModal={openDetailModal}
+      />
+      <TestModal
+        srcCode={srcCode}
+        results={results}
+        language={language}
+        open={detailOpen}
+        handleClose={handleDetailClose}
+      />
     </Container>
   );
 };

@@ -3,7 +3,6 @@ import {
   Link, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Container, Typography, TextField, IconButton, Box
 } from '@mui/material';
 import { useRouter } from 'next/router';
-import SearchIcon from '@mui/icons-material/Search';
 
 const ContestProblems = ({ problems }) => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -21,6 +20,10 @@ const ContestProblems = ({ problems }) => {
 
   const goToProblem = useCallback((id) => {
     router.push(`/contests/1/problem/${id}`)
+  }, []);
+
+  const goToStatus = useCallback((id) => {
+    router.push(`/contests/1/problem?pid=${id}`)
   }, []);
 
   return (
@@ -53,6 +56,7 @@ const ContestProblems = ({ problems }) => {
               <TableCell sx={{ fontWeight: 'bold', backgroundColor: '#f5f5f5' }}>Problem Name</TableCell>
               <TableCell sx={{ fontWeight: 'bold', backgroundColor: '#f5f5f5' }}>Time Limit</TableCell>
               <TableCell sx={{ fontWeight: 'bold', backgroundColor: '#f5f5f5' }}>Memory Limit</TableCell>
+              <TableCell sx={{ fontWeight: 'bold', backgroundColor: '#f5f5f5' }}></TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -66,6 +70,9 @@ const ContestProblems = ({ problems }) => {
                 <TableCell>{problem.title}</TableCell>
                 <TableCell>{problem.time_limit / 1000 + ' s'}</TableCell>
                 <TableCell>{problem.memory_limit + " MB"}</TableCell>
+                <TableCell>
+                  <Link style={{ cursor: 'pointer' }} onClick={() => goToStatus(problem.id)}>Status</Link>
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>

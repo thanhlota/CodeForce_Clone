@@ -9,6 +9,7 @@ export default function Rankings() {
     const router = useRouter();
     const [problems, setProblems] = useState([]);
     const [scores, setScores] = useState([]);
+    const [contestTime, setContestTime] = useState(null);
 
     const hasFetched = useRef(false);
 
@@ -17,6 +18,9 @@ export default function Rankings() {
     const fetchProblems = useCallback(async () => {
         try {
             const { problems } = await problemService.getProblemByContest(contestId);
+            if (problems?.length) {
+                setContestTime(problems[0].contest.start_time);
+            }
             const newProblems = problems.map((item) => item.id);
             setProblems(newProblems);
         }
@@ -45,7 +49,7 @@ export default function Rankings() {
 
     return (
         <ContestLayout>
-            <ContestRankings scores={scores} problems={problems} />
+            <ContestRankings contestTime={contestTime} scores={scores} problems={problems} />
         </ContestLayout>
     )
 }
