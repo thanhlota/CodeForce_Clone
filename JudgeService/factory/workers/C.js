@@ -21,7 +21,7 @@ class C extends Worker {
   }
 
   async processJob(job) {
-    const { mem, time, code, testcases, worker_response, submission_id } = job;
+    const { mem, time, code, testcases, worker_response, ranking_response, submission_id } = job;
     const response = [];
     let data = {};
     try {
@@ -103,8 +103,9 @@ class C extends Worker {
     ) {
       await this.handleResourceExceed();
     }
-    worker_response(response);
     this.setWorkerAvailable();
+    worker_response(response);
+    ranking_response(data.verdict);
   }
 
   async handleServerError() {

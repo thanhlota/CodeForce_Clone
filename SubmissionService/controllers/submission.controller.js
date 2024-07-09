@@ -10,19 +10,23 @@ const PAGE_LIMIT = 20;
 
 async function create(req, res) {
     try {
-        const { user_id, problem_id, contest_id, code, language, mem, time } = req.body;
-        if (!user_id || !problem_id || !code || !language || !contest_id || !mem || !time) {
+        const { user_id, user_name, problem_id, contest_id, code, language, mem, time } = req.body;
+        if (!user_id || !user_name || !problem_id || !code || !language || !contest_id || !mem || !time) {
             return new ErrorHandler(
                 ERROR.MISSING_SUBMISSION_INFO.status,
                 ERROR.MISSING_SUBMISSION_INFO.message
             ).httpResponse(res);
         }
-        const submission = await SubmissionService.create(user_id, problem_id, code, language, contest_id);
+        const submission = await SubmissionService.create(user_id, user_name, problem_id, code, language, contest_id);
         if (submission && submission.id) {
             const { testcases } = await TestcaseService.getTestcase(problem_id);
             const publisher = Publisher.getInstance();
             const job = {
+                contest_id,
+                problem_id,
                 submission_id: submission.id,
+                user_id,
+                user_name,
                 mem,
                 time,
                 code,

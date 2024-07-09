@@ -2,9 +2,10 @@ const submissions = require("../models").submissions;
 const results = require("../models").results;
 const CodeStatus = require("../enum/CodeStatus");
 
-async function create(user_id, problem_id, code, language, contest_id) {
+async function create(user_id, user_name, problem_id, code, language, contest_id) {
     const submission = submissions.build({
         user_id,
+        user_name,
         problem_id,
         code,
         language,

@@ -21,7 +21,7 @@ class Java extends Worker {
   }
 
   async processJob(job) {
-    const { mem, time, code, testcases, worker_response, submission_id } = job;
+    const { mem, time, code, testcases, worker_response, ranking_response, submission_id } = job;
     const response = [];
     let data = {};
     try {
@@ -104,6 +104,7 @@ class Java extends Worker {
     }
     this.setWorkerAvailable();
     worker_response(response);
+    ranking_response(data.verdict);
   }
 
   async handleServerError() {

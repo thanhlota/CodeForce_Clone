@@ -4,6 +4,7 @@ const amqp = require('amqplib');
 const QUEUE = 'jobs';
 const Job = require("../factory/jobs");
 const Factory = require("../factory");
+const Publisher = require("./publisher");
 class Consumer {
     static instance = null;
     channel = null;
@@ -46,8 +47,40 @@ class Consumer {
                     )
                     this.channel.ack(msg);
                 };
-                const { lang, mem, time, code, testcases, submission_id } = jobObject;
-                const newJob = new Job(lang, mem, time, code, testcases, worker_reponse, submission_id);
+                const {
+                    contest_id,
+                    problem_id,
+                    user_id,
+                    user_name,
+                    lang,
+                    mem,
+                    time,
+                    code,
+                    testcases,
+                    submission_id
+                } = jobObject;
+                const ranking_response = (verdict) => {
+                    const job = {
+                        contest_id,
+                        problem_id,
+                        user_id,
+                        user_name,
+                        verdict
+                    }
+                    Publisher.getInstance().pushJob(job);
+                };
+
+                const newJob = new Job(
+                    lang,
+                    mem,
+                    time,
+                    code,
+                    testcases,
+                    worker_reponse,
+                    ranking_response,
+                    submission_id
+                );
+
                 const FactoryInstance = Factory.getInstance();
                 const worker = FactoryInstance.distributeWorker(newJob);
                 if (!worker) {
@@ -60,6 +93,7 @@ class Consumer {
         }
         catch (e) {
             console.log("Error when receive job", e.message);
+            this.channel.nack(msg, false, true);
         }
     }
 

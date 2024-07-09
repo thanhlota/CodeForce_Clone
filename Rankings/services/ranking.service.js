@@ -1,6 +1,8 @@
 const rankings = require("../models").rankings;
 const Redis = require("../redisClient");
 const PAGE_LIMIT = 20;
+const Verdict = require("../enum/Verdict");
+
 async function create(user_id, contest_id, user_score) {
     const ranking = rankings.build({
         user_id,
@@ -110,9 +112,9 @@ async function updateRedisRanking(userId, userName, contestId, problemId, verdic
         const problemKey = `problem:${problemId}`;
         const existingVerdict = await client.hGet(userContestKey, problemKey);
 
-        if (!existingVerdict || (existingVerdict !== 'pass')) {
+        if (!existingVerdict || (existingVerdict != Verdict.AC)) {
             await client.hSet(userContestKey, problemKey, verdict);
-            const score = verdict === 'pass' ? 10 : 0;
+            const score = verdict == Verdict.AC ? 10 : 0;
             const existingScore = await client.zScore(`contest:${contestId}_scores`, `user:${userId}`);
             if (existingScore !== null) {
                 await client.zAdd(`contest:${contestId}_scores`, { score: existingScore + score, value: `user:${userId}` });

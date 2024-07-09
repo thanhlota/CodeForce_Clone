@@ -29,7 +29,20 @@ function hasRegistered(contestants, userId) {
     return false;
 }
 
-function ContestRow({ type, contest, handleRankingClick, handleIdClick, toggleRegister, updateContestState }) {
+function ContestRow(
+    {
+        type,
+        contest,
+        handleRankingClick,
+        handleIdClick,
+        toggleRegister,
+        updateContestState,
+        setSnackbarOpen,
+        setSnackbarSeverity,
+        setSnackbarMessage
+    }) {
+    const router = useRouter();
+
     const contestStartTime = new Date(contest.display_start);
     const contestEndTime = new Date(contest.display_end);
 
@@ -62,6 +75,17 @@ function ContestRow({ type, contest, handleRankingClick, handleIdClick, toggleRe
         }
     }, []);
 
+    const handleParticipate = (contestants, userId, contestId) => {
+        if (hasRegistered(contestants, userId)) {
+            router.push(`/contests/${contestId}`);
+        }
+        else {
+            setSnackbarMessage("You has not registered contest!");
+            setSnackbarSeverity("error");
+            setSnackbarOpen(true);
+        }
+    }
+
     useEffect(() => {
         if (type == "ongoing") {
             const intervalId = setInterval(updateCountdown, 1000);
@@ -90,7 +114,11 @@ function ContestRow({ type, contest, handleRankingClick, handleIdClick, toggleRe
             <TableCell>
                 <Link sx={{ cursor: 'pointer' }}>
                     {
-                        type == "ongoing" ? "Participate" : null
+                        type == "ongoing" ?
+                            <span onClick={() => handleParticipate(contest?.user_contests, userId, contest.id)}>
+                                Participate
+                            </span>
+                            : null
                     }
                     {
                         type == "upcoming" ? <span onClick={() => toggleRegister(contest?.user_contests, contest.id)}>
@@ -240,6 +268,9 @@ const ContestList = ({ updateContestState, updateContestContestants, contests, t
                                 handleRankingClick={handleRankingClick}
                                 toggleRegister={toggleRegister}
                                 updateContestState={updateContestState}
+                                setSnackbarOpen={setSnackbarOpen}
+                                setSnackbarSeverity={setSnackbarSeverity}
+                                setSnackbarMessage={setSnackbarMessage}
                             />
                         ))}
                     </TableBody>

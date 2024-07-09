@@ -8,7 +8,7 @@ import ContestLayout from "@/components/layout/ContestLayout";
 import { FormControl, InputLabel, Select, MenuItem, Button, CircularProgress, Snackbar, Alert } from '@mui/material';
 import UpFileBtn from "@/components/common/UpFileBtn";
 import { useSelector } from "react-redux";
-import { userIdSelector } from "@/redux/reducers/user.reducer";
+import { userIdSelector, userNameSelector } from "@/redux/reducers/user.reducer";
 import submitService from "@/services/submit.service";
 import { authorizeUser } from "@/utils/auth";
 
@@ -65,6 +65,7 @@ const SubmitPage = () => {
     const { contestId } = router.query;
     const hasFetched = useRef(false);
     const userId = useSelector(userIdSelector);
+    const userName = useSelector(userNameSelector);
     const [srcCode, setSrcCode] = useState("");
     const [fileContent, setFileContent] = useState(null);
     const [contest, setContest] = useState({
@@ -115,6 +116,7 @@ const SubmitPage = () => {
             setLoading(true);
             const data = {
                 user_id: userId,
+                user_name: userName,
                 problem_id: selectedProblem,
                 language: selectedLanguage,
                 code: srcCode,

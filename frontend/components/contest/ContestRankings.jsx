@@ -24,6 +24,7 @@ import moment from 'moment';
 import TestModal from '@/components/submit/TestModal';
 import { useSelector } from 'react-redux';
 import { userIdSelector } from '@/redux/reducers/user.reducer';
+import Verdict from "@/enum/Verdict";
 
 const getElapsedTime = (contestStartTime, submissionTime) => {
   const start = moment(contestStartTime);
@@ -75,7 +76,7 @@ const SubmissionModal = ({ openDetailModal, contestTime, submissions, open, hand
                   return (
                     <div>
                       {contestTime && <span className={styles.time}>{getElapsedTime(contestTime, item.createdAt)}</span>}
-                      <span className={item.verdict == "accepted" ? styles.pass : styles.fail}>{item.verdict}</span>
+                      <span className={item.verdict == Verdict.AC ? styles.pass : styles.fail}>{item.verdict}</span>
                       <span> → </span>
                       <span>
                         <Link style={{ cursor: 'pointer' }} onClick={() => handleGetDetail(item.id)}>
@@ -105,7 +106,7 @@ function sortedScores(allProblemIds, userProblems) {
       const userProblem = userProblems.find(problem => problem.id == problemId);
       return {
         id: problemId,
-        verdict: userProblem ? (userProblem.verdict == "pass" ? 10 : 0) : '-'
+        verdict: userProblem ? (userProblem.verdict == Verdict.AC ? 10 : 0) : '-'
       };
     }
     else {
@@ -186,6 +187,7 @@ const ContestRankings = ({ contestTime, scores, problems, endTime }) => {
     score.userName.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  console.log('filteredscores', filteredscores);
   return (
     <Container maxWidth="lg" className={styles.container}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>

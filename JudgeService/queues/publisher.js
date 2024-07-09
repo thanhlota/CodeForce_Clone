@@ -50,7 +50,6 @@ class Publisher {
 
     pushJob(job) {
         try {
-            console.log(job);
             this.channel.publish(EXCHANGE, ROUTING_KEY, Buffer.from(JSON.stringify(job)));
         }
         catch (e) {

@@ -17,6 +17,10 @@ module.exports = {
             type: Sequelize.INTEGER,
             allowNull: false
           },
+          user_name: {
+            type: Sequelize.STRING,
+            allowNull: false
+          },
           problem_id: {
             type: Sequelize.INTEGER,
             allowNull: false
