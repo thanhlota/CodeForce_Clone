@@ -35,6 +35,21 @@ export default function ContestPage() {
         setContests(updatedContests);
     }
 
+    const updateContestState = (type, contest) => {
+        if (type == "upcoming") {
+            const updatedUpcoming = contests.upcomingContests.filter(item => item.id != contest.id);
+            const updatedOngoing = [...contests.ongoingContests, contest];
+            const updatedContests = { ...contests, upcomingContests: updatedUpcoming, ongoingContests: updatedOngoing };
+            setContests(updatedContests);
+        }
+        else if (type == "ongoing") {
+            const updatedOngoing = contests.ongoingContests.filter(item => item.id != contest.id);
+            const updatedEnd = [contest, ...contests.endedContests];
+            const updatedContests = { ...contests, ongoingContests: updatedOngoing, endedContests: updatedEnd };
+            setContests(updatedContests);
+        }
+    }
+
     useEffect(() => {
         if (!hasFetched.current) {
             fetchContests();
@@ -50,7 +65,7 @@ export default function ContestPage() {
                         <Typography variant="h4" gutterBottom>
                             Ongoing Contests
                         </Typography>
-                        <ContestList contests={contests.ongoingContests} type="ongoing" />
+                        <ContestList updateContestState={updateContestState} contests={contests.ongoingContests} type="ongoing" />
                     </div>
                 ) : null}
             </Box>
@@ -60,7 +75,7 @@ export default function ContestPage() {
                         <Typography variant="h4" gutterBottom>
                             Upcoming Contests
                         </Typography>
-                        <ContestList updateContestContestants={updateContestContestants} contests={contests.upcomingContests} type="upcoming" />
+                        <ContestList updateContestState={updateContestState} updateContestContestants={updateContestContestants} contests={contests.upcomingContests} type="upcoming" />
                     </div>
                 ) : null}
             </Box>

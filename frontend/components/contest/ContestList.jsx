@@ -1,4 +1,3 @@
-import React, { useState } from 'react';
 import {
     TableContainer,
     Table,
@@ -16,7 +15,7 @@ import styles from "./ContestTable.module.css";
 import { useSelector } from 'react-redux';
 import { userIdSelector, userNameSelector } from "@/redux/reducers/user.reducer";
 import contestService from '@/services/contest.service';
-
+import React, { useState, useEffect } from "react"
 const offset = -new Date().getTimezoneOffset() / 60;
 
 const Alert = React.forwardRef(function Alert(props, ref) {
@@ -30,7 +29,119 @@ function hasRegistered(contestants, userId) {
     return false;
 }
 
-const ContestList = ({ updateContestContestants, contests, type }) => {
+function ContestRow({ type, contest, handleRankingClick, handleIdClick, toggleRegister, updateContestState }) {
+    const contestStartTime = new Date(contest.display_start);
+    const contestEndTime = new Date(contest.display_end);
+
+    const [countdown, setCountdown] = useState('');
+
+    useEffect(() => {
+        if (type == "upcoming") {
+            const intervalId = setInterval(updateCountdown, 1000);
+            function updateCountdown() {
+                const currentTime = new Date();
+                const timeDifference = contestStartTime - currentTime;
+                if (timeDifference > 0) {
+                    const days = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
+                    if (days >= 1) {
+                        setCountdown(`Before start ${days} day${days > 1 ? 's' : ''}`);
+                    } else {
+                        const hours = Math.floor((timeDifference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                        const minutes = Math.floor((timeDifference % (1000 * 60 * 60)) / (1000 * 60));
+                        const seconds = Math.floor((timeDifference % (1000 * 60)) / 1000);
+                        setCountdown(`Before contest: ${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`);
+                    }
+                } else {
+                    if (updateContestState)
+                        updateContestState(type, contest);
+                    clearInterval(intervalId);
+                }
+            };
+            updateCountdown();
+            return () => clearInterval(intervalId);
+        }
+    }, []);
+
+    useEffect(() => {
+        if (type == "ongoing") {
+            const intervalId = setInterval(updateCountdown, 1000);
+            function updateCountdown() {
+                const currentTime = new Date();
+                const timeDifference = contestEndTime - currentTime;
+                if (timeDifference > 0) {
+                    const hours = Math.floor((timeDifference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const minutes = Math.floor((timeDifference % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((timeDifference % (1000 * 60)) / 1000);
+                    setCountdown(`Contest end: ${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`);
+                } else {
+                    if (updateContestState)
+                        updateContestState(type, contest);
+                    clearInterval(intervalId);
+                }
+            };
+            updateCountdown();
+            return () => clearInterval(intervalId);
+        }
+    }, []);
+    const userId = useSelector(userIdSelector);
+
+    return (
+        <TableRow key={contest.id}>
+            <TableCell>
+                <Link sx={{ cursor: 'pointer' }}>
+                    {
+                        type == "ongoing" ? "Participate" : null
+                    }
+                    {
+                        type == "upcoming" ? <span onClick={() => toggleRegister(contest?.user_contests, contest.id)}>
+                            {hasRegistered(contest?.user_contests, userId) ? "Unregister" : "Register"}
+                        </span>
+                            : null
+                    }
+                    {
+                        type == "ended" ?
+                            <span onClick={() => handleIdClick(contest.id)}>
+                                Enter
+                            </span>
+                            : null
+                    }
+                </Link>
+            </TableCell>
+            <TableCell>{contest.name}</TableCell>
+            <TableCell>
+                <div className={styles.dateTime}>
+                    {contest.display_start}
+                    <span className={styles.utc}>{`UTC+${offset}`}</span>
+                </div>
+            </TableCell>
+            <TableCell>
+                <div className={styles.dateTime}>
+                    {contest.display_end}
+                    <span className={styles.utc}>{`UTC+${offset}`}</span>
+                </div>
+            </TableCell>
+            <TableCell>
+                {
+                    type == "ended" ?
+                        <Link sx={{ cursor: 'pointer' }} onClick={() => handleRankingClick(contest.id)}>
+                            Final standings
+                        </Link> : null
+                }
+                {
+                    type == "upcoming" ? countdown : null
+                }
+                {
+                    type == "ongoing" ? countdown : null
+                }
+            </TableCell>
+            <TableCell>
+                <span>{contest?.user_contests?.length}</span>
+            </TableCell>
+        </TableRow>
+    )
+}
+
+const ContestList = ({ updateContestState, updateContestContestants, contests, type }) => {
     const router = useRouter();
 
     const userId = useSelector(userIdSelector);
@@ -94,7 +205,6 @@ const ContestList = ({ updateContestContestants, contests, type }) => {
                 else {
                     const { contestant } = await res.json();
                     newContestants = [...contestants, contestant];
-                    console.log('newContestants', newContestants);
                     updateContestContestants(contestId, newContestants);
                     setSnackbarSeverity('success');
                     setSnackbarMessage('Registered successfully');
@@ -123,49 +233,14 @@ const ContestList = ({ updateContestContestants, contests, type }) => {
                     </TableHead>
                     <TableBody>
                         {filteredContests.map((contest) => (
-                            <TableRow key={contest.id}>
-                                <TableCell>
-                                    <Link sx={{ cursor: 'pointer' }}>
-                                        {
-                                            type == "ongoing" ? "Participate" : null
-                                        }
-                                        {
-                                            type == "upcoming" ? <span onClick={() => toggleRegister(contest?.user_contests, contest.id)}>
-                                                {hasRegistered(contest?.user_contests, userId) ? "Unregister" : "Register"}
-                                            </span>
-                                                : null
-                                        }
-                                        {
-                                            type == "ended" ?
-                                                <span onClick={() => handleIdClick(contest.id)}>
-                                                    Enter
-                                                </span>
-                                                : null
-                                        }
-                                    </Link>
-                                </TableCell>
-                                <TableCell>{contest.name}</TableCell>
-                                <TableCell>
-                                    <div className={styles.dateTime}>
-                                        {contest.display_start}
-                                        <span className={styles.utc}>{`UTC+${offset}`}</span>
-                                    </div>
-                                </TableCell>
-                                <TableCell>
-                                    <div className={styles.dateTime}>
-                                        {contest.display_end}
-                                        <span className={styles.utc}>{`UTC+${offset}`}</span>
-                                    </div>
-                                </TableCell>
-                                <TableCell>
-                                    <Link sx={{ cursor: 'pointer' }} onClick={() => handleRankingClick(contest.id)}>
-                                        Final standings
-                                    </Link>
-                                </TableCell>
-                                <TableCell>
-                                    <span>{contest?.user_contests?.length}</span>
-                                </TableCell>
-                            </TableRow>
+                            <ContestRow
+                                type={type}
+                                contest={contest}
+                                handleIdClick={handleIdClick}
+                                handleRankingClick={handleRankingClick}
+                                toggleRegister={toggleRegister}
+                                updateContestState={updateContestState}
+                            />
                         ))}
                     </TableBody>
                 </Table>

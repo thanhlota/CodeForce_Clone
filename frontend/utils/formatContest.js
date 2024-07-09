@@ -46,7 +46,6 @@ const formatDateString3 = (dateString) => {
 }
 const formatContest2 = (contests) => {
     const now = new Date();
-
     const ongoingContests = [];
     const upcomingContests = [];
     const endedContests = [];
@@ -58,12 +57,15 @@ const formatContest2 = (contests) => {
         const display_start = formatDateString3(contest.start_time);
         const display_end = formatDateString3(contest.end_time);
         contest = { ...contest, start_time, end_time, display_start, display_end };
-        if (startTime <= now && endTime >= now) {
-            ongoingContests.push(contest);
-        } else if (startTime > now) {
+        if (startTime > now) {
             upcomingContests.push(contest);
         } else if (endTime < now) {
+            if (contest.name == "Contest 1") {
+                console.log('fck');
+            }
             endedContests.push(contest);
+        } else {
+            ongoingContests.push(contest);
         }
     });
 

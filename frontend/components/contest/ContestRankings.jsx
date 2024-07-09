@@ -14,6 +14,7 @@ import {
   IconButton,
   Box,
   Modal,
+  Snackbar, Alert
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import { useRouter } from 'next/router';
@@ -21,6 +22,8 @@ import styles from "./ContestTable.module.css";
 import submitService from '@/services/submit.service';
 import moment from 'moment';
 import TestModal from '@/components/submit/TestModal';
+import { useSelector } from 'react-redux';
+import { userIdSelector } from '@/redux/reducers/user.reducer';
 
 const getElapsedTime = (contestStartTime, submissionTime) => {
   const start = moment(contestStartTime);
@@ -33,38 +36,66 @@ const getElapsedTime = (contestStartTime, submissionTime) => {
   return `${hours}:${minutes}:${seconds}`;
 };
 
-const SubmissionModal = ({ openDetailModal, contestTime, submissions, open, handleClose }) => {
-  return (
-    <Modal
-      open={open}
-      onClose={handleClose}
-      aria-labelledby="modal-modal-title"
-      aria-describedby="modal-modal-description"
-    >
-      <Box className={styles.modal}>
-        <div className={styles.wrapper}>
-          <div className={styles.inner}>
-            {
-              submissions.map((item) => {
-                return (
-                  <div>
-                    {contestTime && <span className={styles.time}>{getElapsedTime(contestTime, item.createdAt)}</span>}
-                    <span className={item.verdict == "accepted" ? styles.pass : styles.fail}>{item.verdict}</span>
-                    <span> → </span>
-                    <span>
-                      <Link style={{ cursor: 'pointer' }} onClick={() => openDetailModal(item.id)}>
-                        {item.id}
-                      </Link>
-                    </span>
-                  </div>
+const SubmissionModal = ({ openDetailModal, contestTime, submissions, open, handleClose, userId, endTime }) => {
+  const currentUserId = useSelector(userIdSelector);
 
-                )
-              })
-            }
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [snackbarSeverity, setSnackbarSeverity] = useState(null);
+
+  const handleGetDetail = (submissionId) => {
+    const currentTime = new Date();
+    if (currentTime <= endTime && currentUserId != userId) {
+      setSnackbarSeverity("error");
+      setSnackbarMessage("Contest has not ended yet!");
+      setOpenSnackbar(true);
+    }
+    else {
+      openDetailModal(submissionId);
+    }
+  }
+
+  const handleSnackbarClose = () => {
+    setOpenSnackbar(false);
+  }
+
+  return (
+    <>
+      <Modal
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box className={styles.modal}>
+          <div className={styles.wrapper}>
+            <div className={styles.inner}>
+              {
+                submissions.map((item) => {
+                  return (
+                    <div>
+                      {contestTime && <span className={styles.time}>{getElapsedTime(contestTime, item.createdAt)}</span>}
+                      <span className={item.verdict == "accepted" ? styles.pass : styles.fail}>{item.verdict}</span>
+                      <span> → </span>
+                      <span>
+                        <Link style={{ cursor: 'pointer' }} onClick={() => handleGetDetail(item.id)}>
+                          {item.id}
+                        </Link>
+                      </span>
+                    </div>
+                  )
+                })
+              }
+            </div>
           </div>
-        </div>
-      </Box>
-    </Modal>
+        </Box>
+      </Modal>
+      <Snackbar open={openSnackbar} autoHideDuration={6000} onClose={handleSnackbarClose}>
+        <Alert onClose={handleSnackbarClose} severity={snackbarSeverity} sx={{ width: '100%' }}>
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
+    </>
   );
 };
 
@@ -86,7 +117,7 @@ function sortedScores(allProblemIds, userProblems) {
   });
 }
 
-const ContestRankings = ({ contestTime, scores, problems }) => {
+const ContestRankings = ({ contestTime, scores, problems, endTime }) => {
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState('');
   const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -96,6 +127,7 @@ const ContestRankings = ({ contestTime, scores, problems }) => {
   const [srcCode, setSrcCode] = useState(null);
   const [results, setResults] = useState(null);
   const [language, setLanguage] = useState(null);
+  const [userId, setUserId] = useState(null);
 
   const handleOpen = () => {
     setOpen(true);
@@ -113,8 +145,8 @@ const ContestRankings = ({ contestTime, scores, problems }) => {
   const handleScoreClick = async (problemId, userId, verdict) => {
     try {
       if (verdict != "-") {
-        const { submissions } = await submitService.getByUserAndProblem(userId, 16);
-        console.log('submissions', submissions);
+        setUserId(userId);
+        const { submissions } = await submitService.getByUserAndProblem(userId, problemId);
         setSubmissions(submissions);
         handleOpen();
       }
@@ -219,6 +251,8 @@ const ContestRankings = ({ contestTime, scores, problems }) => {
         handleClose={handleClose}
         submissions={submissions}
         openDetailModal={openDetailModal}
+        userId={userId}
+        endTime={endTime}
       />
       <TestModal
         srcCode={srcCode}

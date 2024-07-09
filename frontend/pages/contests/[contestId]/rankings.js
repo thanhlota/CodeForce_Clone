@@ -10,6 +10,7 @@ export default function Rankings() {
     const [problems, setProblems] = useState([]);
     const [scores, setScores] = useState([]);
     const [contestTime, setContestTime] = useState(null);
+    const [endTime, setEndTime] = useState(null);
 
     const hasFetched = useRef(false);
 
@@ -20,6 +21,7 @@ export default function Rankings() {
             const { problems } = await problemService.getProblemByContest(contestId);
             if (problems?.length) {
                 setContestTime(problems[0].contest.start_time);
+                setEndTime(problems[0].contest.end_time);
             }
             const newProblems = problems.map((item) => item.id);
             setProblems(newProblems);
@@ -49,7 +51,7 @@ export default function Rankings() {
 
     return (
         <ContestLayout>
-            <ContestRankings contestTime={contestTime} scores={scores} problems={problems} />
+            <ContestRankings contestTime={contestTime} endTime={endTime} scores={scores} problems={problems} />
         </ContestLayout>
     )
 }
