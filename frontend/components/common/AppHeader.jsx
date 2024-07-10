@@ -67,7 +67,7 @@ export default function Header() {
     const handleCloseSnackbar = () => {
         setSnackbarOpen(false);
     };
-    
+
     return (
         <div className={`${styles.header} ${isAdminRoute ? styles.custom_header : ''}`}>
             <div className={styles.left_navigation}>
@@ -78,7 +78,7 @@ export default function Header() {
                     isAdminRoute ?
                         (
                             <>
-                                <span className={styles.app_title}>
+                                <span className={styles.app_title} onClick={() => router.push("/")}>
                                     <Typography className={styles.app_name}>
                                         HustCode Management
                                     </Typography>
@@ -88,7 +88,7 @@ export default function Header() {
                         :
                         (
                             <>
-                                <span className={styles.app_title}>
+                                <span className={styles.app_title} onClick={() => router.push("/")}>
                                     <Typography className={styles.app_name}>
                                         HustCode Contest
                                     </Typography>

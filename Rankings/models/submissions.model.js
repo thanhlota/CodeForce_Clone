@@ -1,4 +1,5 @@
 "use strict";
+const Verdict = require("../enum/Verdict");
 
 module.exports = (sequelize, DataTypes) => {
   const Submission = sequelize.define('submissions', {
@@ -21,8 +22,16 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false
     },
     verdict: {
-      type: DataTypes.ENUM('not_score', 'pass', 'fail'),
-      allowNull: false
+      type: DataTypes.ENUM(
+        Verdict.AC,
+        Verdict.WA,
+        Verdict.TLE,
+        Verdict.MLE,
+        Verdict.RE,
+        Verdict.CE,
+        Verdict.SE,
+      ),
+      allowNull: true
     },
     createdAt: {
       allowNull: false,

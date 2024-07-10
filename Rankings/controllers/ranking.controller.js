@@ -1,8 +1,7 @@
 const { ErrorHandler, DefaultError } = require("../utils/error");
 const ERROR = require("../enum/error");
 const RankingService = require("../services/ranking.service");
-const SubmissionService = require("../services/submission.service");
-
+const SyncService = require("../services/sync.service");
 async function getRankingByContest(req, res) {
     try {
         const { contest_id } = req.params;
@@ -12,11 +11,10 @@ async function getRankingByContest(req, res) {
                 ERROR.NON_EXISTED_RANKING.message
             ).httpResponse(res);
         }
+
         let { page, user_name } = req.query;
-        if (!page) {
-            page = 1;
-        }
-        const userScores = await RankingService.getRedisRanking({ page, user_name, contest_id });
+
+        const userScores = await RankingService.getRanking({ page, user_name, contest_id });
         return res.status(200).send({
             scores: userScores
         })
@@ -48,7 +46,22 @@ async function updateRanking(req, res) {
     }
 }
 
+async function sync(req, res) {
+    const { contestId } = req.body;
+    try {
+        await SyncService.syncRedis(contestId);
+        return res.status(200).send({
+            message: "OK"
+        })
+    }
+    catch (e) {
+        console.log("Sync ranking failed with error:", e.message);
+        return DefaultError.httpResponse(res);
+    }
+}
+
 module.exports = {
     getRankingByContest,
-    updateRanking
+    updateRanking,
+    sync
 }

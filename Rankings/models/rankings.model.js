@@ -2,19 +2,19 @@
 
 module.exports = (sequelize, DataTypes) => {
   const Ranking = sequelize.define('rankings', {
-    id: {
+    contest_id: {
       allowNull: false,
-      autoIncrement: true,
       primaryKey: true,
       type: DataTypes.INTEGER
     },
     user_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
+      primaryKey: true
     },
-    contest_id: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
+    user_name: {
+      type: DataTypes.STRING,
+      allowNull: false
     },
     user_score: {
       type: DataTypes.FLOAT,

@@ -10,7 +10,7 @@ export default function Problems() {
 
     const fetchProblemsData = useCallback(async () => {
         try {
-            const { problems } = await problemService.getProblems();
+            const { problems } = await problemService.getTrainingProblems();
             problems.forEach((item) => {
                 const merge_categories = item.categories.map((category) => category.type);
                 const display_categories = merge_categories.join(", ");

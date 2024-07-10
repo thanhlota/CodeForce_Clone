@@ -11,7 +11,7 @@ async function create(user_id, contest_id, problem_id, verdict) {
 }
 
 async function getSubmissions(filter = {}) {
-    return await rankings.findAll({
+    return await submissions.findAll({
         where: filter,
     });
 }

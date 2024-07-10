@@ -11,7 +11,7 @@ const {
 } = require("../../configs/container/c.config.js");
 const CodeError = require("../../enum/CodeError.js");
 
-class CPlusPlus extends Lang {
+class C extends Lang {
   constructor(mem, time, code, input) {
     super(mem, time, code, input);
     this.id = Date.now().toString(36);
@@ -298,4 +298,4 @@ class CPlusPlus extends Lang {
   }
 }
 
-module.exports = CPlusPlus;
+module.exports = C;

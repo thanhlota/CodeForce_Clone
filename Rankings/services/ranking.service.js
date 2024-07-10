@@ -1,9 +1,11 @@
-const rankings = require("../models").rankings;
+const Ranking = require("../models").rankings;
+const Submission = require("../models").submissions;
+
 const Redis = require("../redisClient");
 const PAGE_LIMIT = 20;
 const Verdict = require("../enum/Verdict");
 
-async function create(user_id, contest_id, user_score) {
+async function create(user_id, user_name, contest_id, user_score) {
     const ranking = rankings.build({
         user_id,
         contest_id,
@@ -13,17 +15,49 @@ async function create(user_id, contest_id, user_score) {
 }
 
 async function getRanking(filter = {}) {
-    return await rankings.findOne({
-        where: filter,
-    });
+    const { contest_id } = filter;
+    const contest = await Ranking.findByPk(contest_id);
+
+    if (contest) {
+        const rankings = await Ranking.findAll({
+            where: { contest_id }
+        });
+
+        const submissions = await Submission.findAll({
+            where: { contest_id }
+        });
+
+        const result = rankings.map(ranking => {
+            const userSubmissions = submissions.filter(submission => submission.user_id === ranking.user_id);
+            return {
+                id: ranking.user_id,
+                userName: ranking.user_name,
+                problems: userSubmissions.map(submission => ({
+                    id: submission.problem_id,
+                    verdict: submission.verdict
+                })),
+                score: ranking.user_score
+            };
+        });
+        return result;
+    } else {
+        return await getRedisRanking(filter);
+    }
 }
 
 async function getRedisRanking(filter = {}) {
     try {
         const client = Redis.getInstance().getClient();
         const { page, user_name, contest_id } = filter;
-        const start = (page - 1) * PAGE_LIMIT;
-        const end = start + PAGE_LIMIT - 1;
+        let start, end;
+        if (page) {
+            start = (page - 1) * PAGE_LIMIT;
+            end = start + PAGE_LIMIT - 1;
+        }
+        else {
+            start = 0;
+            end = -1;
+        }
         let userScores = [];
         if (!user_name) {
             const users = await client.sendCommand(['ZREVRANGE', `contest:${contest_id}_scores`, start.toString(), end.toString(), 'WITHSCORES']);
@@ -90,7 +124,6 @@ async function getRedisRanking(filter = {}) {
                 }
             }
         }
-        userScores = userScores.slice(start, end + 1);
         return userScores;
     }
     catch (e) {

@@ -28,7 +28,7 @@ import contestService from '@/services/contest.service';
 import { useRouter } from 'next/router';
 import { formatDateString, formatDateString2, getCurrentDate } from '@/utils/formatContest';
 import styles from "./ContestTable.module.css";
-
+import rankingService from '@/services/ranking.service';
 
 const Alert = React.forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -235,6 +235,20 @@ const ContestTable = ({ contests, setContests }) => {
         router.push(`/admin/contest/${id}`);
     }
 
+    const handleSyncRanking = async (contestId) => {
+        try {
+            await rankingService.syncRanking(contestId);
+            setSnackbarMessage('Sync ranking successfully!');
+            setSnackbarSeverity('success');
+        }
+        catch (e) {
+            console.log("ERROR", e);
+            setSnackbarMessage('Failed to sync contest');
+            setSnackbarSeverity('error');
+        }
+        setSnackbarOpen(true);
+    }
+
     return (
         <>
             <TableContainer component={Paper} style={{}}>
@@ -274,6 +288,7 @@ const ContestTable = ({ contests, setContests }) => {
                             <TableCell>End Time</TableCell>
                             <TableCell>State</TableCell>
                             <TableCell>Actions</TableCell>
+                            <TableCell></TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -317,6 +332,9 @@ const ContestTable = ({ contests, setContests }) => {
                                     <IconButton disabled={contest.state === 'ongoing'} color="secondary" onClick={() => handleOpenDeleteDialog(contest.id)}>
                                         <Delete />
                                     </IconButton>
+                                </TableCell>
+                                <TableCell>
+                                    <Button onClick={() => { handleSyncRanking(contest.id) }}>Sync Ranking</Button>
                                 </TableCell>
                             </TableRow>
                         ))}

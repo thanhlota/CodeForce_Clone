@@ -225,7 +225,7 @@ const ContestRankings = ({ contestTime, scores, problems, endTime }) => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {filteredscores.map((score, index) => (
+            {(filteredscores && filteredscores.length) ? filteredscores.map((score, index) => (
               <TableRow key={score.id} sx={{ '&:nth-of-type(odd)': { backgroundColor: '#f9f9f9' } }}>
                 <TableCell>{index + 1}</TableCell>
                 <TableCell>{score.userName}</TableCell>
@@ -243,7 +243,11 @@ const ContestRankings = ({ contestTime, scores, problems, endTime }) => {
                   <span className={styles.score}>{score.score}</span>
                 </TableCell>
               </TableRow>
-            ))}
+            )) : <TableRow>
+              <TableCell colSpan={problems?.length + 3} className={styles.center}>
+                No data available
+              </TableCell>
+            </TableRow>}
           </TableBody>
         </Table>
       </TableContainer>

@@ -1,19 +1,21 @@
 'use strict';
+const Verdict = require("../enum/Verdict");
+
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     await queryInterface.createTable('rankings', {
-      id: {
+      contest_id: {
+        type: Sequelize.INTEGER,
         allowNull: false,
-        autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER
       },
       user_id: {
         type: Sequelize.INTEGER,
         allowNull: false,
+        primaryKey: true,
       },
-      contest_id: {
-        type: Sequelize.INTEGER,
+      user_name: {
+        type: Sequelize.STRING,
         allowNull: false,
       },
       user_score: {
@@ -50,8 +52,16 @@ module.exports = {
         allowNull: false
       },
       verdict: {
-        type: Sequelize.ENUM('not_score', 'pass', 'fail'),
-        allowNull: false
+        type: Sequelize.ENUM(
+          Verdict.AC,
+          Verdict.WA,
+          Verdict.TLE,
+          Verdict.MLE,
+          Verdict.RE,
+          Verdict.CE,
+          Verdict.SE,
+        ),
+        allowNull: true
       },
       createdAt: {
         allowNull: false,
@@ -64,7 +74,7 @@ module.exports = {
     });
   },
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('ranking');
-    await queryInterface.dropTable('submission');
+    await queryInterface.dropTable('rankings');
+    await queryInterface.dropTable('submissions');
   }
 };

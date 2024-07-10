@@ -3,6 +3,7 @@ const ERROR = require("../enum/error");
 const ContestService = require("../services/contest.service");
 const ProblemService = require("../services/problem.service");
 const CategoryService = require("../services/category.service");
+const contests = require("../models").contests;
 
 const { Op } = require("sequelize");
 const { sequelize } = require("../models");
@@ -211,14 +212,29 @@ async function getProblemById(req, res) {
 
 async function getProblems(req, res) {
     try {
-        const { ns, cs, cgs } = req.query;
+        const { ns, cs, cgs, isUser } = req.query;
         const searchConditions = [];
         if (ns) searchConditions.push({ name: { [Op.like]: `%${ns}%` } });
         if (cs) searchConditions.push({ contest_id: { [Op.eq]: cs } });
+        if (isUser) {
+            const now = new Date();
+            const ongoingContests = await contests.findAll({
+                where: {
+                    end_time: { [Op.gte]: now }
+                }
+            });
+            const ongoingContestIds = ongoingContests.map(contest => contest.id);
+            searchConditions.push({
+                contest_id: {
+                    [Op.notIn]: ongoingContestIds
+                }
+            })
+        }
         const filter = {
             [Op.and]: searchConditions
         }
-        let problems = await ProblemService.getProblems(filter);
+        const problems = await ProblemService.getProblems(filter);
+
         return res.status(200).send({
             problems
         })
