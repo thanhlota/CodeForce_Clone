@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import {
-    Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Pagination
+    Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Pagination,
+    RadioGroup, FormControlLabel, Radio
 } from '@mui/material';
 import styles from './SubmissionList.module.css';
 import formatDate from '@/utils/formatDate';
@@ -8,8 +9,9 @@ import { useRouter } from 'next/router';
 import verdict from "@/constants/verdict";
 import submitService from '@/services/submit.service';
 import TestModal from '@/components/submit/TestModal';
+import Point from "@/enum/Point";
 
-const SubmissionList = ({ data, page, totalPages, handlePageChange }) => {
+const SubmissionList = ({ seeUser, data, page, totalPages, handlePageChange }) => {
     const router = useRouter();
     const { contestId } = router.query;
     const [open, setOpen] = useState(false);
@@ -17,8 +19,22 @@ const SubmissionList = ({ data, page, totalPages, handlePageChange }) => {
     const [results, setResults] = useState(null);
     const [language, setLanguage] = useState(null);
 
+    const [sortOption, setSortOption] = useState('submissionTime'); 
+    
+    const sortedData = data ? [...data].sort((a, b) => {
+        if (sortOption === 'submissionTime') {
+            return new Date(a.createdAt) - new Date(b.createdAt);
+        } else if (sortOption === 'executionTime') {
+            return a.time - b.time;
+        } else if (sortOption === 'memoryUsage') {
+            return a.memory - b.memory;
+        }
+        return 0;
+    }) : [];
+
+
     const handleProblemClick = useCallback((problemId) => {
-        if (contestId) {s
+        if (contestId) {
             router.push(`/contests/${contestId}/problem/${problemId}`);
         }
     }, [contestId]);
@@ -55,14 +71,19 @@ const SubmissionList = ({ data, page, totalPages, handlePageChange }) => {
                     <TableHead>
                         <TableRow>
                             <TableCell className={styles.header}>Submission</TableCell>
+                            {
+                                seeUser ? <TableCell className={styles.header}>Who</TableCell> : null
+                            }
                             <TableCell className={styles.header}>When</TableCell>
                             <TableCell className={styles.header}>Language</TableCell>
                             <TableCell className={styles.header}>Verdict</TableCell>
                             <TableCell className={styles.header}>Problem</TableCell>
+                            <TableCell className={styles.header}>Time</TableCell>
+                            <TableCell className={styles.header}>Memory</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {(data && data.length) ? data.map((submission) => {
+                        {(data && data.length) ? sortedData.map((submission) => {
                             const { formattedDate, utc } = formatDate(submission.createdAt);
                             let verdictClass = "";
                             if (submission.verdict === verdict.TT) {
@@ -81,6 +102,14 @@ const SubmissionList = ({ data, page, totalPages, handlePageChange }) => {
                                             #{submission.id}
                                         </span>
                                     </TableCell>
+                                    {
+                                        seeUser ?
+                                            <TableCell className={styles.center}>
+                                                <span>
+                                                    {submission.user_name}
+                                                </span>
+                                            </TableCell> : null
+                                    }
                                     <TableCell className={styles.center}>
                                         <div className={styles.dateTime}>
                                             {formattedDate}
@@ -98,21 +127,48 @@ const SubmissionList = ({ data, page, totalPages, handlePageChange }) => {
                                             #{submission.problem_id}
                                         </span>
                                     </TableCell>
+                                    <TableCell className={styles.center} >
+                                        <span>
+                                            {submission.time == Point.MAX_TIME_LIMIT ? null : submission.time + " ms"}
+                                        </span>
+                                    </TableCell>
+                                    <TableCell className={styles.center} >
+                                        <span>
+                                            {submission.memory == Point.MAX_MEMORY_LIMIT ? null : submission.memory + " KB"}
+                                        </span>
+                                    </TableCell>
                                 </TableRow>
                             )
-                        }) : null}
+                        }) :
+                            <TableRow>
+                                <TableCell colSpan={seeUser ? 8 : 7} className={styles.center}>
+                                    No data available
+                                </TableCell>
+                            </TableRow>}
                     </TableBody>
                 </Table>
             </TableContainer>
-            {
-                totalPages ?
-                    <Pagination
-                        count={totalPages}
-                        page={page}
-                        onChange={handlePageChange}
-                        className={styles.pagination}
-                    /> : null
-            }
+            <div className={styles.controls}>
+                {
+                    totalPages ?
+                        <Pagination
+                            count={totalPages}
+                            page={page}
+                            onChange={handlePageChange}
+                            className={styles.pagination}
+                        /> : null
+                }
+                <RadioGroup
+                    row
+                    value={sortOption}
+                    onChange={(e) => setSortOption(e.target.value)}
+                    className={styles.radioGroup}
+                >
+                    <FormControlLabel value="submissionTime" control={<Radio />} label="Submission Time" />
+                    <FormControlLabel value="executionTime" control={<Radio />} label="Execution Time" />
+                    <FormControlLabel value="memoryUsage" control={<Radio />} label="Memory Usage" />
+                </RadioGroup>
+            </div>
             <TestModal srcCode={srcCode} results={results} language={language} open={open} handleClose={handleClose} />
         </>
     );

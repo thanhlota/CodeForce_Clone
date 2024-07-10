@@ -6,3 +6,9 @@
 .drawer {
     min-width: 240px;
 }
+
+.active {
+    background-color: rgba(0, 0, 0, 0.08); /* Thay đổi màu nền cho điểm nhấn */
+    color: #1976d2; /* Thay đổi màu chữ cho điểm nhấn */
+    border-left: 4px solid #1976d2; /* Thêm đường viền bên trái */
+}

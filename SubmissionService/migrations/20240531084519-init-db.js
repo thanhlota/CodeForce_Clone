@@ -45,6 +45,14 @@ module.exports = {
           verdict: {
             allowNull: false,
             type: Sequelize.STRING
+          },
+          time: {
+            type: Sequelize.INTEGER,
+            allowNull: false
+          },
+          memory: {
+            type: Sequelize.INTEGER,
+            allowNull: false
           }
         }, { transaction: t }),
         queryInterface.createTable("results", {

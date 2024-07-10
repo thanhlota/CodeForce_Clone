@@ -10,7 +10,7 @@ const PAGE_LIMIT = 20;
 
 async function create(req, res) {
     try {
-        const { user_id, user_name, problem_id, contest_id, code, language, mem, time } = req.body;
+        const { user_id, user_name, problem_id, contest_id, code, language, mem, time, ongoingContest } = req.body;
         if (!user_id || !user_name || !problem_id || !code || !language || !contest_id || !mem || !time) {
             return new ErrorHandler(
                 ERROR.MISSING_SUBMISSION_INFO.status,
@@ -31,9 +31,11 @@ async function create(req, res) {
                 time,
                 code,
                 lang: language,
-                testcases
+                testcases,
+                ongoingContest
             }
-            publisher.pushJob(job);
+            if (testcases && testcases?.length)
+                publisher.pushJob(job);
             return res.status(200).send({
                 submission: submission
             })

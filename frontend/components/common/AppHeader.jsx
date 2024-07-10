@@ -67,7 +67,7 @@ export default function Header() {
     const handleCloseSnackbar = () => {
         setSnackbarOpen(false);
     };
-
+    
     return (
         <div className={`${styles.header} ${isAdminRoute ? styles.custom_header : ''}`}>
             <div className={styles.left_navigation}>
@@ -93,15 +93,18 @@ export default function Header() {
                                         HustCode Contest
                                     </Typography>
                                 </span>
-                                <div className={styles.navigation_item} onClick={() => router.push("/")}>
+                                <div className={`${styles.navigation_item} ${router.pathname === "/" ? styles.active : ''}`}
+                                    onClick={() => router.push("/")}>
                                     <span className={styles.custom_icon}><HomeIcon fontSize="10px" /></span>
                                     <span>Home</span>
                                 </div>
-                                <div className={styles.navigation_item} onClick={() => router.push("/contests")}>
+                                <div className={`${styles.navigation_item} ${router.pathname === "/contests" ? styles.active : ''}`}
+                                    onClick={() => router.push("/contests")}>
                                     <span className={styles.custom_icon} ><EmojiEventsIcon fontSize="10px" /></span>
                                     <span>Contests</span>
                                 </div>
-                                <div className={styles.navigation_item} onClick={() => router.push("/problems")}>
+                                <div className={`${styles.navigation_item} ${router.pathname === "/problems" ? styles.active : ''}`}
+                                    onClick={() => router.push("/problems")}>
                                     <span className={styles.custom_icon}><QuizIcon fontSize="10px" /></span>
                                     <span>Problems</span>
                                 </div>

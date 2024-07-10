@@ -40,6 +40,14 @@ module.exports = (sequelize, DataTypes) => {
         verdict: {
             allowNull: false,
             type: DataTypes.STRING
+        },
+        time: {
+            type: DataTypes.INTEGER,
+            allowNull: false
+        },
+        memory: {
+            type: DataTypes.INTEGER,
+            allowNull: false
         }
     },
         {

@@ -10,7 +10,7 @@ import UpFileBtn from "@/components/common/UpFileBtn";
 import { useSelector } from "react-redux";
 import { userIdSelector, userNameSelector } from "@/redux/reducers/user.reducer";
 import submitService from "@/services/submit.service";
-import { authorizeUser } from "@/utils/auth";
+import { isOngoingContest } from "@/utils/auth";
 
 const ProblemDropdown = ({ problems, selectedProblem, onProblemSelect }) => {
     return (
@@ -60,7 +60,7 @@ const LanguageDropdown = ({ languages, selectedLanguage, onLanguageSelect }) => 
     );
 }
 
-const SubmitPage = () => {
+const SubmitPage = ({ ongoingContest }) => {
     const router = useRouter();
     const { contestId } = router.query;
     const hasFetched = useRef(false);
@@ -123,6 +123,7 @@ const SubmitPage = () => {
                 contest_id: contestId,
                 mem: memoryLimit * 1024 * 1024,
                 time: timeLimit * 1000000000,
+                ongoingContest
             }
             await submitService.create(data);
             setSnackbarMessage('Submission has been created successful!');
@@ -290,4 +291,4 @@ const SubmitPage = () => {
 
 export default SubmitPage;
 
-export const getServerSideProps = authorizeUser;
+export const getServerSideProps = isOngoingContest;

@@ -114,3 +114,21 @@
   margin-top: 8px;
   ;
 }
+
+.controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 16px;
+  /* Adjust as needed */
+}
+
+.radioGroup {
+  margin-left: auto;
+  /* Push the radio buttons to the right */
+}
+
+.pagination {
+  margin-right: 16px;
+  /* Adjust as needed */
+}

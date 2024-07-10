@@ -6,7 +6,7 @@ class Redis {
 
   async init() {
     this.client = await createClient({
-      url: process.env.REDIS_URI
+      url: process.env.REDIS_URI,
     })
       .on('error', err => console.log('Redis Client Error', err))
       .on('ready', () => console.log("REDIS CONNECTED SUCCESSFULLY!"))

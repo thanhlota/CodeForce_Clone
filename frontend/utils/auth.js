@@ -1,5 +1,7 @@
 import { wrapper } from "@/redux/store";
 import UserService from "@/services/user.service";
+import contestService from "@/services/contest.service";
+
 import { logout, initUser } from "@/redux/reducers/user.reducer";
 
 const updateUserInfo = wrapper.getServerSideProps((store) => async ({ req }) => {
@@ -129,7 +131,7 @@ const authorizeAdmin = wrapper.getServerSideProps((store) => async ({ req }) => 
     };
 })
 
-const authorizeContestant = wrapper.getServerSideProps((store) => async ({ req }) => {
+const isOngoingContest = wrapper.getServerSideProps((store) => async ({ req, query }) => {
     let accessToken = req.cookies["access_token"];
 
     if (accessToken && !store.getState().user.id) {
@@ -147,14 +149,6 @@ const authorizeContestant = wrapper.getServerSideProps((store) => async ({ req }
                 };
             } else {
                 store.dispatch(initUser(userInfo));
-                if (userInfo.role !== 'admin') {
-                    return {
-                        redirect: {
-                            destination: '/',
-                            permanent: false,
-                        },
-                    };
-                }
             }
 
         } catch (error) {
@@ -178,11 +172,27 @@ const authorizeContestant = wrapper.getServerSideProps((store) => async ({ req }
         };
     }
 
+    const { contestId } = query;
+    let ongoingContest = null;
+    try {
+        const res = await contestService.getContestById(contestId);
+        const now = new Date();
+        const end_time = new Date(res.contest.end_time)
+        if (now > end_time) {
+            ongoingContest = false;
+        }
+        else {
+            ongoingContest = true;
+        }
+    }
+    catch (e) {
+        console.log("Get contest failed with error", e);
+    }
     return {
         props: {
-            accessToken
+            ongoingContest
         },
     };
 })
 
-export { updateUserInfo, authorizeUser, authorizeAdmin, authorizeContestant};
+export { updateUserInfo, authorizeUser, authorizeAdmin, isOngoingContest };

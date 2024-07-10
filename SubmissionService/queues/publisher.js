@@ -8,6 +8,7 @@ const RESPONSE_QUEUE = 'responses';
 const ResultService = require("../services/result.service");
 const SubmissionService = require("../services/submission.service");
 const SseServer = require("../sse/SseServer");
+const Point = require("../enum/Point");
 
 class Publisher {
     static instance = null;
@@ -78,19 +79,27 @@ class Publisher {
                 let submissionPromise = Promise.resolve();
                 let verdict = null;
                 let submissionId = null;
+                let time = null;
+                let memory = null;
                 if (responseObject.length) {
                     const result = responseObject[responseObject.length - 1];
                     if (result.submission_id) {
                         submissionPromise = SubmissionService.update(result.submission_id, {
-                            verdict: result.verdict
+                            verdict: result.verdict,
+                            time: result?.time ? Math.floor(result.time / 1000000) : Point.MAX_TIME_LIMIT,
+                            memory: result?.memory ? Math.floor(result.memory / 1024) : Point.MAX_MEMORY_LIMIT
                         })
                     }
                     verdict = result.verdict;
                     submissionId = result.submission_id;
+                    time = result?.time ? Math.floor(result.time / 1000000) : Point.MAX_TIME_LIMIT;
+                    memory = result?.memory ? Math.floor(result.memory / 1024) : Point.MAX_MEMORY_LIMIT;
                 }
                 await Promise.all([resultPromise, submissionPromise]);
                 const server = SseServer.getInstance();
-                server.sendEvent(submissionId.toString(), verdict)
+                if (submissionId) {
+                    server.sendEvent(submissionId.toString(), verdict, time, memory)
+                }
                 this.channel.ack(msg);
             }, { noAck: false })
         }

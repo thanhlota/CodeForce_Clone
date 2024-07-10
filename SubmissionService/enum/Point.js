@@ -1,0 +1,4 @@
+module.exports = {
+    MAX_TIME_LIMIT: 999999999,
+    MAX_MEMORY_LIMIT: 999999999
+}

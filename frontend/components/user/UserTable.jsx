@@ -4,6 +4,7 @@ import {
     Paper, IconButton, Button, TextField, Typography, Box, Modal,
     FormControl, InputLabel, Select, MenuItem,
     Snackbar, Alert, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle,
+    Pagination
 } from '@mui/material';
 import { Add, Delete, Edit, Search } from '@mui/icons-material';
 import UserService from '@/services/user.service';
@@ -218,6 +219,12 @@ const UserTable = ({ users, setUsers, accessToken }) => {
                     </TableBody>
                 </Table>
             </TableContainer>
+            <Pagination
+                count={1}
+                page={1}
+                onChange={() => { }}
+                className={styles.pagination}
+            />
             <Modal open={openModal} onClose={handleCloseModal} className={styles.modal}
             >
                 <Box

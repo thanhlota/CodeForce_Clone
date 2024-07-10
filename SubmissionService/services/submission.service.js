@@ -1,6 +1,7 @@
 const submissions = require("../models").submissions;
 const results = require("../models").results;
 const CodeStatus = require("../enum/CodeStatus");
+const Point = require("../enum/Point");
 
 async function create(user_id, user_name, problem_id, code, language, contest_id) {
     const submission = submissions.build({
@@ -11,6 +12,8 @@ async function create(user_id, user_name, problem_id, code, language, contest_id
         language,
         contest_id,
         verdict: CodeStatus.TT,
+        time: Point.MAX_TIME_LIMIT,
+        memory: Point.MAX_MEMORY_LIMIT,
         createdAt: new Date()
     });
     return await submission.save();

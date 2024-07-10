@@ -52,6 +52,7 @@ const problemPage = () => {
                 page={page}
                 totalPages={totalPages}
                 handlePageChange={handlePageChange}
+                seeUser={true}
             />
         </ContestLayout>
     )

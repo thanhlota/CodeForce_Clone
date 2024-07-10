@@ -5,8 +5,10 @@ import Verify from '@/utils/verify';
 import UserService from '@/services/user.service';
 import { useDispatch } from 'react-redux';
 import { loginSuccess } from '@/redux/reducers/user.reducer';
+import { useRouter } from 'next/router';
 
 const LoginModal = ({ open, handleClose, toggleRegister }) => {
+    const router = useRouter();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [errors, setErrors] = useState({});
@@ -33,6 +35,9 @@ const LoginModal = ({ open, handleClose, toggleRegister }) => {
                 setSnackbarSeverity('success');
                 setSnackbarOpen(true);
                 handleClose();
+                if (data.role == "admin") {
+                    router.push("/admin");
+                }
             }
         } catch (e) {
             setSnackbarSeverity('error');

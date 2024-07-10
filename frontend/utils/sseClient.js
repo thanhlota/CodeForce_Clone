@@ -11,11 +11,13 @@ const sseClient = (submissionIds, originalSubmissions, setSubmission) => {
             console.log('SSE disconnect by server!');
             return;
         }
-        const { submissionId, verdict } = data;
+        const { submissionId, verdict, time, memory } = data;
         const updatedSubmissions = [...originalSubmissions];
         const submissionIndex = updatedSubmissions.findIndex(submission => submission.id == submissionId);
         if (submissionIndex !== -1) {
             updatedSubmissions[submissionIndex].verdict = verdict;
+            updatedSubmissions[submissionIndex].time = time;
+            updatedSubmissions[submissionIndex].memory = memory;
             setSubmission(updatedSubmissions);
         }
     }

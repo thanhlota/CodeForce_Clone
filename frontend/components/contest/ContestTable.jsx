@@ -19,7 +19,8 @@ import {
     Box,
     Snackbar,
     CircularProgress,
-    Link
+    Link,
+    Pagination
 } from '@mui/material';
 import { Add, Edit, Delete, Search } from '@mui/icons-material';
 import MuiAlert from '@mui/material/Alert';
@@ -236,7 +237,7 @@ const ContestTable = ({ contests, setContests }) => {
 
     return (
         <>
-            <TableContainer component={Paper} style={{ marginTop: 20 }}>
+            <TableContainer component={Paper} style={{}}>
                 <Box display="flex" justifyContent="center" alignItems="center" p={2} sx={{}}>
                     <Typography variant="h5">Contest List</Typography>
                 </Box>
@@ -322,6 +323,12 @@ const ContestTable = ({ contests, setContests }) => {
                     </TableBody>
                 </Table>
             </TableContainer>
+            <Pagination
+                count={1}
+                page={1}
+                onChange={() => { }}
+                className={styles.pagination}
+            />
             <Dialog open={open} onClose={handleClose}>
                 <DialogTitle>{isEditing ? 'Edit Contest' : 'Add Contest'}</DialogTitle>
                 <DialogContent>

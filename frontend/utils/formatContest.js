@@ -60,9 +60,6 @@ const formatContest2 = (contests) => {
         if (startTime > now) {
             upcomingContests.push(contest);
         } else if (endTime < now) {
-            if (contest.name == "Contest 1") {
-                console.log('fck');
-            }
             endedContests.push(contest);
         } else {
             ongoingContests.push(contest);

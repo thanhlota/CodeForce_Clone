@@ -16,7 +16,7 @@ class SseServer {
         console.log(`Client: ${client.id} established connection successfully!`);
     }
 
-    sendEvent(submissionId, verdict) {
+    sendEvent(submissionId, verdict, time, memory) {
         if (!submissionId) {
             console.log("Missing submission id!");
             return;
@@ -27,6 +27,16 @@ class SseServer {
             return;
         }
 
+        if (!time) {
+            console.log("Missing time!");
+            return;
+        }
+
+        if (!memory) {
+            console.log("Missing memory!");
+            return;
+        }
+
         for (let i = 0; i < SseServer.clients.length; i++) {
             const client = SseServer.clients[i];
             const id = Date.now();
@@ -34,7 +44,9 @@ class SseServer {
                 client.response.write(`id: ${id}\n`);
                 client.response.write(`data: ${JSON.stringify({
                     submissionId,
-                    verdict
+                    verdict,
+                    time,
+                    memory
                 })}\n\n`);
                 client.submission_ids = client.submission_ids.filter((id) => id != submissionId);
                 if (client.submission_ids.length == 0) {

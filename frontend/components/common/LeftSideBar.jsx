@@ -7,6 +7,7 @@ import styles from "./LeftSideBar.module.css";
 
 const Sidebar = () => {
     const router = useRouter();
+    const currentPath = router.pathname;
 
     const handleNavigation = (path) => {
         router.push(path);
@@ -19,13 +20,21 @@ const Sidebar = () => {
         >
             <div className={styles.item_container}>
                 <List>
-                    <ListItem button onClick={() => handleNavigation('/admin')}>
+                    <ListItem
+                        button
+                        onClick={() => handleNavigation('/admin')}
+                        className={!currentPath.includes('/users') ? styles.active : ''}
+                    >
                         <ListItemIcon>
                             <AssignmentIcon />
                         </ListItemIcon>
                         <ListItemText primary="Manage Contest" />
                     </ListItem>
-                    <ListItem button onClick={() => handleNavigation('/admin/users')}>
+                    <ListItem
+                        button
+                        onClick={() => handleNavigation('/admin/users')}
+                        className={currentPath.includes('/admin/users') ? styles.active : ''}
+                    >
                         <ListItemIcon>
                             <PeopleIcon />
                         </ListItemIcon>

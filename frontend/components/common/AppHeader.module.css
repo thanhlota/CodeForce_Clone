@@ -78,3 +78,15 @@
 .avatar {
     margin-right: 8px;
 }
+
+.active {
+    background-color: rgba(0, 0, 0, 0.08);
+    color: #1976d2;
+    border-bottom: 2px solid #1976d2;
+}
+
+.navigation_item:hover {
+    background-color: rgba(0, 0, 0, 0.04);
+    color: #1976d2;
+    border-bottom: 2px solid #1976d2;
+}

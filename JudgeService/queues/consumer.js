@@ -57,17 +57,20 @@ class Consumer {
                     time,
                     code,
                     testcases,
-                    submission_id
+                    submission_id,
+                    ongoingContest
                 } = jobObject;
                 const ranking_response = (verdict) => {
-                    const job = {
-                        contest_id,
-                        problem_id,
-                        user_id,
-                        user_name,
-                        verdict
+                    if (ongoingContest) {
+                        const job = {
+                            contest_id,
+                            problem_id,
+                            user_id,
+                            user_name,
+                            verdict
+                        }
+                        Publisher.getInstance().pushJob(job);
                     }
-                    Publisher.getInstance().pushJob(job);
                 };
 
                 const newJob = new Job(
