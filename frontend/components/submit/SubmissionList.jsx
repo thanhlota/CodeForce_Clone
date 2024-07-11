@@ -19,11 +19,11 @@ const SubmissionList = ({ seeUser, data, page, totalPages, handlePageChange }) =
     const [results, setResults] = useState(null);
     const [language, setLanguage] = useState(null);
 
-    const [sortOption, setSortOption] = useState('submissionTime'); 
-    
+    const [sortOption, setSortOption] = useState('submissionTime');
+
     const sortedData = data ? [...data].sort((a, b) => {
         if (sortOption === 'submissionTime') {
-            return new Date(a.createdAt) - new Date(b.createdAt);
+            return new Date(b.createdAt) - new Date(a.createdAt);
         } else if (sortOption === 'executionTime') {
             return a.time - b.time;
         } else if (sortOption === 'memoryUsage') {

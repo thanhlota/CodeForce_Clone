@@ -1,11 +1,11 @@
 
-const codes = require("./sortingArray.js");
+const codes = require("./fibonnaci");
 
 // URL của API chấm bài
 const apiURL = 'http://192.168.172.82:8000/submissions/api/submission/submit';
 
 // Access token của bạn
-const accessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImJvcm50b2JlYWd5bWVyN0BnbWFpbC5jb20iLCJpZCI6MSwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzE5Njc2ODE4LCJleHAiOjE3MTk3NjMyMTh9.OO_zCWv2rNLsZQffB8YZKbx1WbfHm95Qt7VMN0DJIwM';
+const accessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImJvcm50b2JlYWd5bWVyN0BnbWFpbC5jb20iLCJpZCI6MSwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzIwNjQyOTkyLCJleHAiOjE3MjA3MjkzOTJ9.FJs3tnKGFrDr7NvAmCVPwKZyyafLW3NQcMUXo69jLD4';
 
 // Hàm để gửi request
 async function sendRequest(language, code) {
@@ -18,7 +18,8 @@ async function sendRequest(language, code) {
         credentials: 'include',
         body: JSON.stringify({
             user_id: 1,
-            problem_id: 16,
+            user_name: "admin",
+            problem_id: 14,
             contest_id: 1,
             language: language,
             code: code,
@@ -30,7 +31,7 @@ async function sendRequest(language, code) {
     console.log(`Response for ${language}:`, data);
 }
 
-const languages = ['C++', 'C', 'JAVA'];
+const languages = ['C++', 'C++', 'C++', 'C++', 'C', 'C', 'JAVA', 'JAVA'];
 let languageIndex = 0;
 
 // Hàm để gửi yêu cầu theo chu kỳ
@@ -46,7 +47,7 @@ async function sendRequests() {
     setTimeout(async () => {
         clearInterval(interval);
         console.log('Test completed.');
-    }, 10 * 1000);
+    }, 60 * 1000);
 }
 
 // Bắt đầu gửi yêu cầu

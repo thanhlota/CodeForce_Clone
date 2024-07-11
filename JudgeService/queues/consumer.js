@@ -28,7 +28,7 @@ class Consumer {
             const queue = await judgeChannel.assertQueue(QUEUE, { duration: true });
             this.setQueue(queue);
 
-            judgeChannel.prefetch(8);
+            judgeChannel.prefetch(16);
             console.log(' [x] Awaiting RPC requests');
         }
         catch (e) {

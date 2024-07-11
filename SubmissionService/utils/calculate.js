@@ -1,7 +1,6 @@
 const { submissions, results } = require('../models');
 const { Op, fn, col } = require('sequelize');
 
-
 async function calculateAverageRunTime() {
     const _results = await results.findAll({
         attributes: [
