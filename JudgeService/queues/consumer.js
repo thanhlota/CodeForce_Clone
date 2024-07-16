@@ -4,7 +4,7 @@ const amqp = require('amqplib');
 const QUEUE = 'jobs';
 const Job = require("../factory/jobs");
 const Factory = require("../factory");
-const Publisher = require("./publisher");
+const Publisher = require("./publisher"); 
 class Consumer {
     static instance = null;
     channel = null;
@@ -28,7 +28,8 @@ class Consumer {
             const queue = await judgeChannel.assertQueue(QUEUE, { duration: true });
             this.setQueue(queue);
 
-            judgeChannel.prefetch(16);
+            // judgeChannel.prefetch(16);
+            
             console.log(' [x] Awaiting RPC requests');
         }
         catch (e) {

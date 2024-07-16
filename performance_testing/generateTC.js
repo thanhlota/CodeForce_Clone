@@ -27,8 +27,8 @@ function createRandomTestCase(inputFilePath, outputFilePath, length, max) {
 }
 
 
-const length = 1000000;
-const max = 1000000000;
+const length = 10000;
+const max = 10;
 const inputFilePath = `input_${length}.txt`;
 const outputFilePath = `output_${length}.txt`;
 createRandomTestCase(inputFilePath, outputFilePath, length, max);

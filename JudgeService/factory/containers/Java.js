@@ -10,11 +10,12 @@ const {
   buildConfig,
 } = require("../../configs/container/java.config.js");
 const CodeError = require("../../enum/CodeError.js");
+const { v4: uuidv4 } = require('uuid');
 
 class JAVA extends Lang {
   constructor(mem, time, code, input) {
     super(mem, time, code, input);
-    this.id = Date.now().toString(36);
+    this.id = uuidv4();
     this.vm = null;
     this.inPath = "Main.java";
     this.outPath = "Main";
@@ -152,9 +153,6 @@ class JAVA extends Lang {
                 this.setExitCode(CodeError.COMPILE_ERROR);
                 reject({ message: error });
               } else {
-                const stats = await this.vm.stats({ stream: false });
-                this.setCpuUsage(stats.cpu_stats.cpu_usage.total_usage);
-                this.setMemUsage(stats.memory_stats.usage);
                 console.log("Compile successfully!");
                 resolve(true);
               }
@@ -174,6 +172,10 @@ class JAVA extends Lang {
       STATS EXEC
       */
       try {
+        const stats = await this.vm.stats({ stream: false });
+        this.setCpuUsage(stats.cpu_stats.cpu_usage.total_usage);
+        this.setMemUsage(stats.memory_stats.usage);
+
         const statsStream = await this.vm.stats({ stream: true });
         this.setInfoStream(statsStream);
         statsStream.on("data", (data) => {

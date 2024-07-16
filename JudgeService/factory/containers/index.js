@@ -17,7 +17,7 @@ class Lang {
     this.mem = mem;
     this.time = time;
     this.code = code;
-    this.input = input;
+    this.input = input; 
   }
 
   createContainer() {}

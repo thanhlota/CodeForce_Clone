@@ -3,8 +3,7 @@ const CPlusPlusWorker = require("./workers/C++.js");
 const JavaWorker = require("./workers/Java.js");
 const WorkerState = require("../enum/WorkerState.js");
 const Language = require("../enum/Language.js");
-const WorkerConfig = require("../configs/worker.config.js");
-
+const WorkerConfig = require("../configs/worker.config.js"); 
 class Factory {
   static instance = null;
   static workers = [];
@@ -12,6 +11,7 @@ class Factory {
   constructor() { }
 
   distributeWorker(job) {
+    console.log('fck', Factory.workers.length);
     let worker = this.checkAvailableWorker(job);
     if (worker) {
       console.log('available worker');
